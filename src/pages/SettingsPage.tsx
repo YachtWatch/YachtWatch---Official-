@@ -1,18 +1,28 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Switch } from '../components/ui/switch';
-import { ArrowLeft, Moon, Sun, Bell, Ship } from 'lucide-react';
+import { ArrowLeft, Moon, Sun, Bell, Ship, Globe } from 'lucide-react';
 import { useTheme } from '../components/theme-provider';
 
 import { useAuth } from '../contexts/AuthContext';
 import { useData } from '../contexts/DataContext';
+import { NotificationService } from '../services/NotificationService';
+
+function formatOffset(tz: string): string {
+    try {
+        const parts = new Intl.DateTimeFormat('en', { timeZone: tz, timeZoneName: 'shortOffset' }).formatToParts(new Date());
+        return parts.find(p => p.type === 'timeZoneName')?.value.replace('GMT', 'UTC') ?? tz;
+    } catch { return tz; }
+}
 
 export default function SettingsPage() {
     const navigate = useNavigate();
     const { user, updateUser, deleteAccount } = useAuth();
     const { getVessel, updateVesselSettings, updateUserInStore } = useData();
     const { theme, setTheme } = useTheme();
+    const [notifying, setNotifying] = useState(false);
 
     const vessel = user?.vesselId ? getVessel(user.vesselId) : undefined;
     const isCaptain = user?.role === 'captain';
@@ -150,6 +160,50 @@ export default function SettingsPage() {
                 {isCaptain && vessel && (
                     <div className="space-y-4">
                         <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider pl-1">Vessel Settings</h2>
+
+                        <Card>
+                            <CardHeader>
+                                <div className="flex items-center gap-2">
+                                    <Globe className="h-5 w-5 text-primary" />
+                                    <CardTitle className="text-lg">Vessel Timezone</CardTitle>
+                                </div>
+                                <CardDescription>All crew must have their phone set to this timezone</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                <div className="flex items-center justify-between rounded-lg border px-4 py-3">
+                                    <div>
+                                        <div className="font-medium">{formatOffset(vessel.timezone)}</div>
+                                        <div className="text-xs text-muted-foreground">{vessel.timezone}</div>
+                                    </div>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={async () => {
+                                            const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                                            await updateVesselSettings(vessel.id, { timezone: tz });
+                                        }}
+                                    >
+                                        Set to my device
+                                    </Button>
+                                </div>
+                                <Button
+                                    variant="default"
+                                    className="w-full"
+                                    disabled={notifying}
+                                    onClick={async () => {
+                                        setNotifying(true);
+                                        await NotificationService.triggerPushNotification('timezone_updated', {
+                                            vesselId: vessel.id,
+                                            timezone: vessel.timezone,
+                                        });
+                                        setNotifying(false);
+                                    }}
+                                >
+                                    {notifying ? 'Sending…' : 'Notify crew to update timezone'}
+                                </Button>
+                            </CardContent>
+                        </Card>
+
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <div className="space-y-1">

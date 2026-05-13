@@ -1,4 +1,7 @@
 import { LocalNotifications } from '@capacitor/local-notifications';
+import { PushNotifications } from '@capacitor/push-notifications';
+import { Capacitor } from '@capacitor/core';
+import { supabase } from '../lib/supabase';
 import { WatchSchedule } from '../contexts/DataContext';
 
 export const NotificationService = {
@@ -38,6 +41,58 @@ export const NotificationService = {
         const date = new Date();
         date.setHours(hours, minutes, 0, 0);
         return date;
+    },
+
+    async registerPushNotifications() {
+        if (!Capacitor.isNativePlatform()) {
+            console.log('[Push] Skipping push registration on web.');
+            return;
+        }
+
+        let permStatus = await PushNotifications.checkPermissions();
+        if (permStatus.receive === 'prompt') {
+            permStatus = await PushNotifications.requestPermissions();
+        }
+
+        if (permStatus.receive !== 'granted') {
+            console.warn('[Push] Push notification permission denied.');
+            return;
+        }
+
+        await PushNotifications.register();
+        console.log('[Push] Registered with APNs.');
+
+        // Remove any existing listeners to avoid duplicates on re-mount
+        await PushNotifications.removeAllListeners();
+
+        PushNotifications.addListener('registration', async token => {
+            console.log('[Push] Device token received:', token.value);
+            // Save token to the user's profile so database triggers can find it
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                const { error } = await supabase
+                    .from('profiles')
+                    .update({ push_token: token.value })
+                    .eq('id', user.id);
+                if (error) {
+                    console.error('[Push] Failed to save device token to profile:', error.message);
+                } else {
+                    console.log('[Push] Device token saved to profile.');
+                }
+            }
+        });
+
+        PushNotifications.addListener('registrationError', error => {
+            console.error('[Push] APNs registration failed:', error);
+        });
+
+        PushNotifications.addListener('pushNotificationReceived', notification => {
+            console.log('[Push] Notification received in foreground:', notification.title, notification.body);
+        });
+
+        PushNotifications.addListener('pushNotificationActionPerformed', action => {
+            console.log('[Push] User tapped notification:', action.notification.title);
+        });
     },
 
     async scheduleWatchReminders(schedule: WatchSchedule, userId: string, reminder1: number, reminder2: number) {
@@ -115,6 +170,21 @@ export const NotificationService = {
                 console.error("Failed to schedule notifications", e);
             }
         }
+    },
+
+    async triggerPushNotification(event: string, params: { targetUserId?: string; vesselId?: string; timezone?: string }) {
+        if (!Capacitor.isNativePlatform()) return;
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return;
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+        fetch(`${supabaseUrl}/functions/v1/notify`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session.access_token}`,
+            },
+            body: JSON.stringify({ event, ...params }),
+        }).catch(e => console.error('[Push] Failed to trigger notification:', e));
     },
 
     async sendLocalAlert(title: string, body: string) {

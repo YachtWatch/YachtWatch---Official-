@@ -9,14 +9,12 @@ export function useNotifications() {
     const { schedules, refreshData } = useData();
     const activeSchedule = user?.vesselId ? schedules.find(s => s.vesselId === user.vesselId) : undefined;
 
-    // 1. Check Permissions on mount
+    // 1. Register for local + push notifications on mount
     useEffect(() => {
-        NotificationService.checkPermissions().then(granted => {
-            if (!granted) {
-                // Optionally request? Better to do this on user action or specific setting page
-                // NotificationService.requestPermissions();
-            }
+        NotificationService.requestPermissions().then(granted => {
+            console.log(`[Notifications] Local notification permission granted: ${granted}`);
         });
+        NotificationService.registerPushNotifications();
     }, []);
 
     // 2. Watch Reminders

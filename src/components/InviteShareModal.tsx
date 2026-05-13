@@ -12,7 +12,7 @@ interface InviteShareModalProps {
     joinCode?: string | null;
 }
 
-const APP_LINK = 'https://yachtwatch.app';
+const APP_LINK = 'https://join.yachtwatch.co';
 const isWeb = !Capacitor.isNativePlatform();
 
 export function InviteShareModal({ isOpen, onClose, joinCode }: InviteShareModalProps) {

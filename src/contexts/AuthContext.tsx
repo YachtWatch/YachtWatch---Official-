@@ -189,7 +189,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     { data: secureData },
                     { data: ownedVessel }
                 ] = await Promise.all([
-                    supabase.from('vessel_members').select('vessel_id, role').eq('user_id', userId).order('joined_at', { ascending: false }).limit(1).maybeSingle(),
+                    supabase.from('vessel_members').select('vessel_id, role').eq('user_id', userId).limit(1).maybeSingle(),
                     supabase.from('crew_secure_data').select('passport_number, date_of_birth').eq('user_id', userId).maybeSingle(),
                     supabase.from('vessels').select('id').eq('captain_id', userId).order('created_at', { ascending: false }).limit(1).maybeSingle()
                 ]);

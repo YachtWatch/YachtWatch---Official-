@@ -1,3 +1,4 @@
+import { TimezoneWarningBanner } from '../../components/TimezoneWarningBanner';
 import { useState, useMemo } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { SailboatLoader } from '../../components/SailboatLoader';
@@ -88,7 +89,8 @@ export default function CaptainDashboard() {
             type: vesselType,
             capacity: Number(vesselCapacity),
             checkInEnabled: true,
-            checkInInterval: 15
+            checkInInterval: 15,
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         });
 
         if (newVessel) {
@@ -151,7 +153,7 @@ export default function CaptainDashboard() {
     if (!vessel) {
         // Double check: if user has a vesselId but we can't find it, it might still be loading or it was deleted.
         // But since we checked 'loading' above, if we are here and have vesselId but no vessel, it's an error state (or deleted).
-        if (user?.vesselId) {
+        if (user?.vesselId && initialLoadComplete) {
             return (
                 <div className="container max-w-md mx-auto py-12 px-4 text-center">
                     <Card>
@@ -247,6 +249,7 @@ export default function CaptainDashboard() {
                     </div>
                 </div>
             </header>
+            <TimezoneWarningBanner />
 
             <main className="container mx-auto px-4 py-6 pb-24">
                 <div className="flex flex-col gap-6">

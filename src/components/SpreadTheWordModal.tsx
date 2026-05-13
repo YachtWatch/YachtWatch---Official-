@@ -12,7 +12,7 @@ interface SpreadTheWordModalProps {
     onClose: () => void;
 }
 
-const APP_LINK = 'https://yachtwatch.app';
+const APP_LINK = 'https://join.yachtwatch.co';
 
 const WHATSAPP_MESSAGE =
     `Hey! I've been using YachtWatch to manage watches and crew onboard — it's a game changer 🛥️ Check it out: ${APP_LINK}`;

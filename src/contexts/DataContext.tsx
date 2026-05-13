@@ -12,6 +12,7 @@ export interface Vessel {
     joinCode: string;
     checkInEnabled: boolean;
     checkInInterval: number;
+    timezone: string;
 }
 
 export interface JoinRequest {
@@ -114,6 +115,7 @@ interface SupabaseVessel {
     join_code: string;
     check_in_enabled: boolean;
     check_in_interval?: number;
+    timezone?: string;
 }
 
 interface SupabaseJoinRequest {
@@ -173,7 +175,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
         capacity: v.capacity,
         joinCode: v.join_code,
         checkInEnabled: v.check_in_enabled,
-        checkInInterval: v.check_in_interval || 15
+        checkInInterval: v.check_in_interval || 15,
+        timezone: v.timezone || 'UTC',
     });
 
     const mapRequest = (r: SupabaseJoinRequest): JoinRequest => ({
@@ -383,7 +386,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
             setUsers(usersWithVessels);
 
-            const { data: vData } = await supabase.from('vessels').select('id, captain_id, name, length, type, capacity, join_code, check_in_enabled, check_in_interval, created_at');
+            const { data: vData } = await supabase.from('vessels').select('id, captain_id, name, length, type, capacity, join_code, check_in_enabled, check_in_interval, timezone, created_at');
             const newVessels = vData ? (vData as SupabaseVessel[]).map(mapVessel) : [];
             if (vData) setVessels(newVessels);
 
@@ -460,7 +463,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
         // Check if I am a crew member of this vessel
-        const { data: profileVessel } = await supabase.from('vessel_members').select('vessel_id').eq('user_id', user.id).order('joined_at', { ascending: false }).limit(1).maybeSingle();
+        const { data: profileVessel } = await supabase.from('vessel_members').select('vessel_id').eq('user_id', user.id).limit(1).maybeSingle();
         if (profileVessel && profileVessel.vessel_id === sch.vesselId) {
             NotificationService.sendLocalAlert('New Watch Schedule', `A new schedule "${sch.name}" has been published.`);
         }
@@ -517,7 +520,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
                 const updatedSchedule = payload.new;
                 // Check if I am a crew member of this vessel (or the captain)
-                const { data: profileVessel } = await supabase.from('vessel_members').select('vessel_id').eq('user_id', user.id).order('joined_at', { ascending: false }).limit(1).maybeSingle();
+                const { data: profileVessel } = await supabase.from('vessel_members').select('vessel_id').eq('user_id', user.id).limit(1).maybeSingle();
 
                 if (profileVessel && profileVessel.vessel_id === updatedSchedule.vessel_id) {
                     NotificationService.sendLocalAlert('Schedule Updated', `The schedule "${updatedSchedule.name}" has been updated.`);
@@ -661,7 +664,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         // 2. Strict Verify: Read it back immediately
         const { data: verifyData, error: verifyError } = await supabase
             .from('vessels')
-            .select('id, captain_id, name, length, type, capacity, join_code, check_in_enabled, check_in_interval, created_at')
+            .select('id, captain_id, name, length, type, capacity, join_code, check_in_enabled, check_in_interval, timezone, created_at')
             .eq('id', tempId)
             .single();
 
@@ -697,7 +700,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         // might not contain vessels the user isn't a member of.
         if (!vessel) {
             console.log(`[JoinReq] Code ${cleanCode} not in local cache, querying server...`);
-            const { data, error } = await supabase.from('vessels').select('id, captain_id, name, length, type, capacity, join_code, check_in_enabled, check_in_interval, created_at').eq('join_code', cleanCode).maybeSingle();
+            const { data, error } = await supabase.from('vessels').select('id, captain_id, name, length, type, capacity, join_code, check_in_enabled, check_in_interval, timezone, created_at').eq('join_code', cleanCode).maybeSingle();
 
             if (error) {
                 console.error("❌ Join Request Vessel Lookup Failed:", error);
@@ -739,9 +742,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
         const { error } = await supabase.from('join_requests').update({ status }).eq('id', requestId);
         if (error) throw error;
 
-        if (status === 'approved') {
-            const request = requests.find(r => r.id === requestId);
-            if (request) {
+        const request = requests.find(r => r.id === requestId);
+        if (request) {
+            if (status === 'approved') {
                 const { error: insertError } = await supabase
                     .from('vessel_members')
                     .upsert({
@@ -789,7 +792,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
             alert("Failed to publish schedule. Please try again.");
             return;
         }
-
 
         await refreshData();
     };
@@ -1002,6 +1004,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         if (updates.capacity) dbUpdates.capacity = updates.capacity;
         if (updates.checkInEnabled !== undefined) dbUpdates.check_in_enabled = updates.checkInEnabled;
         if (updates.checkInInterval) dbUpdates.check_in_interval = updates.checkInInterval;
+        if (updates.timezone) dbUpdates.timezone = updates.timezone;
 
         await supabase.from('vessels').update(dbUpdates).eq('id', vesselId);
         await refreshData();

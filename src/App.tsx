@@ -82,6 +82,7 @@ function App() {
                             <div className="min-h-screen bg-background text-foreground font-sans antialiased">
                                 <BrowserRouter>
                                     <OfflineBanner />
+                                   
                                     <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-background"><SailboatLoader /></div>}>
                                         <Routes>
                                             <Route path="/" element={<RootRedirect />} />

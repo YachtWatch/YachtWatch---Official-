@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { TimezoneWarningBanner } from '../../components/TimezoneWarningBanner';
+import { useState, useMemo, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useData } from '../../contexts/DataContext';
 import { Button } from '../../components/ui/button';
@@ -11,6 +12,7 @@ import { SailboatLoader } from '../../components/SailboatLoader';
 import { CrewScheduleView } from './CrewScheduleView';
 import { CrewListView } from './CrewListView';
 import { useWatchLogic } from '../../hooks/useWatchLogic';
+import { App as CapApp } from '@capacitor/app';
 // import { getCurrentSlot, getTimeRemaining } from '../../lib/time-utils'; // Not used with new local logic
 
 const formatTime = (isoString: string) => {
@@ -30,16 +32,33 @@ const formatTime = (isoString: string) => {
 
 export default function CrewDashboard() {
     const { user, logout } = useAuth();
-    const { requestJoin, getCrewVessel, getPendingRequest, getVessel, getSchedule, checkInToWatch, users, refreshData, loading, initialLoadComplete } = useData();
+    const { requestJoin, getCrewVessel, getPendingRequest, getVessel, getSchedule, checkInToWatch, users, requests, refreshData, loading, initialLoadComplete } = useData();
     const [joinCode, setJoinCode] = useState('');
     // const [selectedPosition, setSelectedPosition] = useState(''); // Removed per user request
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [submitting, setSubmitting] = useState(false);
     const [activeTab, setActiveTab] = useState<'dashboard' | 'schedule' | 'crew'>('dashboard');
+    useEffect(() => {
+  const path = window.location.pathname;
+  const match = path.match(/\/join\/([A-Z0-9]+)/i);
+  if (match) setJoinCode(match[1].toUpperCase());
+
+  const listener = CapApp.addListener('appUrlOpen', (event) => {
+    const url = new URL(event.url);
+    const code = url.pathname.replace('/join/', '').toUpperCase();
+    if (code) setJoinCode(code);
+  });
+
+  return () => { listener.then(l => l.remove()); };
+}, []);
 
     const approvedVessel = user ? getCrewVessel(user.id) : undefined;
     const pendingRequest = user ? getPendingRequest(user.id) : undefined;
+    // True if the user has an approved request but the vessel isn't readable yet
+    // (happens when vessel_members is missing → RLS blocks vessel read)
+    const approvedButVesselMissing = !approvedVessel && !pendingRequest
+        && requests.some(r => r.userId === user?.id && r.status === 'approved');
 
     const activeVessel = approvedVessel;
     const schedule = activeVessel ? getSchedule(activeVessel.id) : undefined;
@@ -98,6 +117,17 @@ export default function CrewDashboard() {
     // Without this guard, a background data refresh can briefly show "Join a Vessel" before the
     // requests/vessels data repopulates, creating a false redirect.
     if (loading && (!initialLoadComplete || !activeVessel)) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-background">
+                <SailboatLoader />
+            </div>
+        );
+    }
+
+    // Approved but vessel not readable (vessel_members entry missing → RLS blocks vessel).
+    // Trigger a refresh to self-heal once the DB is fixed, rather than showing the join page.
+    if (approvedButVesselMissing) {
+        refreshData();
         return (
             <div className="min-h-screen flex items-center justify-center bg-background">
                 <SailboatLoader />
@@ -204,6 +234,7 @@ export default function CrewDashboard() {
                     </div>
                 </div>
             </header>
+            <TimezoneWarningBanner />
 
             <main className="container mx-auto px-4 py-6 pb-24">
 

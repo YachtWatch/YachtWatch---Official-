@@ -13,32 +13,29 @@ const CustomPaywall: React.FC<CustomPaywallProps> = ({ onClose }) => {
     const [billingInterval, setBillingInterval] = useState<'monthly' | 'annual'>('annual');
     const [selectedTier, setSelectedTier] = useState<string | null>('6-10'); // Default to most popular
 
-    // Mock Tier Data structure to match the design.
-    // In a real scenario, we would map this to RevenueCat package identifiers.
+    // Tiers mapped to actual RevenueCat package identifiers from the "default" offering.
+    // Packages: monthly_5, monthly_10, yearly_5, yearly_10
     const tiers = [
         {
             id: '1-5',
             name: '1-5 CREW',
-            price: { monthly: 29, annual: 299 }, // Annual usually discounted
-            monthlyPriceDisplay: 29,
-            rcPackageIdMonthly: 'crew_1_5_monthly', // Example RC identifiers
-            rcPackageIdAnnual: 'crew_1_5_annual',
+            price: { monthly: 5, annual: 5 },
+            rcPackageIdMonthly: 'monthly_5',
+            rcPackageIdAnnual: 'yearly_5',
         },
         {
             id: '6-10',
             name: '6-10 CREW',
-            price: { monthly: 89, annual: 890 },
-            monthlyPriceDisplay: 89,
+            price: { monthly: 10, annual: 10 },
             isPopular: true,
-            rcPackageIdMonthly: 'crew_6_10_monthly',
-            rcPackageIdAnnual: 'crew_6_10_annual',
+            rcPackageIdMonthly: 'monthly_10',
+            rcPackageIdAnnual: 'yearly_10',
         },
         {
             id: '11+',
             name: '11+ CREW',
             customPrice: 'Contact Us',
             price: { monthly: 0, annual: 0 },
-            monthlyPriceDisplay: 0,
             rcPackageIdMonthly: '',
             rcPackageIdAnnual: '',
         }
@@ -55,17 +52,17 @@ const CustomPaywall: React.FC<CustomPaywallProps> = ({ onClose }) => {
             return;
         }
 
-        // Try to find the matching RevenueCat package
         const targetPackageId = billingInterval === 'monthly' ? tier.rcPackageIdMonthly : tier.rcPackageIdAnnual;
+        console.log(`[Paywall] Selected tier: ${tier.name} | Billing: ${billingInterval} | Target package: ${targetPackageId}`);
+
         const packageToPurchase = offerings.find(pkg => pkg.identifier === targetPackageId);
 
         if (packageToPurchase) {
+            console.log(`[Paywall] Package found — sending to RevenueCat: ${packageToPurchase.identifier}`);
             await purchasePackage(packageToPurchase);
-            onClose(); // Close on success? Or wait for effect to close based on subscription status?
+            onClose();
         } else {
-            console.warn(`No RevenueCat package found for ${targetPackageId}.Simulating purchase for UI demo.`);
-            // For demo purposes or if RC isn't set up, we might just close or alert
-            // alert("Purchase simulation: Real purchase requires matching RevenueCat configuration.");
+            console.warn(`[Paywall] No RevenueCat package found for identifier "${targetPackageId}". Available packages: ${offerings.map(p => p.identifier).join(', ')}`);
         }
     };
 
@@ -162,12 +159,32 @@ const CustomPaywall: React.FC<CustomPaywallProps> = ({ onClose }) => {
                                 <div className="flex items-center h-[44px] mb-1">
                                     <span className="text-2xl font-bold text-slate-900">{(tier as any).customPrice}</span>
                                 </div>
-                            ) : (
-                                <div className="flex items-baseline mb-1">
-                                    <span className="text-3xl font-bold text-slate-900">${billingInterval === 'monthly' ? tier.price.monthly : Math.round(tier.price.annual / 12)}</span>
-                                    <span className="text-xs text-slate-500 ml-1">/mo</span>
-                                </div>
-                            )}
+                            ) : (() => {
+                                const rcId = billingInterval === 'monthly' ? tier.rcPackageIdMonthly : tier.rcPackageIdAnnual;
+                                const rcPkg = offerings.find(p => p.identifier === rcId);
+                                if (rcPkg) {
+                                    const isAnnual = billingInterval === 'annual';
+                                    const perMonthPrice = isAnnual
+                                        ? `$${(rcPkg.product.price / 12).toFixed(2)}`
+                                        : rcPkg.product.priceString;
+                                    return (
+                                        <div className="flex flex-col items-center mb-1">
+                                            <div className="flex items-baseline">
+                                                <span className="text-3xl font-bold text-slate-900">{perMonthPrice}</span>
+                                                <span className="text-xs text-slate-500 ml-1">/mo</span>
+                                            </div>
+                                            {isAnnual && (
+                                                <span className="text-[10px] text-slate-400">{rcPkg.product.priceString}/yr</span>
+                                            )}
+                                        </div>
+                                    );
+                                }
+                                return (
+                                    <div className="flex items-baseline mb-1 h-[44px]">
+                                        <span className="text-slate-400 text-sm">Loading...</span>
+                                    </div>
+                                );
+                            })()}
 
                             <div className="text-[10px] text-slate-400 mb-4 italic">
                                 {(tier as any).customPrice ? 'Custom enterprise plan' : (billingInterval === 'monthly' ? 'Billed monthly' : 'Billed annually')}
@@ -193,11 +210,32 @@ const CustomPaywall: React.FC<CustomPaywallProps> = ({ onClose }) => {
                         className="w-full text-lg font-semibold bg-slate-700 hover:bg-slate-800 text-white py-6 h-auto"
                         onClick={handleSubscribe}
                     >
-                        {selectedTier && tiers.find(t => t.id === selectedTier) && (tiers.find(t => t.id === selectedTier) as any).customPrice ? 'Contact Sales' : 'Get Started'}
+                        {selectedTier && tiers.find(t => t.id === selectedTier) && (tiers.find(t => t.id === selectedTier) as any).customPrice ? 'Contact Sales' : 'Continue'}
                     </Button>
+                    <p className="text-center text-[11px] text-slate-400 mt-2">
+                        Cancel anytime. Subscription renews automatically unless cancelled.
+                    </p>
                     <div className="flex items-center justify-center gap-2 mt-4 text-xs text-slate-400 uppercase tracking-widest">
                         <Lock className="h-3 w-3" />
                         Secure & Encrypted Payments
+                    </div>
+                    <div className="flex items-center justify-center gap-4 mt-3">
+                        <a
+                            href="https://www.apple.com/legal/internet-services/itunes/dev/stdeula/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[11px] text-slate-400 underline hover:text-slate-600 transition-colors"
+                        >
+                            Terms of Use
+                        </a>
+                        <a
+                            href="https://yachtwatch.co/privacy-policy"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[11px] text-slate-400 underline hover:text-slate-600 transition-colors"
+                        >
+                            Privacy Policy
+                        </a>
                     </div>
                 </div>
             </div>

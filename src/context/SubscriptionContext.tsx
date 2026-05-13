@@ -23,31 +23,42 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
     useEffect(() => {
         const init = async () => {
             if (Capacitor.getPlatform() === 'web') {
-                console.log('RevenueCat is not supported on web. Mocking or skipping initialization.');
+                console.log('[RevenueCat] Web platform detected — skipping initialization.');
                 setLoading(false);
                 return;
             }
 
             try {
-                if (Capacitor.getPlatform() === 'ios') {
+                const platform = Capacitor.getPlatform();
+                if (platform === 'ios') {
                     await Purchases.configure({ apiKey: 'appl_TxXCVVHhofCaDGcrSSspCfRbEGF' });
-                } else if (Capacitor.getPlatform() === 'android') {
+                    console.log('[RevenueCat] Initialized on iOS.');
+                } else if (platform === 'android') {
                     await Purchases.configure({ apiKey: import.meta.env.REVENUECAT_API_KEY_GOOGLE });
+                    console.log('[RevenueCat] Initialized on Android.');
                 }
 
                 await Purchases.setLogLevel({ level: import.meta.env.DEV ? LOG_LEVEL.DEBUG : LOG_LEVEL.ERROR });
 
-                // Purchases.getCustomerInfo() returns { customerInfo: ... }
                 const { customerInfo } = await Purchases.getCustomerInfo();
                 setCurrentCustomerInfo(customerInfo);
                 updateSubscriptionStatus(customerInfo);
+                const isPro = customerInfo.entitlements.active['pro'] !== undefined;
+                console.log(`[RevenueCat] Customer info loaded. Entitlement "pro" active: ${isPro}`);
 
                 const offerings = await Purchases.getOfferings();
                 if (offerings.current && offerings.current.availablePackages.length !== 0) {
-                    setOfferings(offerings.current.availablePackages);
+                    const pkgs = offerings.current.availablePackages;
+                    setOfferings(pkgs);
+                    console.log(`[RevenueCat] Offerings loaded — ${pkgs.length} package(s) in current offering:`);
+                    pkgs.forEach(pkg => {
+                        console.log(`  → [${pkg.identifier}] ${pkg.product.title} — ${pkg.product.priceString}`);
+                    });
+                } else {
+                    console.warn('[RevenueCat] No packages found in current offering.');
                 }
             } catch (error) {
-                console.error('Error initializing RevenueCat', error);
+                console.error('[RevenueCat] Initialization error:', error);
             } finally {
                 setLoading(false);
             }
@@ -57,31 +68,38 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }, []);
 
     const updateSubscriptionStatus = (customerInfo: CustomerInfo) => {
-        // Replace 'pro' with your actual entitlement identifier
-        // active is an object where keys are entitlement identifiers
         const isPro = customerInfo.entitlements.active['pro'] !== undefined;
         setIsSubscribed(isPro);
+        console.log(`[RevenueCat] Subscription status updated — "pro" entitlement active: ${isPro}`);
     };
 
     const purchasePackage = async (pkg: PurchasesPackage) => {
+        console.log(`[RevenueCat] Attempting purchase of package: ${pkg.identifier}`);
         try {
             const { customerInfo } = await Purchases.purchasePackage({ aPackage: pkg });
             setCurrentCustomerInfo(customerInfo);
             updateSubscriptionStatus(customerInfo);
+            const isPro = customerInfo.entitlements.active['pro'] !== undefined;
+            console.log(`[RevenueCat] Purchase SUCCESS — package: ${pkg.identifier} | "pro" entitlement active: ${isPro}`);
         } catch (error: any) {
-            if (!error.userCancelled) {
-                console.error('Error purchasing package', error);
+            if (error.userCancelled) {
+                console.log('[RevenueCat] Purchase cancelled by user.');
+            } else {
+                console.error(`[RevenueCat] Purchase FAILED — package: ${pkg.identifier}`, error);
             }
         }
     };
 
     const restorePurchases = async () => {
+        console.log('[RevenueCat] Attempting to restore purchases...');
         try {
             const { customerInfo } = await Purchases.restorePurchases();
             setCurrentCustomerInfo(customerInfo);
             updateSubscriptionStatus(customerInfo);
+            const isPro = customerInfo.entitlements.active['pro'] !== undefined;
+            console.log(`[RevenueCat] Restore SUCCESS — "pro" entitlement active: ${isPro}`);
         } catch (error) {
-            console.error('Error restoring purchases', error);
+            console.error('[RevenueCat] Restore FAILED:', error);
         }
     };
 

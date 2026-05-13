@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { ScheduleMatrixView } from '../../components/ScheduleMatrixView';
 import { WatchSchedule } from '../../contexts/DataContext';
-import { Calendar, Clock, Users } from 'lucide-react';
-import { Card } from '../../components/ui/card';
+import { Clock, Users, CheckCircle } from 'lucide-react';
+import { Card, CardContent } from '../../components/ui/card';
 import { Switch } from '../../components/ui/switch';
 
 
@@ -16,10 +16,23 @@ export function CrewScheduleView({ schedule, user }: CrewScheduleViewProps) {
 
     if (!schedule) {
         return (
-            <div className="p-8 text-center text-muted-foreground">
-                <Calendar className="mx-auto h-12 w-12 opacity-20 mb-4" />
-                <p>No schedule published yet.</p>
-            </div>
+            <Card className="max-w-md mx-auto text-center border shadow-sm">
+                <CardContent className="pt-10 pb-8 px-8 flex flex-col items-center gap-6">
+                    <div className="h-20 w-20 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-2">
+                        <Clock className="h-10 w-10 stroke-[1.5]" />
+                    </div>
+                    <div className="space-y-2">
+                        <h3 className="text-2xl font-bold text-foreground">Standby for Orders</h3>
+                        <p className="text-muted-foreground text-sm leading-relaxed max-w-xs mx-auto">
+                            Sit tight — your Captain is working on the next watch schedule. You'll be notified as soon as it's ready.
+                        </p>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground bg-accent/30 px-4 py-3 rounded-lg w-full max-w-xs justify-center">
+                        <CheckCircle className="h-4 w-4 text-primary/70 shrink-0" />
+                        <span>Push notifications are enabled for schedule updates</span>
+                    </div>
+                </CardContent>
+            </Card>
         );
     }
 
