@@ -135,12 +135,12 @@ export function generateSchedule(crew: CrewMember[], options: SchedulerOptions):
             }
         }
 
-        // Generate ISO string timestamps
+        // Generate ISO string timestamps (using UTC to ensure consistency across timezones)
         const slotStartDate = new Date(startDate);
-        slotStartDate.setHours(startTime, 0, 0, 0);
+        slotStartDate.setUTCHours(startTime, 0, 0, 0);
         
         const slotEndDate = new Date(startDate);
-        slotEndDate.setHours(endTime, 0, 0, 0);
+        slotEndDate.setUTCHours(endTime, 0, 0, 0);
 
         slots.push({
             id: i,
