@@ -2,6 +2,52 @@ import { createContext, useContext, useState, useEffect, useRef, ReactNode } fro
 import { supabase } from '../lib/supabase';
 
 import { NotificationService } from '../services/NotificationService';
+
+export type WatchType = 'anchor' | 'Navigation' | 'dock';
+
+export interface WatchConfig {
+    crewPerWatch: number;
+    duration: number;
+    startHour?: number;
+    endHour?: number;
+    isStaggered?: boolean;
+    watchLeaderCount?: number;
+}
+
+export const WATCH_TYPE_DEFAULTS: Record<WatchType, Partial<WatchConfig>> = {
+    'Navigation': {
+        crewPerWatch: 2,
+        duration: 4,
+        isStaggered: false,
+    },
+    'anchor': {
+        crewPerWatch: 1,
+        duration: 4,
+        startHour: 20,
+        endHour: 8,
+        isStaggered: false,
+    },
+    'dock': {
+        crewPerWatch: 1,
+        duration: 12,
+        startHour: 8,
+        endHour: 20,
+        isStaggered: false,
+    },
+};
+
+export function getWatchTypeDefaults(watchType: WatchType): WatchConfig {
+    const defaults = WATCH_TYPE_DEFAULTS[watchType];
+    return {
+        crewPerWatch: defaults.crewPerWatch || 2,
+        duration: defaults.duration || 4,
+        startHour: defaults.startHour,
+        endHour: defaults.endHour,
+        isStaggered: defaults.isStaggered || false,
+        watchLeaderCount: 0,
+    };
+}
+
 export interface Vessel {
     id: string;
     captainId: string;
@@ -29,16 +75,16 @@ export interface WatchSchedule {
     id: string;
     vesselId: string;
     name: string;
-    watchType: 'anchor' | 'Navigation' | 'dock';
+    watchType: WatchType;
     createdAt: string;
-    // New fields for generator meta-data
-    crewPerWatch?: number;
-    isStaggered?: boolean;
+    timezone: string;
+    watchConfig: WatchConfig;
     slots: {
         id: number;
         start: string;
         end: string;
         crew: { userId: string; userFirstName: string; userLastName: string; checkedInAt?: string }[];
+        condition?: 'always' | 'outside-watch-hours' | 'weekend-only';
     }[];
 }
 
@@ -132,14 +178,16 @@ interface SupabaseSchedule {
     id: string;
     vessel_id: string;
     name: string;
-    watch_type: 'anchor' | 'Navigation' | 'dock';
+    watch_type: WatchType;
     created_at: string;
+    timezone?: string;
+    watch_config?: WatchConfig;
     slots: {
         id: number;
         start: string;
         end: string;
         crew: { userId: string; userFirstName: string; userLastName: string; checkedInAt?: string }[];
-        condition?: 'always' | 'weekend-only';
+        condition?: 'always' | 'weekend-only' | 'outside-watch-hours';
     }[];
 }
 
@@ -195,6 +243,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
         name: s.name,
         watchType: s.watch_type,
         createdAt: s.created_at,
+        timezone: s.timezone || 'UTC',
+        watchConfig: s.watch_config || getWatchTypeDefaults(s.watch_type),
         slots: s.slots
     });
 
@@ -784,6 +834,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
             vessel_id: schedule.vesselId,
             name: schedule.name,
             watch_type: schedule.watchType,
+            timezone: schedule.timezone,
+            watch_config: schedule.watchConfig,
             slots: schedule.slots
         });
 

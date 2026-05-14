@@ -47,7 +47,7 @@ export const CaptainScheduleView = memo(function CaptainScheduleView({
                 fileName:     `${(schedule.name || 'WatchSchedule').replace(/[^a-zA-Z0-9 ]/g, '')}.pdf`,
                 scheduleName: schedule.name || 'Watch Schedule',
                 watchType:    schedule.watchType,
-                crewPerWatch: schedule.crewPerWatch || 0,
+                crewPerWatch: schedule.watchConfig.crewPerWatch || 0,
                 vesselName:   vessel?.name || 'Vessel',
                 vesselType:   vessel?.type || 'sail',
                 slots: schedule.slots.map((s: any) => ({
@@ -91,7 +91,7 @@ export const CaptainScheduleView = memo(function CaptainScheduleView({
         ? (new Date(firstSlot.end).getTime() - new Date(firstSlot.start).getTime()) / (1000 * 60 * 60)
         : 0;
 
-    const displayCrewPerWatch = schedule.crewPerWatch || (firstSlot ? firstSlot.crew.length : '-');
+    const displayCrewPerWatch = schedule.watchConfig.crewPerWatch || (firstSlot ? firstSlot.crew.length : '-');
 
     const handleDelete = () => {
         setShowDeleteConfirm(true);

@@ -50,7 +50,7 @@ const PickerTrigger = React.forwardRef<HTMLDivElement, { value?: string; onClick
 );
 
 export default function ScheduleGeneratorWizard() {
-    const { users, createSchedule, toggleWatchLeader } = useData();
+    const { users, createSchedule, toggleWatchLeader, vessels } = useData();
     const { user: currentUser } = useAuth();
     const { isSubscribed } = useSubscription();
     const navigate = useNavigate();
@@ -58,6 +58,9 @@ export default function ScheduleGeneratorWizard() {
 
     // Check for existing schedule to edit/remix
     const existingSchedule = location.state?.schedule as WatchSchedule | undefined;
+    
+    // Get current vessel
+    const currentVessel = currentUser?.vesselId ? vessels.find(v => v.id === currentUser.vesselId) : null;
 
     // STEPS: 1=Config, 2=Crew, 3=Preview
     const [step, setStep] = useState(1);
@@ -112,13 +115,13 @@ export default function ScheduleGeneratorWizard() {
     });
 
     const [crewPerWatch, setCrewPerWatch] = useState(() => {
-        if (existingSchedule?.crewPerWatch) return existingSchedule.crewPerWatch;
+        if (existingSchedule?.watchConfig?.crewPerWatch) return existingSchedule.watchConfig.crewPerWatch;
         if (existingSchedule && existingSchedule.slots.length > 0) {
             return existingSchedule.slots[0].crew.length;
         }
         return 1;
     });
-    const [isStaggered, setIsStaggered] = useState(existingSchedule?.isStaggered !== undefined ? existingSchedule.isStaggered : true);
+    const [isStaggered, setIsStaggered] = useState(existingSchedule?.watchConfig?.isStaggered !== undefined ? existingSchedule.watchConfig.isStaggered : true);
 
     // -- Step 2: Crew State --
     const [selectedCrewIds, setSelectedCrewIds] = useState<string[]>(() => {
@@ -221,8 +224,13 @@ export default function ScheduleGeneratorWizard() {
             name: scheduleName,
             watchType: watchType,
             createdAt: new Date().toISOString(),
-            crewPerWatch,
-            isStaggered,
+            timezone: currentVessel?.timezone || 'UTC',
+            watchConfig: {
+                crewPerWatch,
+                duration,
+                isStaggered,
+                watchLeaderCount: 0,
+            },
             slots
         };
 
