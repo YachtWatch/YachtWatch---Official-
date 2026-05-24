@@ -7,7 +7,7 @@ import { Input } from '../../components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { BottomTabs } from '../../components/ui/BottomTabs';
 import { ProfileDropdown } from '../../components/ui/ProfileDropdown';
-import { Anchor, Clock, Ship, CheckCircle, Sailboat, Users } from 'lucide-react';
+import { Anchor, Clock, Ship, CheckCircle, Sailboat, Users, ClipboardList, CheckSquare, Square } from 'lucide-react';
 import { SailboatLoader } from '../../components/SailboatLoader';
 import { CrewScheduleView } from './CrewScheduleView';
 import { CrewListView } from './CrewListView';
@@ -32,13 +32,15 @@ const formatTime = (isoString: string) => {
 
 export default function CrewDashboard() {
     const { user, logout } = useAuth();
-    const { requestJoin, getCrewVessel, getPendingRequest, getVessel, getSchedule, checkInToWatch, users, requests, refreshData, loading, initialLoadComplete } = useData();
+    const { requestJoin, getCrewVessel, getPendingRequest, getVessel, getSchedule, checkInToWatch, users, requests, refreshData, loading, initialLoadComplete, acknowledgeStandingOrders, completeStandingOrder } = useData();
     const [joinCode, setJoinCode] = useState('');
     // const [selectedPosition, setSelectedPosition] = useState(''); // Removed per user request
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [submitting, setSubmitting] = useState(false);
     const [activeTab, setActiveTab] = useState<'dashboard' | 'schedule' | 'crew'>('dashboard');
+    const [showStandingOrdersModal, setShowStandingOrdersModal] = useState(false);
+    const [ackSubmitting, setAckSubmitting] = useState(false);
     useEffect(() => {
   const path = window.location.pathname;
   const match = path.match(/\/join\/([A-Z0-9]+)/i);
@@ -62,6 +64,23 @@ export default function CrewDashboard() {
 
     const activeVessel = approvedVessel;
     const schedule = activeVessel ? getSchedule(activeVessel.id) : undefined;
+
+    // Show standing orders modal if crew hasn't acknowledged yet
+    useEffect(() => {
+        if (!schedule || !user) return;
+        const orders = schedule.standingOrders || [];
+        if (orders.length === 0) return;
+        const hasAcked = schedule.acknowledgments?.[user.id];
+        if (!hasAcked) setShowStandingOrdersModal(true);
+    }, [schedule?.id, user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    const handleAcknowledge = async () => {
+        if (!activeVessel || !user) return;
+        setAckSubmitting(true);
+        await acknowledgeStandingOrders(activeVessel.id, user.id);
+        setAckSubmitting(false);
+        setShowStandingOrdersModal(false);
+    };
 
     // Robustly get all approved crew:
     // DataContext already fetches exactly the Captain + Approved Crew for this specific vessel via RLS-safe queries.
@@ -437,6 +456,88 @@ export default function CrewDashboard() {
 
             </main>
             <BottomTabs activeTab={activeTab} onTabChange={setActiveTab} />
+
+            {/* Standing Orders Acknowledgment Modal */}
+            {showStandingOrdersModal && schedule && (
+                <div className="fixed inset-0 z-50 flex flex-col bg-background safe-area-pt">
+                    <div className="flex-1 overflow-y-auto p-6">
+                        <div className="flex items-center gap-3 mb-2">
+                            <ClipboardList className="h-6 w-6 text-primary flex-shrink-0" />
+                            <h1 className="text-2xl font-bold tracking-tight">Standing Orders</h1>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-6">
+                            Read the standing orders for <span className="font-semibold text-foreground">{schedule.name}</span> and acknowledge below before starting your first watch.
+                        </p>
+
+                        <div className="space-y-3 mb-8">
+                            {(schedule.standingOrders || []).map((order, i) => (
+                                <div key={order.id} className="rounded-xl border bg-card p-4">
+                                    <div className="flex gap-3">
+                                        <span className="h-6 w-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>
+                                        <div className="flex-1">
+                                            <p className="text-sm font-medium text-foreground leading-snug">{order.text}</p>
+                                            <div className="flex gap-3 mt-1.5">
+                                                {order.time && (
+                                                    <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                                        <Clock className="h-3 w-3" />{order.time} daily
+                                                    </span>
+                                                )}
+                                                {order.requiresCompletion && (
+                                                    <span className="text-xs text-primary font-medium">● Requires completion</span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="p-6 border-t bg-background safe-area-pb">
+                        <Button
+                            className="w-full h-12 text-base font-semibold bg-primary hover:bg-primary/90"
+                            onClick={handleAcknowledge}
+                            disabled={ackSubmitting}
+                        >
+                            {ackSubmitting ? 'Saving…' : 'I have read and acknowledge these orders'}
+                        </Button>
+                    </div>
+                </div>
+            )}
+
+            {/* Standing Orders completion section — shown on dashboard tab if orders require completion */}
+            {activeTab === 'dashboard' && schedule && (schedule.standingOrders || []).some(o => o.requiresCompletion) && schedule.acknowledgments?.[user?.id || ''] && (
+                <div className="fixed bottom-[80px] left-0 right-0 px-4">
+                    <div className="max-w-lg mx-auto">
+                        <Card className="shadow-lg border">
+                            <CardHeader className="pb-2 pt-4 px-4">
+                                <CardTitle className="text-sm flex items-center gap-2">
+                                    <ClipboardList className="h-4 w-4 text-primary" />
+                                    Standing Orders
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="px-4 pb-4 space-y-2">
+                                {(schedule.standingOrders || []).filter(o => o.requiresCompletion).map(order => {
+                                    const done = (schedule.orderCompletions?.[user?.id || ''] || []).includes(order.id);
+                                    return (
+                                        <button
+                                            key={order.id}
+                                            type="button"
+                                            onClick={() => activeVessel && user && !done && completeStandingOrder(activeVessel.id, user.id, order.id)}
+                                            className="w-full flex items-start gap-3 text-left"
+                                        >
+                                            {done
+                                                ? <CheckSquare className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                                                : <Square className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />}
+                                            <span className={`text-sm ${done ? 'line-through text-muted-foreground' : 'text-foreground'}`}>{order.text}</span>
+                                        </button>
+                                    );
+                                })}
+                            </CardContent>
+                        </Card>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
