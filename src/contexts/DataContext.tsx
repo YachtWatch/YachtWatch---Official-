@@ -2,6 +2,67 @@ import { createContext, useContext, useState, useEffect, useRef, ReactNode } fro
 import { supabase } from '../lib/supabase';
 
 import { NotificationService } from '../services/NotificationService';
+
+export type WatchType = 'anchor' | 'Navigation' | 'dock';
+
+export interface StandingOrder {
+    id: string;
+    text: string;
+    time?: string;              // HH:mm — optional daily reminder time
+    requiresCompletion: boolean;
+}
+
+export interface WatchConfig {
+    crewPerWatch: number;
+    duration: number;
+    startHour?: number;
+    endHour?: number;
+    weekdayStartHour?: number;
+    weekdayEndHour?: number;
+    weekendStartHour?: number;
+    weekendEndHour?: number;
+    isStaggered?: boolean;
+    watchLeaderCount?: number;
+}
+
+export const WATCH_TYPE_DEFAULTS: Record<WatchType, Partial<WatchConfig>> = {
+    'Navigation': {
+        crewPerWatch: 2,
+        duration: 4,
+        isStaggered: false,
+    },
+    'anchor': {
+        crewPerWatch: 1,
+        duration: 4,
+        startHour: 20,
+        endHour: 8,
+        isStaggered: false,
+    },
+    'dock': {
+        crewPerWatch: 1,
+        duration: 12,
+        startHour: 8,
+        endHour: 20,
+        weekdayStartHour: 8,
+        weekdayEndHour: 20,
+        weekendStartHour: 8,
+        weekendEndHour: 20,
+        isStaggered: false,
+    },
+};
+
+export function getWatchTypeDefaults(watchType: WatchType): WatchConfig {
+    const defaults = WATCH_TYPE_DEFAULTS[watchType];
+    return {
+        crewPerWatch: defaults.crewPerWatch || 2,
+        duration: defaults.duration || 4,
+        startHour: defaults.startHour,
+        endHour: defaults.endHour,
+        isStaggered: defaults.isStaggered || false,
+        watchLeaderCount: 0,
+    };
+}
+
 export interface Vessel {
     id: string;
     captainId: string;
@@ -29,16 +90,19 @@ export interface WatchSchedule {
     id: string;
     vesselId: string;
     name: string;
-    watchType: 'anchor' | 'Navigation' | 'dock';
+    watchType: WatchType;
     createdAt: string;
-    // New fields for generator meta-data
-    crewPerWatch?: number;
-    isStaggered?: boolean;
+    timezone: string;
+    watchConfig: WatchConfig;
+    standingOrders?: StandingOrder[];
+    acknowledgments?: Record<string, string>;    // userId → ISO timestamp of ack
+    orderCompletions?: Record<string, string[]>; // userId → [completedOrderId, ...]
     slots: {
         id: number;
         start: string;
         end: string;
         crew: { userId: string; userFirstName: string; userLastName: string; checkedInAt?: string }[];
+        condition?: 'always' | 'outside-watch-hours' | 'weekend-only';
     }[];
 }
 
@@ -88,6 +152,8 @@ interface DataContextType {
     confirmWatchAlert: (vesselId: string, slotId: number, userId: string) => Promise<void>;
     deleteSchedule: (vesselId: string) => Promise<void>;
     refreshData: () => Promise<void>;
+    acknowledgeStandingOrders: (vesselId: string, userId: string) => Promise<void>;
+    completeStandingOrder: (vesselId: string, userId: string, orderId: string) => Promise<void>;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -132,14 +198,19 @@ interface SupabaseSchedule {
     id: string;
     vessel_id: string;
     name: string;
-    watch_type: 'anchor' | 'Navigation' | 'dock';
+    watch_type: WatchType;
     created_at: string;
+    timezone?: string;
+    watch_config?: WatchConfig;
+    standing_orders?: StandingOrder[];
+    acknowledgments?: Record<string, string>;
+    order_completions?: Record<string, string[]>;
     slots: {
         id: number;
         start: string;
         end: string;
         crew: { userId: string; userFirstName: string; userLastName: string; checkedInAt?: string }[];
-        condition?: 'always' | 'weekend-only';
+        condition?: 'always' | 'weekend-only' | 'outside-watch-hours';
     }[];
 }
 
@@ -195,6 +266,11 @@ export function DataProvider({ children }: { children: ReactNode }) {
         name: s.name,
         watchType: s.watch_type,
         createdAt: s.created_at,
+        timezone: s.timezone || 'UTC',
+        watchConfig: s.watch_config || getWatchTypeDefaults(s.watch_type),
+        standingOrders: s.standing_orders || [],
+        acknowledgments: s.acknowledgments || {},
+        orderCompletions: s.order_completions || {},
         slots: s.slots
     });
 
@@ -412,7 +488,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
             }
 
             // ORDER BY created_at DESC to ensure we always get the latest schedule first
-            const { data: sData } = await supabase.from('schedules').select('id, vessel_id, name, watch_type, slots, created_at').order('created_at', { ascending: false });
+            const { data: sData } = await supabase.from('schedules').select('id, vessel_id, name, watch_type, watch_config, timezone, slots, standing_orders, acknowledgments, order_completions, created_at').order('created_at', { ascending: false });
             let newSchedules: WatchSchedule[] = [];
             if (sData) {
                 newSchedules = (sData as SupabaseSchedule[]).map(mapSchedule);
@@ -784,7 +860,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
             vessel_id: schedule.vesselId,
             name: schedule.name,
             watch_type: schedule.watchType,
-            slots: schedule.slots
+            timezone: schedule.timezone,
+            watch_config: schedule.watchConfig,
+            slots: schedule.slots,
+            standing_orders: schedule.standingOrders || [],
+            acknowledgments: {},
+            order_completions: {},
         });
 
         if (insertError) {
@@ -1010,13 +1091,32 @@ export function DataProvider({ children }: { children: ReactNode }) {
         await refreshData();
     };
 
+    const acknowledgeStandingOrders = async (vesselId: string, userId: string) => {
+        const schedule = schedules.find(s => s.vesselId === vesselId);
+        if (!schedule) return;
+        const newAck = { ...(schedule.acknowledgments || {}), [userId]: new Date().toISOString() };
+        await supabase.from('schedules').update({ acknowledgments: newAck }).eq('id', schedule.id);
+        await refreshData();
+    };
+
+    const completeStandingOrder = async (vesselId: string, userId: string, orderId: string) => {
+        const schedule = schedules.find(s => s.vesselId === vesselId);
+        if (!schedule) return;
+        const existing = schedule.orderCompletions?.[userId] || [];
+        if (existing.includes(orderId)) return;
+        const newCompletions = { ...(schedule.orderCompletions || {}), [userId]: [...existing, orderId] };
+        await supabase.from('schedules').update({ order_completions: newCompletions }).eq('id', schedule.id);
+        await refreshData();
+    };
+
     return (
         <DataContext.Provider value={{
             vessels, requests, schedules, createVessel, getVessel, getVesselByJoinCode,
             requestJoin, getRequestsForVessel, updateRequestStatus, getCrewVessel, getPendingRequest,
             createSchedule, updateScheduleSlot, updateScheduleSettings, getSchedule,
             users, updateUserInStore, loading, initialLoadComplete,
-            removeCrew, updateCrewRole, toggleWatchLeader, updateVesselSettings, checkInToWatch, confirmWatchAlert, deleteSchedule, refreshData
+            removeCrew, updateCrewRole, toggleWatchLeader, updateVesselSettings, checkInToWatch, confirmWatchAlert, deleteSchedule, refreshData,
+            acknowledgeStandingOrders, completeStandingOrder
         }}>
             {children}
         </DataContext.Provider>

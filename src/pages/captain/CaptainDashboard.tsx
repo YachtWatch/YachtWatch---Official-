@@ -120,6 +120,13 @@ export default function CaptainDashboard() {
                 name: options.watchType === 'dock' ? 'Dock Schedule' : (options.watchType === 'anchor' ? 'Anchor Watch' : 'Standard Rotation'),
                 watchType: options.watchType,
                 createdAt: new Date().toISOString(),
+                timezone: vessel.timezone || 'UTC',
+                watchConfig: {
+                    crewPerWatch: options.crewPerWatch || 2,
+                    duration: options.duration || 4,
+                    isStaggered: options.isStaggered || false,
+                    watchLeaderCount: 0,
+                },
                 slots
             });
         } catch (error: any) {

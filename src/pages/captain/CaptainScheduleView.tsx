@@ -3,9 +3,9 @@ import { useState, memo } from 'react';
 import { Button } from '../../components/ui/button';
 import { Switch } from '../../components/ui/switch';
 import { Card } from '../../components/ui/card';
-import { Clock, Users, Download } from 'lucide-react';
+import { Clock, Users, Download, ClipboardList, CheckCircle2, Circle } from 'lucide-react';
 import { PrintService } from '../../services/PrintService';
-import { WatchSchedule, JoinRequest } from '../../contexts/DataContext';
+import { WatchSchedule, JoinRequest, UserData } from '../../contexts/DataContext';
 import { ScheduleMatrixView } from '../../components/ScheduleMatrixView';
 import { useAuth } from '../../contexts/AuthContext';
 import { NoScheduleState } from '../../components/NoScheduleState';
@@ -19,6 +19,7 @@ interface CaptainScheduleViewProps {
     onUpdateScheduleSettings: (vesselId: string, settings: any) => void;
     onUpdateSlot: (vesselId: string, slotId: number, crewIds: string[]) => void;
     onClearSchedule: () => void;
+    users?: UserData[];
 }
 
 export const CaptainScheduleView = memo(function CaptainScheduleView({
@@ -27,7 +28,8 @@ export const CaptainScheduleView = memo(function CaptainScheduleView({
     // approvedCrew, // Unused while modal is disabled
     // onUpdateScheduleSettings,
     // onUpdateSlot, // Unused while modal is disabled
-    onClearSchedule
+    onClearSchedule,
+    users = [],
 }: CaptainScheduleViewProps) {
     const navigate = useNavigate();
     const { user } = useAuth();
@@ -47,7 +49,7 @@ export const CaptainScheduleView = memo(function CaptainScheduleView({
                 fileName:     `${(schedule.name || 'WatchSchedule').replace(/[^a-zA-Z0-9 ]/g, '')}.pdf`,
                 scheduleName: schedule.name || 'Watch Schedule',
                 watchType:    schedule.watchType,
-                crewPerWatch: schedule.crewPerWatch || 0,
+                crewPerWatch: schedule.watchConfig.crewPerWatch || 0,
                 vesselName:   vessel?.name || 'Vessel',
                 vesselType:   vessel?.type || 'sail',
                 slots: schedule.slots.map((s: any) => ({
@@ -91,7 +93,7 @@ export const CaptainScheduleView = memo(function CaptainScheduleView({
         ? (new Date(firstSlot.end).getTime() - new Date(firstSlot.start).getTime()) / (1000 * 60 * 60)
         : 0;
 
-    const displayCrewPerWatch = schedule.crewPerWatch || (firstSlot ? firstSlot.crew.length : '-');
+    const displayCrewPerWatch = schedule.watchConfig.crewPerWatch || (firstSlot ? firstSlot.crew.length : '-');
 
     const handleDelete = () => {
         setShowDeleteConfirm(true);
@@ -239,6 +241,68 @@ export const CaptainScheduleView = memo(function CaptainScheduleView({
                         showOnlyUserId={showMyWatches ? user?.id : undefined}
                     />
                 </div>
+
+                {/* Standing Orders */}
+                {(schedule.standingOrders || []).length > 0 && (
+                    <Card className="p-5 shadow-sm bg-card border">
+                        <div className="flex items-center gap-2 mb-4">
+                            <ClipboardList className="h-4 w-4 text-primary" />
+                            <h3 className="font-semibold text-sm">Standing Orders</h3>
+                            <span className="ml-auto text-xs text-muted-foreground">
+                                {Object.keys(schedule.acknowledgments || {}).length}/{users.filter(u => u.role === 'crew').length} acknowledged
+                            </span>
+                        </div>
+
+                        <div className="space-y-4">
+                            {(schedule.standingOrders || []).map((order, i) => {
+                                const ackedUserIds = Object.keys(schedule.acknowledgments || {});
+                                const completedBy = order.requiresCompletion
+                                    ? Object.entries(schedule.orderCompletions || {})
+                                        .filter(([, ids]) => ids.includes(order.id))
+                                        .map(([uid]) => uid)
+                                    : [];
+
+                                return (
+                                    <div key={order.id} className="space-y-2">
+                                        {/* Order header */}
+                                        <div className="flex gap-2 items-start">
+                                            <span className="h-5 w-5 rounded-full bg-primary/10 text-primary text-[11px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>
+                                            <div className="flex-1">
+                                                <p className="text-sm font-medium text-foreground leading-snug">{order.text}</p>
+                                                <div className="flex gap-3 mt-1">
+                                                    {order.time && <span className="text-xs text-muted-foreground flex items-center gap-1"><Clock className="h-3 w-3" />{order.time} daily</span>}
+                                                    {order.requiresCompletion && <span className="text-xs text-primary font-medium">● Requires completion</span>}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Ack status pills */}
+                                        <div className="flex flex-wrap gap-1.5 pl-7">
+                                            {users.filter(u => u.role === 'crew').map(u => {
+                                                const acked = ackedUserIds.includes(u.id);
+                                                const completed = completedBy.includes(u.id);
+                                                return (
+                                                    <span
+                                                        key={u.id}
+                                                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium border ${acked ? 'bg-green-50 border-green-200 text-green-700' : 'bg-muted border-border text-muted-foreground'}`}
+                                                    >
+                                                        {acked
+                                                            ? <CheckCircle2 className="h-3 w-3" />
+                                                            : <Circle className="h-3 w-3" />}
+                                                        {u.firstName}
+                                                        {order.requiresCompletion && acked && (
+                                                            <span className={completed ? 'text-green-600' : 'text-amber-500'}>{completed ? ' ✓' : ' …'}</span>
+                                                        )}
+                                                    </span>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </Card>
+                )}
             </div >
 
             {/* Edit Slot Modal - Disabled for now */}

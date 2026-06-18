@@ -3,9 +3,15 @@ export interface SchedulerOptions {
     duration: number; // Watch duration in hours (e.g. 4)
     crewPerWatch: number;
     watchType: 'Navigation' | 'anchor' | 'dock';
-    // Night hours for Anchor/Dock modes
-    nightStart?: number; // e.g. 20 (8 PM)
-    nightEnd?: number;   // e.g. 8 (8 AM)
+    startDate?: Date; // Start date for schedule (defaults to today)
+    // Timezone for the captain (ISO string like 'America/New_York')
+    timezone?: string;
+    // Custom watch hours for Anchor/Dock modes
+    startHour?: number; // e.g. 20 (8 PM) for anchor
+    endHour?: number;   // e.g. 8 (8 AM) for anchor
+    // Legacy support for night hours
+    nightStart?: number; // e.g. 20 (8 PM) - deprecated, use startHour
+    nightEnd?: number;   // e.g. 8 (8 AM) - deprecated, use endHour
 }
 
 export interface CrewMember {
@@ -21,7 +27,7 @@ export interface Slot {
     start: string;
     end: string;
     crew: CrewMember[];
-    condition?: 'always' | 'weekend-only';
+    condition?: 'always' | 'weekend-only' | 'outside-watch-hours';
 }
 
 export function generateSchedule(crew: CrewMember[], options: SchedulerOptions): Slot[] {
@@ -45,16 +51,31 @@ export function generateSchedule(crew: CrewMember[], options: SchedulerOptions):
     let keeperIndex = 0;
     let standardIndex = 0;
 
-    const nightStart = options.nightStart ?? 20;
-    const nightEnd = options.nightEnd ?? 8;
     const watchType = options.watchType;
+    const startDate = options.startDate || new Date();
+    
+    // Support new startHour/endHour parameters, with fallback to legacy nightStart/nightEnd
+    let configuredStartHour: number;
+    let configuredEndHour: number;
+    
+    if (watchType === 'anchor') {
+        configuredStartHour = options.startHour ?? options.nightStart ?? 20;
+        configuredEndHour = options.endHour ?? options.nightEnd ?? 8;
+    } else if (watchType === 'dock') {
+        configuredStartHour = options.startHour ?? options.nightStart ?? 20;
+        configuredEndHour = options.endHour ?? options.nightEnd ?? 8;
+    } else {
+        // Navigation: uses full 24h, these are ignored
+        configuredStartHour = 0;
+        configuredEndHour = 24;
+    }
 
-    const isNight = (h: number, start: number, end: number) => {
+    const isWithinConfiguredHours = (h: number, start: number, end: number): boolean => {
         if (start > end) {
-            // e.g. 20 to 8
+            // e.g. 20 to 8 (spans midnight)
             return h >= start || h < end;
         } else {
-            // e.g. 18 to 22
+            // e.g. 8 to 20
             return h >= start && h < end;
         }
     };
@@ -65,24 +86,22 @@ export function generateSchedule(crew: CrewMember[], options: SchedulerOptions):
 
         // Determine if we should generate this slot and what its condition is
         let shouldGenerate = true;
-        let condition: 'always' | 'weekend-only' = 'always';
+        let condition: 'always' | 'weekend-only' | 'outside-watch-hours' = 'always';
 
-        const isNightSlot = isNight(startTime, nightStart, nightEnd);
+        const isWithinWatchHours = isWithinConfiguredHours(startTime, configuredStartHour, configuredEndHour);
 
-        // Check for Anchor mode (strict filtering)
+        // Anchor mode: only generate slots within configured watch hours
         if (watchType === 'anchor') {
-            if (!isNightSlot) {
+            if (!isWithinWatchHours) {
                 shouldGenerate = false;
             }
         }
 
-        // Check for Dock mode (conditional filtering)
+        // Dock mode: all slots generated, but those outside watch hours are marked as 'outside-watch-hours'
         if (watchType === 'dock') {
-            if (!isNightSlot) {
-                // Day time in Dock mode -> Weekend only
-                condition = 'weekend-only';
+            if (!isWithinWatchHours) {
+                condition = 'outside-watch-hours';
             }
-            // Night time -> Always
         }
 
         if (!shouldGenerate) continue;
@@ -116,12 +135,19 @@ export function generateSchedule(crew: CrewMember[], options: SchedulerOptions):
             }
         }
 
+        // Generate ISO string timestamps (using UTC to ensure consistency across timezones)
+        const slotStartDate = new Date(startDate);
+        slotStartDate.setUTCHours(startTime, 0, 0, 0);
+        
+        const slotEndDate = new Date(startDate);
+        slotEndDate.setUTCHours(endTime, 0, 0, 0);
+
         slots.push({
             id: i,
-            start: `${startTime.toString().padStart(2, '0')}:00`,
-            end: `${endTime.toString().padStart(2, '0')}:00`,
+            start: slotStartDate.toISOString(),
+            end: slotEndDate.toISOString(),
             crew: assigned,
-            condition // Add this to the slot object
+            condition
         });
     }
 

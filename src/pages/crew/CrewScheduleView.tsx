@@ -42,7 +42,7 @@ export function CrewScheduleView({ schedule, user }: CrewScheduleViewProps) {
         ? (new Date(firstSlot.end).getTime() - new Date(firstSlot.start).getTime()) / (1000 * 60 * 60)
         : 0;
 
-    const displayCrewPerWatch = schedule.crewPerWatch || (firstSlot ? firstSlot.crew.length : '-');
+    const displayCrewPerWatch = schedule.watchConfig.crewPerWatch || (firstSlot ? firstSlot.crew.length : '-');
 
     return (
         <div className="space-y-6">
