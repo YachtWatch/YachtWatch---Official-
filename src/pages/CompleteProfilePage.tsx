@@ -98,13 +98,13 @@ export default function CompleteProfilePage() {
 
                     <form onSubmit={handleSave} className="space-y-4">
                         <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2 min-w-0">
+                            <div className="space-y-2 min-w-0 overflow-hidden">
                                 <label className="text-sm font-medium">Date of Birth</label>
                                 <Input
                                     type="date"
                                     value={dateOfBirth}
                                     onChange={e => setDateOfBirth(e.target.value)}
-                                    className="w-full"
+                                    className="w-full max-w-full h-10"
                                     required // Encourage filling it out, but skip button exists
                                 />
                             </div>

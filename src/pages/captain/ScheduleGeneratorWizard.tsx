@@ -42,11 +42,16 @@ const parseTimeStr = (s: string) => {
     return d;
 };
 
+const superscriptStyle: React.CSSProperties = { fontSize: 9, fontWeight: 700, color: '#1B2A6B', lineHeight: 1, alignSelf: 'flex-start', marginTop: 1 };
+
 // eslint-disable-next-line react/display-name
-const PickerTrigger = React.forwardRef<HTMLDivElement, { value?: string; onClick?: () => void; icon: React.ReactNode; placeholder: string }>(
-    ({ value, onClick, icon, placeholder }, ref) => (
+const PickerTrigger = React.forwardRef<HTMLDivElement, { value?: string; onClick?: () => void; icon: React.ReactNode; placeholder: string; superscript?: React.ReactNode }>(
+    ({ value, onClick, icon, placeholder, superscript }, ref) => (
         <div ref={ref} style={fieldStyle} onClick={onClick}>
-            <span style={{ fontSize: 14, color: value ? '#0f172a' : '#94a3b8' }}>{value || placeholder}</span>
+            <span style={{ display: 'inline-flex', alignItems: 'flex-start', gap: 2 }}>
+                <span style={{ fontSize: 14, color: value ? '#0f172a' : '#94a3b8' }}>{value || placeholder}</span>
+                {superscript}
+            </span>
             {icon}
         </div>
     )
@@ -54,15 +59,19 @@ const PickerTrigger = React.forwardRef<HTMLDivElement, { value?: string; onClick
 
 const clockIcon = <Clock style={{ width: 16, height: 16, color: '#94a3b8', flexShrink: 0 }} />;
 
-const TimePickerField: React.FC<{ label: string; value: string; onChange: (v: string) => void }> = ({ label, value, onChange }) => {
+const TimePickerField: React.FC<{ label: string; value: string; onChange: (v: string) => void; isNextDay?: boolean }> = ({ label, value, onChange, isNextDay }) => {
     const native = Capacitor.isNativePlatform();
     const parsed = value ? (() => { const [h, m] = value.split(':').map(Number); const d = new Date(); d.setHours(h, m, 0, 0); return d; })() : null;
+    const superscript = isNextDay ? <span style={superscriptStyle}>+1</span> : undefined;
     return (
         <div className="space-y-2">
             <label style={{ fontSize: 13 }} className="font-medium text-foreground">{label}</label>
             {native ? (
                 <div style={{ ...fieldStyle, position: 'relative' }}>
-                    <span style={{ fontSize: 14, color: value ? '#0f172a' : '#94a3b8' }}>{value || 'Select time'}</span>
+                    <span style={{ display: 'inline-flex', alignItems: 'flex-start', gap: 2 }}>
+                        <span style={{ fontSize: 14, color: value ? '#0f172a' : '#94a3b8' }}>{value || 'Select time'}</span>
+                        {superscript}
+                    </span>
                     {clockIcon}
                     <input type="time" value={value} onChange={e => onChange(e.target.value)} style={{ position: 'absolute', inset: 0, opacity: 0, width: '100%', height: '100%', cursor: 'pointer' }} />
                 </div>
@@ -75,7 +84,7 @@ const TimePickerField: React.FC<{ label: string; value: string; onChange: (v: st
                     timeFormat="HH:mm"
                     dateFormat="HH:mm"
                     placeholderText="Select time"
-                    customInput={<PickerTrigger icon={clockIcon} placeholder="Select time" />}
+                    customInput={<PickerTrigger icon={clockIcon} placeholder="Select time" superscript={superscript} />}
                 />
             )}
         </div>
@@ -620,7 +629,7 @@ export default function ScheduleGeneratorWizard() {
                                 </div>
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                                     <TimePickerField label="From" value={anchorStartTime} onChange={setAnchorStartTime} />
-                                    <TimePickerField label="To" value={anchorEndTime} onChange={setAnchorEndTime} />
+                                    <TimePickerField label="To" value={anchorEndTime} onChange={setAnchorEndTime} isNextDay={!!anchorStartTime && !!anchorEndTime && anchorEndTime < anchorStartTime} />
                                 </div>
                             </div>
                         )}
@@ -636,14 +645,14 @@ export default function ScheduleGeneratorWizard() {
                                     <p style={{ fontSize: 12 }} className="font-medium text-muted-foreground uppercase tracking-wide">Weekdays</p>
                                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                                         <TimePickerField label="From" value={dockWeekdayStart} onChange={setDockWeekdayStart} />
-                                        <TimePickerField label="To" value={dockWeekdayEnd} onChange={setDockWeekdayEnd} />
+                                        <TimePickerField label="To" value={dockWeekdayEnd} onChange={setDockWeekdayEnd} isNextDay={!!dockWeekdayStart && !!dockWeekdayEnd && dockWeekdayEnd < dockWeekdayStart} />
                                     </div>
                                 </div>
                                 <div className="space-y-1">
                                     <p style={{ fontSize: 12 }} className="font-medium text-muted-foreground uppercase tracking-wide">Weekends</p>
                                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                                         <TimePickerField label="From" value={dockWeekendStart} onChange={setDockWeekendStart} />
-                                        <TimePickerField label="To" value={dockWeekendEnd} onChange={setDockWeekendEnd} />
+                                        <TimePickerField label="To" value={dockWeekendEnd} onChange={setDockWeekendEnd} isNextDay={!!dockWeekendStart && !!dockWeekendEnd && dockWeekendEnd < dockWeekendStart} />
                                     </div>
                                 </div>
                             </div>

@@ -132,13 +132,13 @@ export default function ProfilePage() {
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-2 min-w-0">
+                                    <div className="space-y-2 min-w-0 overflow-hidden">
                                         <label className="text-sm font-medium">Date of Birth</label>
                                         <Input
                                             type="date"
                                             value={dateOfBirth}
                                             onChange={e => setDateOfBirth(e.target.value)}
-                                            className="w-full"
+                                            className="w-full max-w-full h-10"
                                         />
                                     </div>
                                     <div className="space-y-2 min-w-0">
