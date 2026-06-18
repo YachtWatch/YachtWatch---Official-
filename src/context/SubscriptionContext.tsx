@@ -34,7 +34,7 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
                     await Purchases.configure({ apiKey: 'appl_TxXCVVHhofCaDGcrSSspCfRbEGF' });
                     console.log('[RevenueCat] Initialized on iOS.');
                 } else if (platform === 'android') {
-                    await Purchases.configure({ apiKey: import.meta.env.REVENUECAT_API_KEY_GOOGLE });
+                    await Purchases.configure({ apiKey: import.meta.env.VITE_REVENUECAT_API_KEY_GOOGLE });
                     console.log('[RevenueCat] Initialized on Android.');
                 }
 
