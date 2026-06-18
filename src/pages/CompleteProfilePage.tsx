@@ -1,11 +1,94 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useData } from '../contexts/DataContext';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '../components/ui/card';
-import { User } from 'lucide-react';
+import { User, ChevronDown, Search, X } from 'lucide-react';
+import { COUNTRIES } from '../lib/countries';
+
+function CountryPickerModal({
+    open,
+    selected,
+    onSelect,
+    onClose,
+}: {
+    open: boolean;
+    selected: string;
+    onSelect: (country: string) => void;
+    onClose: () => void;
+}) {
+    const [search, setSearch] = useState('');
+
+    const filtered = useMemo(
+        () => COUNTRIES.filter(c => c.toLowerCase().includes(search.toLowerCase())),
+        [search]
+    );
+
+    useEffect(() => {
+        if (!open) setSearch('');
+    }, [open]);
+
+    if (!open) return null;
+
+    return (
+        <div
+            className="fixed inset-0 z-50 flex flex-col justify-end bg-black/50"
+            onClick={onClose}
+        >
+            <div
+                className="bg-background rounded-t-2xl flex flex-col"
+                style={{ maxHeight: '75vh' }}
+                onClick={e => e.stopPropagation()}
+            >
+                {/* Handle */}
+                <div className="flex justify-center pt-3 pb-1">
+                    <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+                </div>
+
+                {/* Header */}
+                <div className="flex items-center justify-between px-4 py-2 border-b">
+                    <span className="text-base font-semibold">Select Nationality</span>
+                    <button onClick={onClose} className="p-1 rounded-full hover:bg-muted">
+                        <X className="h-5 w-5 text-muted-foreground" />
+                    </button>
+                </div>
+
+                {/* Search */}
+                <div className="px-4 py-2 border-b">
+                    <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                            autoFocus
+                            value={search}
+                            onChange={e => setSearch(e.target.value)}
+                            placeholder="Search countries…"
+                            className="pl-9"
+                        />
+                    </div>
+                </div>
+
+                {/* Scrollable list */}
+                <div className="overflow-y-auto flex-1 py-1">
+                    {filtered.length === 0 && (
+                        <p className="text-center text-muted-foreground text-sm py-6">No countries found</p>
+                    )}
+                    {filtered.map(country => (
+                        <button
+                            key={country}
+                            type="button"
+                            onClick={() => { onSelect(country); onClose(); }}
+                            className={`w-full text-left px-4 py-3 text-sm hover:bg-muted transition-colors ${country === selected ? 'font-semibold text-primary bg-primary/5' : ''}`}
+                        >
+                            {country}
+                        </button>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+}
 
 export default function CompleteProfilePage() {
     const { user, updateUser } = useAuth();
@@ -17,6 +100,7 @@ export default function CompleteProfilePage() {
     const [nationality, setNationality] = useState('');
     const [passportNumber, setPassportNumber] = useState('');
     const [dateOfBirth, setDateOfBirth] = useState('');
+    const [countryPickerOpen, setCountryPickerOpen] = useState(false);
 
     const [saving, setSaving] = useState(false);
 
@@ -78,6 +162,13 @@ export default function CompleteProfilePage() {
     };
 
     return (
+        <>
+        <CountryPickerModal
+            open={countryPickerOpen}
+            selected={nationality}
+            onSelect={setNationality}
+            onClose={() => setCountryPickerOpen(false)}
+        />
         <div className="min-h-screen bg-background flex items-center justify-center p-4">
             <Card className="w-full max-w-md">
                 <CardHeader>
@@ -97,25 +188,29 @@ export default function CompleteProfilePage() {
                     </p>
 
                     <form onSubmit={handleSave} className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2 min-w-0 overflow-hidden">
+                        <div className="flex gap-3 items-end">
+                            <div className="flex-1 min-w-0 overflow-hidden space-y-2">
                                 <label className="text-sm font-medium">Date of Birth</label>
                                 <Input
                                     type="date"
                                     value={dateOfBirth}
                                     onChange={e => setDateOfBirth(e.target.value)}
-                                    className="w-full max-w-full h-10"
-                                    required // Encourage filling it out, but skip button exists
-                                />
-                            </div>
-                            <div className="space-y-2 min-w-0">
-                                <label className="text-sm font-medium">Nationality</label>
-                                <Input
-                                    value={nationality}
-                                    onChange={e => setNationality(e.target.value)}
-                                    placeholder="Nationality"
+                                    className="w-full h-10"
                                     required
                                 />
+                            </div>
+                            <div className="flex-1 min-w-0 overflow-hidden space-y-2">
+                                <label className="text-sm font-medium">Nationality</label>
+                                <button
+                                    type="button"
+                                    onClick={() => setCountryPickerOpen(true)}
+                                    className="flex items-center justify-between w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring h-10"
+                                >
+                                    <span className={`truncate ${nationality ? 'text-foreground' : 'text-muted-foreground'}`}>
+                                        {nationality || 'Nationality'}
+                                    </span>
+                                    <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0 ml-1" />
+                                </button>
                             </div>
                         </div>
 
@@ -141,5 +236,6 @@ export default function CompleteProfilePage() {
                 </CardFooter>
             </Card>
         </div>
+        </>
     );
 }
