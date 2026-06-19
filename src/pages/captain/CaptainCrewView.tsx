@@ -97,19 +97,19 @@ export function CaptainCrewView({ vessel, schedule, captainName, pendingRequests
                     <div className="grid grid-cols-2 gap-3">
                         <button
                             type="button"
-                            onClick={() => setShowInvite(true)}
-                            className="flex items-center justify-center gap-2 py-2.5 rounded-lg border border-[rgba(27,42,107,0.25)] text-[#1B2A6B] bg-background hover:bg-[#1B2A6B]/5 transition-colors font-semibold text-sm"
-                        >
-                            <Share2 className="h-4 w-4 shrink-0" />
-                            Share
-                        </button>
-                        <button
-                            type="button"
                             onClick={() => setShowQRModal(true)}
                             className="flex items-center justify-center gap-2 py-2.5 rounded-lg border border-[rgba(27,42,107,0.25)] text-[#1B2A6B] bg-background hover:bg-[#1B2A6B]/5 transition-colors font-semibold text-sm"
                         >
                             <QrCode className="h-4 w-4 shrink-0" />
                             QR Code
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setShowInvite(true)}
+                            className="flex items-center justify-center gap-2 py-2.5 rounded-lg border border-[rgba(27,42,107,0.25)] text-[#1B2A6B] bg-background hover:bg-[#1B2A6B]/5 transition-colors font-semibold text-sm"
+                        >
+                            <Share2 className="h-4 w-4 shrink-0" />
+                            Share
                         </button>
                     </div>
                 </CardContent>
