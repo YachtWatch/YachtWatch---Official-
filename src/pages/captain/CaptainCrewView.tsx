@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/button';
 import { Card, CardContent } from '../../components/ui/card';
 import { UserData, Vessel } from '../../contexts/DataContext';
-import { X, Check, Printer, RefreshCw, Anchor, Compass, Coffee, Wrench, Users, Star, PenLine, Trash2, UserPlus, QrCode } from 'lucide-react';
+import { X, Check, Printer, RefreshCw, Anchor, Compass, Coffee, Wrench, Users, Star, PenLine, Trash2, Share2, QrCode } from 'lucide-react';
 import { InviteShareModal } from '../../components/InviteShareModal';
 import QRCode from 'react-qr-code';
 
@@ -93,23 +93,25 @@ export function CaptainCrewView({ vessel, schedule, captainName, pendingRequests
                             {vessel.joinCode}
                         </div>
                         <span className="text-[10px] text-muted-foreground mt-1 uppercase tracking-wider font-medium">Click to Copy</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                        <button
+                            type="button"
+                            onClick={() => setShowInvite(true)}
+                            className="flex items-center justify-center gap-2 py-2.5 rounded-lg border border-[rgba(27,42,107,0.25)] text-[#1B2A6B] bg-background hover:bg-[#1B2A6B]/5 transition-colors font-semibold text-sm"
+                        >
+                            <Share2 className="h-4 w-4 shrink-0" />
+                            Share
+                        </button>
                         <button
                             type="button"
                             onClick={() => setShowQRModal(true)}
-                            className="mt-2 flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors"
+                            className="flex items-center justify-center gap-2 py-2.5 rounded-lg border border-[rgba(27,42,107,0.25)] text-[#1B2A6B] bg-background hover:bg-[#1B2A6B]/5 transition-colors font-semibold text-sm"
                         >
-                            <QrCode className="h-4 w-4" />
-                            Show QR Code
+                            <QrCode className="h-4 w-4 shrink-0" />
+                            QR Code
                         </button>
                     </div>
-                    <Button
-                        variant="outline"
-                        className="w-full gap-2 border-[rgba(27,42,107,0.25)] text-[#1B2A6B] hover:bg-[#1B2A6B]/5 font-semibold"
-                        onClick={() => setShowInvite(true)}
-                    >
-                        <UserPlus className="h-4 w-4 shrink-0" />
-                        Invite Crew
-                    </Button>
                 </CardContent>
             </Card>
 
