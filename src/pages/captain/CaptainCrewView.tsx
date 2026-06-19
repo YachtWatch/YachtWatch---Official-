@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/button';
 import { Card, CardContent } from '../../components/ui/card';
 import { UserData, Vessel } from '../../contexts/DataContext';
-import { X, Check, Printer, RefreshCw, Anchor, Compass, Coffee, Wrench, Users, Star, PenLine, Trash2, UserPlus } from 'lucide-react';
+import { X, Check, Printer, RefreshCw, Anchor, Compass, Coffee, Wrench, Users, Star, PenLine, Trash2, UserPlus, QrCode } from 'lucide-react';
 import { InviteShareModal } from '../../components/InviteShareModal';
+import QRCode from 'react-qr-code';
 
 
 interface CaptainCrewViewProps {
@@ -46,6 +47,7 @@ const getDepartment = (role: string) => {
 export function CaptainCrewView({ vessel, schedule, captainName, pendingRequests, users, onEditRole, onRemoveCrew, onRequestAction, onRefresh }: CaptainCrewViewProps) {
     const navigate = useNavigate();
     const [showInvite, setShowInvite] = useState(false);
+    const [showQRModal, setShowQRModal] = useState(false);
     // Ensure captain is properly represented if missing from users array
     const captainUser = users.find(u => u.id === vessel.captainId) || {
         id: vessel.captainId || 'captain',
@@ -91,6 +93,14 @@ export function CaptainCrewView({ vessel, schedule, captainName, pendingRequests
                             {vessel.joinCode}
                         </div>
                         <span className="text-[10px] text-muted-foreground mt-1 uppercase tracking-wider font-medium">Click to Copy</span>
+                        <button
+                            type="button"
+                            onClick={() => setShowQRModal(true)}
+                            className="mt-2 flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors"
+                        >
+                            <QrCode className="h-4 w-4" />
+                            Show QR Code
+                        </button>
                     </div>
                     <Button
                         variant="outline"
@@ -108,6 +118,43 @@ export function CaptainCrewView({ vessel, schedule, captainName, pendingRequests
                 onClose={() => setShowInvite(false)}
                 joinCode={vessel.joinCode}
             />
+
+            {/* QR Code Modal */}
+            {showQRModal && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+                    onClick={() => setShowQRModal(false)}
+                >
+                    <div
+                        className="bg-background rounded-2xl p-8 max-w-sm w-full mx-4 shadow-xl"
+                        onClick={e => e.stopPropagation()}
+                    >
+                        <div className="flex items-center justify-between mb-6">
+                            <h3 className="font-bold text-lg">Scan to Join</h3>
+                            <button
+                                onClick={() => setShowQRModal(false)}
+                                className="p-1 rounded-full hover:bg-muted"
+                            >
+                                <X className="h-5 w-5 text-muted-foreground" />
+                            </button>
+                        </div>
+                        <div className="flex flex-col items-center gap-5">
+                            <div className="bg-white p-5 rounded-2xl shadow-inner">
+                                <QRCode
+                                    value={`https://join.yachtwatch.co/${vessel.joinCode}`}
+                                    size={200}
+                                />
+                            </div>
+                            <p className="text-sm text-center text-muted-foreground">
+                                Crew members can scan this with the YachtWatch app to join <strong>{vessel.name}</strong>
+                            </p>
+                            <div className="font-mono font-bold text-primary text-2xl tracking-[0.2em]">
+                                {vessel.joinCode}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Pending Requests Section */}
             <div className="print:hidden">

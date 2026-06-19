@@ -1,5 +1,5 @@
 import { TimezoneWarningBanner } from '../../components/TimezoneWarningBanner';
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useData } from '../../contexts/DataContext';
 import { Button } from '../../components/ui/button';
@@ -7,12 +7,104 @@ import { Input } from '../../components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { BottomTabs } from '../../components/ui/BottomTabs';
 import { ProfileDropdown } from '../../components/ui/ProfileDropdown';
-import { Anchor, Clock, Ship, CheckCircle, Sailboat, Users, ClipboardList, CheckSquare, Square } from 'lucide-react';
+import { Anchor, Clock, Ship, CheckCircle, Sailboat, Users, ClipboardList, CheckSquare, Square, Camera, X } from 'lucide-react';
 import { SailboatLoader } from '../../components/SailboatLoader';
 import { CrewScheduleView } from './CrewScheduleView';
 import { CrewListView } from './CrewListView';
 import { useWatchLogic } from '../../hooks/useWatchLogic';
 import { App as CapApp } from '@capacitor/app';
+import jsQR from 'jsqr';
+
+function QRScanner({ onScan, onClose }: { onScan: (code: string) => void; onClose: () => void }) {
+    const videoRef = useRef<HTMLVideoElement>(null);
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const streamRef = useRef<MediaStream | null>(null);
+    const rafRef = useRef<number>(0);
+    const [error, setError] = useState('');
+
+    useEffect(() => {
+        let active = true;
+
+        const tick = () => {
+            if (!active || !videoRef.current || !canvasRef.current) return;
+            const video = videoRef.current;
+            const canvas = canvasRef.current;
+            if (video.readyState !== video.HAVE_ENOUGH_DATA) {
+                rafRef.current = requestAnimationFrame(tick);
+                return;
+            }
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return;
+            ctx.drawImage(video, 0, 0);
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const result = jsQR(imageData.data, imageData.width, imageData.height);
+            if (result?.data) {
+                let code = result.data;
+                if (code.includes('join.yachtwatch.co/')) {
+                    code = code.split('join.yachtwatch.co/').pop() || code;
+                } else if (code.includes('yachtwatch://join/')) {
+                    code = code.split('yachtwatch://join/').pop() || code;
+                }
+                code = code.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+                if (code.length > 0) { onScan(code); return; }
+            }
+            rafRef.current = requestAnimationFrame(tick);
+        };
+
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+            .then(stream => {
+                if (!active) { stream.getTracks().forEach(t => t.stop()); return; }
+                streamRef.current = stream;
+                if (videoRef.current) {
+                    videoRef.current.srcObject = stream;
+                    videoRef.current.play().then(tick);
+                }
+            })
+            .catch(() => setError('Camera access denied. Please allow camera access and try again.'));
+
+        return () => {
+            active = false;
+            cancelAnimationFrame(rafRef.current);
+            streamRef.current?.getTracks().forEach(t => t.stop());
+        };
+    }, [onScan]);
+
+    return (
+        <div className="fixed inset-0 z-50 flex flex-col bg-black safe-area-pt">
+            <div className="flex items-center justify-between px-4 py-3">
+                <h3 className="font-semibold text-lg text-white">Scan QR Code</h3>
+                <button onClick={onClose} className="p-2 rounded-full hover:bg-white/10">
+                    <X className="h-6 w-6 text-white" />
+                </button>
+            </div>
+            {error ? (
+                <div className="flex-1 flex items-center justify-center p-8">
+                    <p className="text-white text-center">{error}</p>
+                </div>
+            ) : (
+                <div className="flex-1 relative overflow-hidden">
+                    <video ref={videoRef} className="w-full h-full object-cover" playsInline muted />
+                    <canvas ref={canvasRef} className="hidden" />
+                    {/* Viewfinder overlay */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="relative w-64 h-64">
+                            <div className="absolute inset-0 border-2 border-white/30 rounded-2xl" />
+                            <div className="absolute top-0 left-0 w-10 h-10 border-t-4 border-l-4 border-[#1B2A6B] rounded-tl-2xl" />
+                            <div className="absolute top-0 right-0 w-10 h-10 border-t-4 border-r-4 border-[#1B2A6B] rounded-tr-2xl" />
+                            <div className="absolute bottom-0 left-0 w-10 h-10 border-b-4 border-l-4 border-[#1B2A6B] rounded-bl-2xl" />
+                            <div className="absolute bottom-0 right-0 w-10 h-10 border-b-4 border-r-4 border-[#1B2A6B] rounded-br-2xl" />
+                        </div>
+                    </div>
+                </div>
+            )}
+            <div className="p-6 text-center safe-area-pb">
+                <p className="text-white/60 text-sm">Point your camera at the captain's QR code</p>
+            </div>
+        </div>
+    );
+}
 // import { getCurrentSlot, getTimeRemaining } from '../../lib/time-utils'; // Not used with new local logic
 
 const formatTime = (isoString: string) => {
@@ -38,6 +130,7 @@ export default function CrewDashboard() {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [submitting, setSubmitting] = useState(false);
+    const [showScanner, setShowScanner] = useState(false);
     const [activeTab, setActiveTab] = useState<'dashboard' | 'schedule' | 'crew'>('dashboard');
     const [showStandingOrdersModal, setShowStandingOrdersModal] = useState(false);
     const [ackSubmitting, setAckSubmitting] = useState(false);
@@ -192,6 +285,7 @@ export default function CrewDashboard() {
                                 </Button>
                             </div>
                         ) : (
+                            <>
                             <form onSubmit={handleJoin} className="space-y-4">
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium">Join Code</label>
@@ -201,6 +295,14 @@ export default function CrewDashboard() {
                                         placeholder="e.g. A1B2C3"
                                         className="uppercase font-mono tracking-widest text-center text-lg"
                                     />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowScanner(true)}
+                                        className="w-full flex items-center justify-center gap-2 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                                    >
+                                        <Camera className="h-4 w-4" />
+                                        Scan QR Code instead
+                                    </button>
                                 </div>
                                 {error && <p className="text-sm text-destructive">{error}</p>}
                                 {success && <p className="text-sm text-green-600 font-medium">{success}</p>}
@@ -208,6 +310,13 @@ export default function CrewDashboard() {
                                     {submitting ? 'Sending...' : 'Request to Join'}
                                 </Button>
                             </form>
+                            {showScanner && (
+                                <QRScanner
+                                    onScan={code => { setJoinCode(code); setShowScanner(false); }}
+                                    onClose={() => setShowScanner(false)}
+                                />
+                            )}
+                            </>
                         )}
                     </CardContent>
                 </Card>

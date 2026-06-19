@@ -37,10 +37,12 @@
         "html2canvas": "^1.4.1",
         "jspdf": "^4.1.0",
         "jspdf-autotable": "^5.0.7",
+        "jsqr": "^1.4.0",
         "lucide-react": "^0.309.0",
         "react": "^18.2.0",
         "react-datepicker": "^9.1.0",
         "react-dom": "^18.2.0",
+        "react-qr-code": "^2.2.0",
         "react-router-dom": "^6.21.3",
         "tailwind-merge": "^2.2.0"
     },
