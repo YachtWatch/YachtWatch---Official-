@@ -737,32 +737,14 @@ export function DataProvider({ children }: { children: ReactNode }) {
             return null;
         }
 
-        // 2. Strict Verify: Read it back immediately
-        const { data: verifyData, error: verifyError } = await supabase
-            .from('vessels')
-            .select('id, captain_id, name, length, type, capacity, join_code, check_in_enabled, check_in_interval, timezone, created_at')
-            .eq('id', tempId)
-            .single();
-
-        if (verifyError || !verifyData) {
-            console.error("❌ VESSEL VERIFICATION FAILED:", verifyError);
-            alert("Vessel was created but could not be verified. Possible permissions issue.");
-            return null;
-        }
-
-
-
-        // 3. Link to Captain Profile - this now requires adding to vessel_members
-        // We'll trust the captain is automatically added on backend creation or we add them here.
-        // Assuming we need to add them here manually for safety:
+        // 2. Link captain to vessel_members
         await supabase.from('vessel_members').upsert(
             { vessel_id: tempId, user_id: data.captainId, role: 'captain' },
             { onConflict: 'user_id, vessel_id' }
         );
 
-
         await refreshData();
-        return mapVessel(verifyData);
+        return mapVessel(dbVessel);
     };
 
     const getVessel = (id: string) => vessels.find(v => v.id === id);

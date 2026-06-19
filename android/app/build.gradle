@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace = "com.yachtwatch.app"
+    namespace = "com.yachtwatch.android"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
         applicationId "com.yachtwatch.android"
