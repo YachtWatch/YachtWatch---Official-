@@ -3,6 +3,9 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Purchases, PurchasesPackage, CustomerInfo, LOG_LEVEL } from '@revenuecat/purchases-capacitor';
 import { Capacitor } from '@capacitor/core';
 
+// ⛳ DEV BYPASS — set to true to skip paywall during testing. SET BACK TO false BEFORE SHIPPING.
+const DEV_BYPASS_PAYWALL = true;
+
 interface SubscriptionContextType {
     currentCustomerInfo: CustomerInfo | null;
     offerings: PurchasesPackage[];
@@ -17,11 +20,18 @@ const SubscriptionContext = createContext<SubscriptionContextType | undefined>(u
 export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [currentCustomerInfo, setCurrentCustomerInfo] = useState<CustomerInfo | null>(null);
     const [offerings, setOfferings] = useState<PurchasesPackage[]>([]);
-    const [isSubscribed, setIsSubscribed] = useState(false);
+    const [isSubscribed, setIsSubscribed] = useState(DEV_BYPASS_PAYWALL);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const init = async () => {
+            if (DEV_BYPASS_PAYWALL) {
+                console.log('[RevenueCat] ⛳ DEV_BYPASS_PAYWALL is ON — skipping RevenueCat, treating user as subscribed.');
+                setIsSubscribed(true);
+                setLoading(false);
+                return;
+            }
+
             if (Capacitor.getPlatform() === 'web') {
                 console.log('[RevenueCat] Web platform detected — skipping initialization.');
                 setLoading(false);
