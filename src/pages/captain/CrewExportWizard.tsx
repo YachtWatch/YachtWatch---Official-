@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useData, UserData } from '../../contexts/DataContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../components/ui/button';
-import { ArrowLeft, Printer } from 'lucide-react';
+import { ArrowLeft, Printer, Anchor } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import { ProfileDropdown } from '../../components/ui/ProfileDropdown';
 
 // A4 landscape at 96 dpi
 const A4_W = 1123;
@@ -98,19 +99,19 @@ export default function CrewExportWizard() {
     if (step === 1) {
         return (
             <div className="flex flex-col min-h-screen bg-background">
-                {/* Top bar — safe-area-pt ensures content clears the Dynamic Island */}
-                <div className="safe-area-pt bg-white border-b shrink-0">
-                    <div className="flex items-center gap-3 px-4 py-3">
-                        <button
-                            onClick={() => navigate(-1)}
-                            className="h-9 w-9 flex items-center justify-center rounded-full hover:bg-accent transition-colors"
-                        >
-                            <ArrowLeft className="h-5 w-5 text-[#1B2A6B]" />
-                        </button>
-                        <div>
-                            <h1 className="font-bold text-[#1B2A6B] text-base leading-tight">Export Crew List</h1>
-                            <p className="text-xs text-muted-foreground">Select crew to include</p>
+                {/* Top bar */}
+                <div className="bg-card border-b shrink-0 sticky top-0 z-50" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
+                    <div className="px-4 h-16 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <button onClick={() => navigate(-1)} className="p-2 -ml-2 hover:bg-accent rounded-lg transition-colors">
+                                <ArrowLeft className="h-5 w-5" />
+                            </button>
+                            <div className="flex items-center gap-2 font-bold text-xl text-primary">
+                                <Anchor className="h-6 w-6" />
+                                <span>YachtWatch</span>
+                            </div>
                         </div>
+                        <ProfileDropdown />
                     </div>
                 </div>
 
@@ -203,32 +204,37 @@ export default function CrewExportWizard() {
     const scaledH = A4_H * scale;
 
     return (
-        <div className="flex flex-col min-h-screen bg-gray-100">
-            {/* Top bar — safe-area-pt ensures content clears the Dynamic Island */}
-            <div className="safe-area-pt bg-white border-b shrink-0">
-                <div className="flex items-center justify-between px-4 py-3">
-                    <button
-                        onClick={() => setStep(1)}
-                        className="h-9 w-9 flex items-center justify-center rounded-full hover:bg-accent transition-colors"
-                    >
-                        <ArrowLeft className="h-5 w-5 text-[#1B2A6B]" />
-                    </button>
-                    <span className="font-bold text-[#1B2A6B] text-base">Crew List Preview</span>
-                    <Button
-                        size="sm"
-                        className="gap-2 font-semibold"
-                        onClick={() => window.print()}
-                    >
-                        <Printer className="h-4 w-4" />
-                        Print / Save as PDF
-                    </Button>
+        <div className="min-h-screen bg-gray-100">
+            {/* Fixed header — position:fixed is the only reliable way to respect safe-area-inset-top on this page */}
+            <div className="fixed top-0 left-0 right-0 z-50 bg-card border-b" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
+                <div className="px-4 h-16 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <button onClick={() => setStep(1)} className="p-2 -ml-2 hover:bg-accent rounded-lg transition-colors">
+                            <ArrowLeft className="h-5 w-5" />
+                        </button>
+                        <div className="flex items-center gap-2 font-bold text-xl text-primary">
+                            <Anchor className="h-6 w-6" />
+                            <span>YachtWatch</span>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <Button size="sm" className="gap-2 font-semibold" onClick={() => window.print()}>
+                            <Printer className="h-4 w-4" />
+                            Print / Save as PDF
+                        </Button>
+                        <ProfileDropdown />
+                    </div>
                 </div>
             </div>
+
+            {/* Spacer so content starts below the fixed header */}
+            <div style={{ height: 'calc(env(safe-area-inset-top, 0px) + 64px)' }} />
 
             {/* Grey canvas — scrollable, pinch-zoomable */}
             <div
                 ref={wrapperRef}
-                className="flex-1 overflow-auto p-4 flex flex-col items-center"
+                className="overflow-auto p-4 flex flex-col items-center"
+                style={{ height: 'calc(100vh - env(safe-area-inset-top, 0px) - 64px)' }}
             >
                 {/* Outer box sized to scaled A4 so scroll area is correct */}
                 <div style={{ width: A4_W * scale, height: scaledH, position: 'relative', flexShrink: 0 }}>

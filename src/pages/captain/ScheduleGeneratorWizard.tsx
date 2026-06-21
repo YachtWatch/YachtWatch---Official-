@@ -943,8 +943,7 @@ export default function ScheduleGeneratorWizard() {
                                             </div>
 
                                             <div className="flex items-center gap-3">
-                                                {crewPerWatch >= 2 && (
-                                                    <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
+                                                <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
                                                         <span className="text-xs font-medium text-muted-foreground cursor-default">Watch Leader</span>
                                                         <Switch
                                                             checked={u.isWatchLeader || false}
@@ -952,7 +951,6 @@ export default function ScheduleGeneratorWizard() {
                                                             className="data-[state=checked]:bg-primary"
                                                         />
                                                     </div>
-                                                )}
 
                                                 {/* Special case toggle — Nav Watch only, selected crew only */}
                                                 {isSelected && watchType === 'Navigation' && (

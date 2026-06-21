@@ -5,8 +5,9 @@ import { useData } from '../contexts/DataContext';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { ArrowLeft, Save, User, Pencil, ChevronDown, Search, X } from 'lucide-react';
+import { ArrowLeft, Save, User, Pencil, ChevronDown, Search, X, Anchor } from 'lucide-react';
 import { COUNTRIES } from '../lib/countries';
+import { ProfileDropdown } from '../components/ui/ProfileDropdown';
 
 function CountryPickerModal({
     open,
@@ -92,6 +93,8 @@ export default function ProfilePage() {
     const [nationality, setNationality] = useState(user?.nationality || '');
     const [passportNumber, setPassportNumber] = useState(user?.passportNumber || '');
     const [dateOfBirth, setDateOfBirth] = useState(user?.dateOfBirth || '');
+    const [reminder1, setReminder1] = useState(user?.reminder1 ?? 0);
+    const [reminder2, setReminder2] = useState(user?.reminder2 ?? 0);
 
     const [showNationalityPicker, setShowNationalityPicker] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
@@ -111,7 +114,9 @@ export default function ProfilePage() {
             customRole,
             nationality,
             passportNumber,
-            dateOfBirth
+            dateOfBirth,
+            reminder1,
+            reminder2
         };
 
         // Update local auth context
@@ -136,20 +141,26 @@ export default function ProfilePage() {
         />
         <div className="min-h-screen bg-background">
             <header className="border-b bg-card sticky top-0 z-50 safe-area-pt">
-                <div className="container mx-auto px-4 h-16 flex items-center gap-4">
-                    <button
-                        onClick={() => {
-                            if (window.history.length > 2) {
-                                navigate(-1);
-                            } else {
-                                navigate(user?.role === 'captain' ? '/dashboard/captain' : '/dashboard/crew');
-                            }
-                        }}
-                        className="p-2 -ml-2 hover:bg-accent rounded-lg transition-colors"
-                    >
-                        <ArrowLeft className="h-5 w-5" />
-                    </button>
-                    <h1 className="font-semibold">Profile</h1>
+                <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={() => {
+                                if (window.history.length > 2) {
+                                    navigate(-1);
+                                } else {
+                                    navigate(user?.role === 'captain' ? '/dashboard/captain' : '/dashboard/crew');
+                                }
+                            }}
+                            className="p-2 -ml-2 hover:bg-accent rounded-lg transition-colors"
+                        >
+                            <ArrowLeft className="h-5 w-5" />
+                        </button>
+                        <div className="flex items-center gap-2 font-bold text-xl text-primary">
+                            <Anchor className="h-6 w-6" />
+                            <span>YachtWatch</span>
+                        </div>
+                    </div>
+                    <ProfileDropdown />
                 </div>
             </header>
 
@@ -246,6 +257,30 @@ export default function ProfilePage() {
                                     />
                                 </div>
 
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">Watch Reminders</label>
+                                    <p className="text-xs text-muted-foreground">Get notified before your watch starts.</p>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        {[{ label: 'Reminder 1', value: reminder1, set: setReminder1 }, { label: 'Reminder 2', value: reminder2, set: setReminder2 }].map(({ label, value, set }) => (
+                                            <div key={label} className="space-y-1">
+                                                <label className="text-xs text-muted-foreground">{label}</label>
+                                                <select
+                                                    value={value}
+                                                    onChange={e => set(Number(e.target.value))}
+                                                    className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm"
+                                                >
+                                                    <option value={0}>Off</option>
+                                                    <option value={5}>5 min before</option>
+                                                    <option value={10}>10 min before</option>
+                                                    <option value={15}>15 min before</option>
+                                                    <option value={30}>30 min before</option>
+                                                    <option value={60}>1 hour before</option>
+                                                </select>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
                                 <div className="flex gap-3 pt-2">
                                     <Button type="button" variant="outline" className="flex-1" onClick={() => setIsEditing(false)}>
                                         Cancel
@@ -282,6 +317,12 @@ export default function ProfilePage() {
                                     <div className="space-y-1">
                                         <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Passport Number</label>
                                         <div className="text-base font-medium font-mono">{user?.passportNumber || 'Not set'}</div>
+                                    </div>
+                                    <div className="space-y-1 sm:col-span-2">
+                                        <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Watch Reminders</label>
+                                        <div className="text-base font-medium">
+                                            {[user?.reminder1, user?.reminder2].filter(r => r && r > 0).map(r => r === 60 ? '1 hour' : `${r} min`).join(' · ') || 'Off'}
+                                        </div>
                                     </div>
                                 </div>
                                 <Button className="w-full" onClick={() => setIsEditing(true)}>

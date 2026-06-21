@@ -3,11 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Switch } from '../components/ui/switch';
-import { ArrowLeft, Moon, Sun, Bell, Ship, Globe } from 'lucide-react';
+import { ArrowLeft, Moon, Sun, Bell, Ship, Globe, Anchor } from 'lucide-react';
 import { useTheme } from '../components/theme-provider';
 
 import { useAuth } from '../contexts/AuthContext';
 import { useData } from '../contexts/DataContext';
+import { ProfileDropdown } from '../components/ui/ProfileDropdown';
 import { NotificationService } from '../services/NotificationService';
 
 function formatOffset(tz: string): string {
@@ -30,20 +31,26 @@ export default function SettingsPage() {
     return (
         <div className="min-h-screen bg-background">
             <header className="border-b bg-card sticky top-0 z-50 safe-area-pt">
-                <div className="container mx-auto px-4 h-16 flex items-center gap-4">
-                    <button
-                        onClick={() => {
-                            if (window.history.length > 2) {
-                                navigate(-1);
-                            } else {
-                                navigate(user?.role === 'captain' ? '/dashboard/captain' : '/dashboard/crew');
-                            }
-                        }}
-                        className="p-2 -ml-2 hover:bg-accent rounded-lg transition-colors"
-                    >
-                        <ArrowLeft className="h-5 w-5" />
-                    </button>
-                    <h1 className="font-semibold">Settings</h1>
+                <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={() => {
+                                if (window.history.length > 2) {
+                                    navigate(-1);
+                                } else {
+                                    navigate(user?.role === 'captain' ? '/dashboard/captain' : '/dashboard/crew');
+                                }
+                            }}
+                            className="p-2 -ml-2 hover:bg-accent rounded-lg transition-colors"
+                        >
+                            <ArrowLeft className="h-5 w-5" />
+                        </button>
+                        <div className="flex items-center gap-2 font-bold text-xl text-primary">
+                            <Anchor className="h-6 w-6" />
+                            <span>YachtWatch</span>
+                        </div>
+                    </div>
+                    <ProfileDropdown />
                 </div>
             </header>
 

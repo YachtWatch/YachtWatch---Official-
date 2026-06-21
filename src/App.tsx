@@ -59,7 +59,7 @@ function App() {
     useEffect(() => {
         if (Capacitor.isNativePlatform()) {
             // Set a consistent status bar style
-            StatusBar.setStyle({ style: Style.Dark });
+            StatusBar.setStyle({ style: Style.Light });
 
             if (Capacitor.getPlatform() === 'ios') {
                 StatusBar.setOverlaysWebView({ overlay: true });
