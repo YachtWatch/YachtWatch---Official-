@@ -845,9 +845,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
             timezone: schedule.timezone,
             watch_config: schedule.watchConfig,
             slots: schedule.slots,
-            standing_orders: schedule.standingOrders || [],
-            acknowledgments: {},
-            order_completions: {},
         });
 
         if (insertError) {
