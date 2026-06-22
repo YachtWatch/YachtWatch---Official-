@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/button';
 import { Card, CardContent } from '../../components/ui/card';
 import { UserData, Vessel } from '../../contexts/DataContext';
-import { X, Check, Printer, RefreshCw, Anchor, Compass, Coffee, Wrench, Users, Star, PenLine, Trash2, Share2, QrCode } from 'lucide-react';
+import { X, Check, Printer, Anchor, Compass, Coffee, Wrench, Users, Star, PenLine, Trash2, Share2, QrCode, ChevronDown, ChevronRight } from 'lucide-react';
 import { InviteShareModal } from '../../components/InviteShareModal';
 import QRCode from 'react-qr-code';
 
@@ -44,10 +44,11 @@ const getDepartment = (role: string) => {
     return 'other';
 };
 
-export function CaptainCrewView({ vessel, schedule, captainName, pendingRequests, users, onEditRole, onRemoveCrew, onRequestAction, onRefresh }: CaptainCrewViewProps) {
+export function CaptainCrewView({ vessel, schedule, captainName, pendingRequests, users, onEditRole, onRemoveCrew, onRequestAction }: CaptainCrewViewProps) {
     const navigate = useNavigate();
     const [showInvite, setShowInvite] = useState(false);
     const [showQRModal, setShowQRModal] = useState(false);
+    const [requestsExpanded, setRequestsExpanded] = useState(pendingRequests.length > 0);
     // Ensure captain is properly represented if missing from users array
     const captainUser = users.find(u => u.id === vessel.captainId) || {
         id: vessel.captainId || 'captain',
@@ -86,7 +87,7 @@ export function CaptainCrewView({ vessel, schedule, captainName, pendingRequests
                     </div>
                     <div className="flex flex-col items-center gap-1">
                         <div
-                            className="text-3xl font-mono font-bold tracking-[0.2em] text-primary bg-background px-6 py-3 rounded-lg border shadow-sm select-all cursor-pointer hover:border-primary transition-colors"
+                            className="text-3xl font-mono font-bold tracking-[0.2em] text-primary bg-white px-6 py-3 rounded-lg border shadow-sm select-all cursor-pointer hover:border-primary transition-colors"
                             onClick={() => { navigator.clipboard.writeText(vessel.joinCode); alert('Copied to clipboard!'); }}
                             title="Click to copy"
                         >
@@ -98,7 +99,7 @@ export function CaptainCrewView({ vessel, schedule, captainName, pendingRequests
                         <button
                             type="button"
                             onClick={() => setShowQRModal(true)}
-                            className="flex items-center justify-center gap-2 py-2.5 rounded-lg border border-[rgba(27,42,107,0.25)] text-[#1B2A6B] bg-background hover:bg-[#1B2A6B]/5 transition-colors font-semibold text-sm"
+                            className="flex items-center justify-center gap-2 py-2.5 rounded-lg border border-[rgba(27,42,107,0.25)] text-[#1B2A6B] bg-white hover:bg-[#1B2A6B]/5 transition-colors font-semibold text-sm"
                         >
                             <QrCode className="h-4 w-4 shrink-0" />
                             QR Code
@@ -106,7 +107,7 @@ export function CaptainCrewView({ vessel, schedule, captainName, pendingRequests
                         <button
                             type="button"
                             onClick={() => setShowInvite(true)}
-                            className="flex items-center justify-center gap-2 py-2.5 rounded-lg border border-[rgba(27,42,107,0.25)] text-[#1B2A6B] bg-background hover:bg-[#1B2A6B]/5 transition-colors font-semibold text-sm"
+                            className="flex items-center justify-center gap-2 py-2.5 rounded-lg border border-[rgba(27,42,107,0.25)] text-[#1B2A6B] bg-white hover:bg-[#1B2A6B]/5 transition-colors font-semibold text-sm"
                         >
                             <Share2 className="h-4 w-4 shrink-0" />
                             Share
@@ -158,41 +159,42 @@ export function CaptainCrewView({ vessel, schedule, captainName, pendingRequests
                 </div>
             )}
 
-            {/* Pending Requests Section */}
-            <div className="print:hidden">
-                <h3 className="font-bold mb-4 flex items-center gap-2">
-                    Pending Requests
-                    {pendingRequests.length > 0 && <span className="px-2 py-1 text-xs bg-primary text-white rounded-full">{pendingRequests.length}</span>}
-                    <Button variant="ghost" size="sm" className="ml-auto" onClick={onRefresh}>
-                        <RefreshCw className="h-4 w-4 mr-2" />
-                        Refresh
-                    </Button>
-                </h3>
-                {pendingRequests.length === 0 ? (
-                    <div className="text-sm text-muted-foreground p-4 border rounded-lg bg-card/30 border-dashed">
-                        No pending join requests.
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {pendingRequests.map(req => (
-                            <div key={req.id} className="flex items-center justify-between p-4 border rounded-lg bg-card shadow-sm">
-                                <div>
-                                    <div className="font-bold text-sm">{req.userFirstName} {req.userLastName}</div>
-                                    <div className="text-xs text-muted-foreground">Request sent today</div>
+            {/* Pending Requests Section — only shown when requests exist */}
+            {pendingRequests.length > 0 && (
+                <div className="print:hidden">
+                    <button
+                        className="w-full flex items-center gap-2 mb-1"
+                        onClick={() => setRequestsExpanded(e => !e)}
+                    >
+                        {requestsExpanded
+                            ? <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0" />
+                            : <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />}
+                        <span className="font-bold">Pending Requests</span>
+                        <span className="px-2 py-0.5 text-xs bg-primary text-white rounded-full">{pendingRequests.length}</span>
+                    </button>
+
+                    {requestsExpanded && (
+                        <div className="mt-3 mb-2 space-y-2">
+                            {pendingRequests.map(req => (
+                                <div key={req.id} className="flex items-center justify-between p-4 border rounded-lg bg-card shadow-sm">
+                                    <div>
+                                        <div className="font-bold text-sm">{req.userFirstName} {req.userLastName}</div>
+                                        <div className="text-xs text-muted-foreground">Pending join request</div>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <Button size="sm" variant="outline" className="h-8 w-8 p-0 text-destructive hover:bg-destructive/10" onClick={() => onRequestAction(req.id, 'rejected')}>
+                                            <X className="h-4 w-4" />
+                                        </Button>
+                                        <Button size="sm" className="h-8 w-8 p-0 bg-green-600 hover:bg-green-700 text-white" onClick={() => onRequestAction(req.id, 'approved')}>
+                                            <Check className="h-4 w-4" />
+                                        </Button>
+                                    </div>
                                 </div>
-                                <div className="flex gap-2">
-                                    <Button size="sm" variant="outline" className="h-8 w-8 p-0 text-destructive hover:bg-destructive/10" onClick={() => onRequestAction(req.id, 'rejected')}>
-                                        <X className="h-4 w-4" />
-                                    </Button>
-                                    <Button size="sm" className="h-8 w-8 p-0 bg-green-600 hover:bg-green-700 text-white" onClick={() => onRequestAction(req.id, 'approved')}>
-                                        <Check className="h-4 w-4" />
-                                    </Button>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
-            </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            )}
 
             {/* Active Crew Section */}
             <div className="print:hidden">
@@ -203,6 +205,7 @@ export function CaptainCrewView({ vessel, schedule, captainName, pendingRequests
                         Export Crew List
                     </Button>
                 </div>
+
 
                 {finalCrewList.length === 0 ? (
                     <p className="text-muted-foreground">No crew members yet.</p>
