@@ -1,5 +1,5 @@
 import { TimezoneWarningBanner } from '../../components/TimezoneWarningBanner';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { SailboatLoader } from '../../components/SailboatLoader';
 import { useData } from '../../contexts/DataContext';
@@ -33,6 +33,28 @@ export default function CaptainDashboard() {
     const [vesselCapacity, setVesselCapacity] = useState('');
 
     const vessel = user?.vesselId ? getVessel(user.vesselId) : undefined;
+
+    // Retry logic: if initialLoadComplete but vessel is missing, retry up to 3 times
+    // before showing the error. Absorbs race conditions on cold start / slow networks.
+    const [vesselMissingConfirmed, setVesselMissingConfirmed] = useState(false);
+    const retryCountRef = useRef(0);
+    useEffect(() => {
+        if (!initialLoadComplete || !user?.vesselId || vessel) {
+            setVesselMissingConfirmed(false);
+            retryCountRef.current = 0;
+            return;
+        }
+        if (retryCountRef.current >= 3) {
+            setVesselMissingConfirmed(true);
+            return;
+        }
+        const delay = 1500 * Math.pow(2, retryCountRef.current); // 1.5s, 3s, 6s
+        const timer = setTimeout(async () => {
+            retryCountRef.current += 1;
+            await refreshData();
+        }, delay);
+        return () => clearTimeout(timer);
+    }, [initialLoadComplete, user?.vesselId, vessel, refreshData]);
 
     // O(1) user lookup — avoids nested .find() inside crew-list renders.
     const userById = useMemo(
@@ -158,9 +180,7 @@ export default function CaptainDashboard() {
     }
 
     if (!vessel) {
-        // Double check: if user has a vesselId but we can't find it, it might still be loading or it was deleted.
-        // But since we checked 'loading' above, if we are here and have vesselId but no vessel, it's an error state (or deleted).
-        if (user?.vesselId && initialLoadComplete) {
+        if (user?.vesselId && vesselMissingConfirmed) {
             return (
                 <div className="container max-w-md mx-auto py-12 px-4 text-center">
                     <Card>
@@ -293,7 +313,7 @@ export default function CaptainDashboard() {
                                             <Users className="h-6 w-6" />
                                         </div>
                                         <div className="text-sm text-muted-foreground font-medium mb-1">Crew Size</div>
-                                        <div className="font-bold text-lg leading-tight">{approvedCrew.length + 1}</div>
+                                        <div className="font-bold text-lg leading-tight">{users.filter(u => u.id === user?.id || u.vesselId === vessel.id).length}</div>
                                     </Card>
                                 </div>
 

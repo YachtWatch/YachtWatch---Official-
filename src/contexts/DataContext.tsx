@@ -19,8 +19,10 @@ export interface WatchConfig {
     endHour?: number;
     weekdayStartHour?: number;
     weekdayEndHour?: number;
+    weekdayCrewPerWatch?: number;
     weekendStartHour?: number;
     weekendEndHour?: number;
+    weekendCrewPerWatch?: number;
     isStaggered?: boolean;
     watchLeaderCount?: number;
 }
@@ -797,23 +799,37 @@ export function DataProvider({ children }: { children: ReactNode }) {
     const getRequestsForVessel = (vesselId: string) => requests.filter(r => r.vesselId === vesselId);
 
     const updateRequestStatus = async (requestId: string, status: 'approved' | 'rejected') => {
+        const request = requests.find(r => r.id === requestId);
+
+        if (status === 'rejected') {
+            if (!request) return;
+            // Delete the request entirely — keeps the DB clean and lets the crew re-join later
+            const { error: delError } = await supabase.from('join_requests').delete().eq('id', requestId);
+            if (delError) console.error('Failed to delete join request:', delError);
+            // Clear vessel_id from the crew member's profile so they return to the join page
+            const { error: profError } = await supabase.from('profiles').update({ vessel_id: null }).eq('id', request.userId);
+            if (profError) console.error('Failed to clear vessel_id from profile:', profError);
+            // Remove any vessel_members row in case one exists
+            await supabase.from('vessel_members').delete().eq('user_id', request.userId).eq('vessel_id', request.vesselId);
+            await refreshData();
+            return;
+        }
+
+        // Approved path
         const { error } = await supabase.from('join_requests').update({ status }).eq('id', requestId);
         if (error) throw error;
 
-        const request = requests.find(r => r.id === requestId);
         if (request) {
-            if (status === 'approved') {
-                const { error: insertError } = await supabase
-                    .from('vessel_members')
-                    .upsert({
-                        vessel_id: request.vesselId,
-                        user_id: request.userId,
-                        role: 'crew'
-                    }, { onConflict: 'user_id, vessel_id' });
-
-                if (insertError) console.error("Failed to add vessel member:", insertError);
-            }
+            const { error: insertError } = await supabase
+                .from('vessel_members')
+                .upsert({
+                    vessel_id: request.vesselId,
+                    user_id: request.userId,
+                    role: 'crew'
+                }, { onConflict: 'user_id, vessel_id' });
+            if (insertError) console.error('Failed to add vessel member:', insertError);
         }
+
         await refreshData();
     };
 

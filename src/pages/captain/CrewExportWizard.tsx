@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useData, UserData } from '../../contexts/DataContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../components/ui/button';
-import { ArrowLeft, Printer, Anchor } from 'lucide-react';
+import { ArrowLeft, Anchor } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { ProfileDropdown } from '../../components/ui/ProfileDropdown';
 
@@ -29,6 +29,20 @@ export default function CrewExportWizard() {
 
     const [step, setStep] = useState<1 | 2>(1);
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
+    const [safeTop, setSafeTop] = useState(0);
+
+    // Read safe-area-inset-top via JS — more reliable than CSS env() in Capacitor WebView
+    useEffect(() => {
+        const probe = document.createElement('div');
+        probe.style.position = 'fixed';
+        probe.style.top = '0';
+        probe.style.paddingTop = 'env(safe-area-inset-top, 0px)';
+        probe.style.visibility = 'hidden';
+        document.body.appendChild(probe);
+        const value = parseInt(window.getComputedStyle(probe).paddingTop || '0', 10);
+        document.body.removeChild(probe);
+        setSafeTop(value || 0);
+    }, []);
 
     const wrapperRef = useRef<HTMLDivElement>(null);
     const [scale, setScale] = useState(1);
@@ -100,7 +114,7 @@ export default function CrewExportWizard() {
         return (
             <div className="flex flex-col min-h-screen bg-background">
                 {/* Top bar */}
-                <div className="bg-card border-b shrink-0 sticky top-0 z-50" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
+                <div className="bg-card border-b shrink-0 sticky top-0 z-50" style={{ paddingTop: safeTop }}>
                     <div className="px-4 h-16 flex items-center justify-between">
                         <div className="flex items-center gap-3">
                             <button onClick={() => navigate(-1)} className="p-2 -ml-2 hover:bg-accent rounded-lg transition-colors">
@@ -204,9 +218,9 @@ export default function CrewExportWizard() {
     const scaledH = A4_H * scale;
 
     return (
-        <div className="min-h-screen bg-gray-100">
-            {/* Fixed header — position:fixed is the only reliable way to respect safe-area-inset-top on this page */}
-            <div className="fixed top-0 left-0 right-0 z-50 bg-card border-b" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
+        <div className="flex flex-col bg-white" style={{ height: '100vh' }}>
+            {/* Header — JS-measured safeTop is reliable here */}
+            <div className="bg-card border-b shrink-0" style={{ paddingTop: safeTop }}>
                 <div className="px-4 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <button onClick={() => setStep(1)} className="p-2 -ml-2 hover:bg-accent rounded-lg transition-colors">
@@ -217,28 +231,16 @@ export default function CrewExportWizard() {
                             <span>YachtWatch</span>
                         </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                        <Button size="sm" className="gap-2 font-semibold" onClick={() => window.print()}>
-                            <Printer className="h-4 w-4" />
-                            Print / Save as PDF
-                        </Button>
-                        <ProfileDropdown />
-                    </div>
+                    <ProfileDropdown />
                 </div>
             </div>
-
-            {/* Spacer so content starts below the fixed header */}
-            <div style={{ height: 'calc(env(safe-area-inset-top, 0px) + 64px)' }} />
 
             {/* Grey canvas — scrollable, pinch-zoomable */}
             <div
                 ref={wrapperRef}
-                className="overflow-auto p-4 flex flex-col items-center"
-                style={{ height: 'calc(100vh - env(safe-area-inset-top, 0px) - 64px)' }}
+                className="flex-1 overflow-auto p-4 flex flex-col items-center"
             >
-                {/* Outer box sized to scaled A4 so scroll area is correct */}
                 <div style={{ width: A4_W * scale, height: scaledH, position: 'relative', flexShrink: 0 }}>
-                    {/* A4 page at natural size, scaled down via transform */}
                     <div
                         style={{
                             width: A4_W,
@@ -260,8 +262,17 @@ export default function CrewExportWizard() {
                         />
                     </div>
                 </div>
-                {/* Bottom breathing room */}
-                <div style={{ height: 32 }} />
+                <div style={{ height: 16 }} />
+            </div>
+
+            {/* Bottom button — same container as Generate Crew List */}
+            <div
+                className="bg-white border-t px-4 pt-3 shrink-0"
+                style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 20px) + 47px)' }}
+            >
+                <Button className="w-full h-12 text-base font-semibold shadow-lg" onClick={() => window.print()}>
+                    Print / Save as PDF
+                </Button>
             </div>
 
             <style>{`

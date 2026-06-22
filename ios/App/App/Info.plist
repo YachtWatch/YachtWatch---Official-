@@ -68,5 +68,7 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>YachtWatch uses your camera to scan QR codes for joining a vessel.</string>
 </dict>
 </plist>

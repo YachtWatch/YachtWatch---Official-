@@ -3,7 +3,7 @@ import { useState, memo } from 'react';
 import { Button } from '../../components/ui/button';
 import { Switch } from '../../components/ui/switch';
 import { Card } from '../../components/ui/card';
-import { Clock, Users, Download, ClipboardList, CheckCircle2, Circle } from 'lucide-react';
+import { Clock, Users, Share2, ClipboardList, CheckCircle2, Circle } from 'lucide-react';
 import { PrintService } from '../../services/PrintService';
 import { WatchSchedule, JoinRequest, UserData } from '../../contexts/DataContext';
 import { ScheduleMatrixView } from '../../components/ScheduleMatrixView';
@@ -87,13 +87,22 @@ export const CaptainScheduleView = memo(function CaptainScheduleView({
         );
     }
 
-    // Calculate generic watch duration from the first slot (approximate)
     const firstSlot = schedule.slots[0];
     const watchDurationHours = firstSlot
         ? (new Date(firstSlot.end).getTime() - new Date(firstSlot.start).getTime()) / (1000 * 60 * 60)
         : 0;
 
     const displayCrewPerWatch = schedule.watchConfig.crewPerWatch || (firstSlot ? firstSlot.crew.length : '-');
+
+    const isDock = schedule.watchType === 'dock';
+    const wdStart = schedule.watchConfig.weekdayStartHour ?? 8;
+    const wdEnd   = schedule.watchConfig.weekdayEndHour   ?? 20;
+    const weStart = schedule.watchConfig.weekendStartHour ?? 8;
+    const weEnd   = schedule.watchConfig.weekendEndHour   ?? 20;
+    const wdHours = ((wdEnd - wdStart) + 24) % 24 || 24;
+    const weHours = ((weEnd - weStart) + 24) % 24 || 24;
+    const wdCPW   = schedule.watchConfig.weekdayCrewPerWatch ?? 1;
+    const weCPW   = schedule.watchConfig.weekendCrewPerWatch ?? 1;
 
     const handleDelete = () => {
         setShowDeleteConfirm(true);
@@ -185,7 +194,7 @@ export const CaptainScheduleView = memo(function CaptainScheduleView({
                                     onClick={handleShare}
                                     title="Share / Save PDF"
                                 >
-                                    <Download className="h-4 w-4" />
+                                    <Share2 className="h-4 w-4" />
                                 </Button>
                             </div>
                         </div>
@@ -200,9 +209,16 @@ export const CaptainScheduleView = memo(function CaptainScheduleView({
                                     <Clock className="h-3.5 w-3.5" />
                                     <span>Duration</span>
                                 </div>
-                                <div className="text-lg font-semibold text-foreground">
-                                    {Number.isInteger(watchDurationHours) ? watchDurationHours : watchDurationHours.toFixed(1)}h <span className="text-sm font-normal text-muted-foreground">watches</span>
-                                </div>
+                                {isDock ? (
+                                    <div className="flex flex-col gap-0.5">
+                                        <div className="text-sm font-semibold text-foreground">Weekdays <span className="font-normal text-muted-foreground">·</span> {wdHours}h</div>
+                                        <div className="text-sm font-semibold text-foreground">Weekends <span className="font-normal text-muted-foreground">·</span> {weHours}h</div>
+                                    </div>
+                                ) : (
+                                    <div className="text-lg font-semibold text-foreground">
+                                        {Number.isInteger(watchDurationHours) ? watchDurationHours : watchDurationHours.toFixed(1)}h <span className="text-sm font-normal text-muted-foreground">watches</span>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="w-px self-stretch bg-border/40" />
@@ -212,9 +228,16 @@ export const CaptainScheduleView = memo(function CaptainScheduleView({
                                     <Users className="h-3.5 w-3.5" />
                                     <span>Crew</span>
                                 </div>
-                                <div className="text-lg font-semibold text-foreground">
-                                    {displayCrewPerWatch} <span className="text-sm font-normal text-muted-foreground">per watch</span>
-                                </div>
+                                {isDock ? (
+                                    <div className="flex flex-col gap-0.5">
+                                        <div className="text-sm font-semibold text-foreground">Weekdays <span className="font-normal text-muted-foreground">·</span> {wdCPW}</div>
+                                        <div className="text-sm font-semibold text-foreground">Weekends <span className="font-normal text-muted-foreground">·</span> {weCPW}</div>
+                                    </div>
+                                ) : (
+                                    <div className="text-lg font-semibold text-foreground">
+                                        {displayCrewPerWatch} <span className="text-sm font-normal text-muted-foreground">per watch</span>
+                                    </div>
+                                )}
                             </div>
                         </div>
 

@@ -59,6 +59,8 @@ const PickerTrigger = React.forwardRef<HTMLDivElement, { value?: string; onClick
 
 const clockIcon = <Clock style={{ width: 16, height: 16, color: '#94a3b8', flexShrink: 0 }} />;
 
+
+
 const TimePickerField: React.FC<{ label: string; value: string; onChange: (v: string) => void; isNextDay?: boolean }> = ({ label, value, onChange, isNextDay }) => {
     const native = Capacitor.isNativePlatform();
     const parsed = value ? (() => { const [h, m] = value.split(':').map(Number); const d = new Date(); d.setHours(h, m, 0, 0); return d; })() : null;
@@ -80,7 +82,7 @@ const TimePickerField: React.FC<{ label: string; value: string; onChange: (v: st
                     selected={parsed}
                     onChange={(d: Date | null) => d && onChange(d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }))}
                     showTimeSelect showTimeSelectOnly
-                    timeIntervals={30}
+                    timeIntervals={15}
                     timeFormat="HH:mm"
                     dateFormat="HH:mm"
                     placeholderText="Select time"
@@ -136,12 +138,7 @@ function SortableOrderCard({ order, isExpanded, onToggleExpand, onRemove, onUpda
                         <label style={{ fontSize: 12 }} className="font-medium text-foreground w-24 flex-shrink-0">Tied time</label>
                         <div style={{ ...fieldStyle, flex: 1, padding: '8px 12px', position: 'relative' }}>
                             <span style={{ fontSize: 13, color: order.time ? '#0f172a' : '#94a3b8' }}>{order.time || 'No time'}</span>
-                            <input
-                                type="time"
-                                value={order.time || ''}
-                                onChange={e => onUpdate({ time: e.target.value || undefined })}
-                                style={{ position: 'absolute', inset: 0, opacity: 0, width: '100%', height: '100%', cursor: 'pointer' }}
-                            />
+                            <input type="time" value={order.time || ''} onChange={e => onUpdate({ time: e.target.value || undefined })} style={{ position: 'absolute', inset: 0, opacity: 0, width: '100%', height: '100%', cursor: 'pointer' }} />
                         </div>
                         {order.time && (
                             <button type="button" onClick={() => onUpdate({ time: undefined })} className="text-xs text-muted-foreground underline flex-shrink-0">Clear</button>
@@ -200,7 +197,8 @@ export default function ScheduleGeneratorWizard() {
         if (existingSchedule && existingSchedule.slots.length > 0) {
             return new Date(existingSchedule.slots[0].start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
         }
-        return "12:00";
+        const now = new Date();
+        return `${String(now.getHours()).padStart(2, '0')}:00`;
     });
 
     const [endDate, setEndDate] = useState(() => {
@@ -260,6 +258,9 @@ export default function ScheduleGeneratorWizard() {
         const h = existingSchedule?.watchConfig?.weekdayEndHour;
         return h !== undefined ? String(h).padStart(2, '0') + ':00' : '20:00';
     });
+    const [dockWeekdayCrewPerWatch, setDockWeekdayCrewPerWatch] = useState(() =>
+        existingSchedule?.watchConfig?.weekdayCrewPerWatch ?? 1
+    );
     const [dockWeekendStart, setDockWeekendStart] = useState(() => {
         const h = existingSchedule?.watchConfig?.weekendStartHour;
         return h !== undefined ? String(h).padStart(2, '0') + ':00' : '08:00';
@@ -268,6 +269,9 @@ export default function ScheduleGeneratorWizard() {
         const h = existingSchedule?.watchConfig?.weekendEndHour;
         return h !== undefined ? String(h).padStart(2, '0') + ':00' : '20:00';
     });
+    const [dockWeekendCrewPerWatch, setDockWeekendCrewPerWatch] = useState(() =>
+        existingSchedule?.watchConfig?.weekendCrewPerWatch ?? 1
+    );
 
     // -- Step 2: Crew State --
     // Per-crew restrictions for Nav Watch special cases (max watches/day, available hours)
@@ -319,6 +323,7 @@ export default function ScheduleGeneratorWizard() {
 
     // -- Step 3: Preview and Paywall State --
     const [previewSchedule, setPreviewSchedule] = useState<WatchSchedule | null>(null);
+    const [scheduleViolations, setScheduleViolations] = useState<string[]>([]);
     const [showPaywall, setShowPaywall] = useState(false);
 
     // Filter crew logic updated to only look at `users` state directly
@@ -373,36 +378,31 @@ export default function ScheduleGeneratorWizard() {
         }
 
         const slots = [];
-        let currentTime = new Date(startDateTime);
         let slotId = 1;
 
-        // For dock watch, duration is the weekday watch window length (weekend may differ but the
-        // hour-filter handles off-duty marking). Clamp to 1h minimum to avoid infinite loops.
-        const effectiveDuration = watchType === 'dock'
-            ? Math.max(1, (parseInt(dockWeekdayEnd.split(':')[0], 10) - parseInt(dockWeekdayStart.split(':')[0], 10) + 24) % 24)
-            : duration;
-
-        const offsetHours = isStaggered && crewPerWatch > 1 ? (effectiveDuration / crewPerWatch) : effectiveDuration;
-        const loopIncrement = offsetHours * 60 * 60 * 1000;
+        const parseHour = (t: string) => parseInt(t.split(':')[0], 10);
+        const parseMin  = (t: string) => parseInt(t.split(':')[1] ?? '0', 10);
 
         const orderedCrew = selectedCrewIds.map(id => availableCrew.find(u => u.id === id)).filter(Boolean) as UserData[];
         if (orderedCrew.length === 0) return;
 
-        // Returns true if the date's local hour falls within [startStr, endStr] (handles midnight-spanning windows)
-        const parseHour = (t: string) => parseInt(t.split(':')[0], 10);
         const isWithinHours = (date: Date, startStr: string, endStr: string): boolean => {
             const h = date.getHours();
             const s = parseHour(startStr);
             const e = parseHour(endStr);
-            if (s > e) return h >= s || h < e;
+            if (s >= e) return h >= s || h < e; // overnight or same (24h)
             return h >= s && h < e;
         };
 
-        let iter = 0;
-        let rotationIdx = 0; // advances independently for restriction-aware assignment
+        let rotationIdx = 0;
         const watchesOnDay: Record<string, Record<string, number>> = {};
         const totalCrew = orderedCrew.length;
         const hasRestrictions = watchType === 'Navigation' && Object.keys(restrictions).length > 0;
+
+        const constrainedPlacedOnDay: Record<string, Set<string>> = {};
+        const constrainedCrew = orderedCrew.filter(u => restrictions[u.id]);
+        const unconstrainedCrew = orderedCrew.filter(u => !restrictions[u.id]);
+        constrainedCrew.forEach(u => { constrainedPlacedOnDay[u.id] = new Set(); });
 
         const crewLabel = (u: UserData) => {
             const isCaptain = u.id === currentUser?.id;
@@ -412,11 +412,90 @@ export default function ScheduleGeneratorWizard() {
             };
         };
 
+        // ── Dock watch: one slot per calendar day, correctly anchored to the window ──
+        if (watchType === 'dock') {
+            const effectiveDuration = duration; // used only for watchConfig saving
+            const day = new Date(startDateTime);
+            day.setHours(0, 0, 0, 0);
+            const endDay = new Date(endDateTime);
+            endDay.setHours(0, 0, 0, 0);
+
+            while (day <= endDay) {
+                const isWkend = day.getDay() === 0 || day.getDay() === 6;
+                const wStart  = isWkend ? dockWeekendStart  : dockWeekdayStart;
+                const wEnd    = isWkend ? dockWeekendEnd    : dockWeekdayEnd;
+                const slotCPW = isWkend ? dockWeekendCrewPerWatch : dockWeekdayCrewPerWatch;
+
+                const slotStart = new Date(day);
+                slotStart.setHours(parseHour(wStart), parseMin(wStart), 0, 0);
+
+                const slotEnd = new Date(day);
+                slotEnd.setHours(parseHour(wEnd), parseMin(wEnd), 0, 0);
+                // Same time or end before start → overnight / 24h → end is next day
+                if (slotEnd.getTime() <= slotStart.getTime()) {
+                    slotEnd.setDate(slotEnd.getDate() + 1);
+                }
+
+                const dateKey = day.toISOString().split('T')[0];
+                const activeCrewInChunk: { userId: string; userFirstName: string; userLastName: string }[] = [];
+
+                let added = 0;
+                let attempts = 0;
+                const startIdx = rotationIdx;
+                while (added < slotCPW && attempts < totalCrew * 2) {
+                    const u = orderedCrew[rotationIdx % totalCrew];
+                    rotationIdx++;
+                    attempts++;
+                    if (activeCrewInChunk.find(a => a.userId === u.id)) continue;
+                    activeCrewInChunk.push({ userId: u.id, ...crewLabel(u) });
+                    if (!watchesOnDay[u.id]) watchesOnDay[u.id] = {};
+                    watchesOnDay[u.id][dateKey] = (watchesOnDay[u.id][dateKey] ?? 0) + 1;
+                    added++;
+                }
+                if (added < slotCPW) {
+                    let fallback = startIdx;
+                    while (added < slotCPW) {
+                        const u = orderedCrew[fallback % totalCrew];
+                        fallback++;
+                        if (activeCrewInChunk.find(a => a.userId === u.id)) continue;
+                        activeCrewInChunk.push({ userId: u.id, ...crewLabel(u) });
+                        added++;
+                    }
+                }
+
+                slots.push({ id: slotId++, start: slotStart.toISOString(), end: slotEnd.toISOString(), crew: activeCrewInChunk, condition: 'always' as const });
+
+                day.setDate(day.getDate() + 1);
+            }
+
+            // Save and show preview
+            const newSchedule = {
+                id: 'preview-id', vesselId: 'current-vessel', name: scheduleName, watchType,
+                createdAt: new Date().toISOString(), timezone: currentVessel?.timezone || 'UTC',
+                standingOrders, watchConfig: {
+                    crewPerWatch, duration: effectiveDuration, isStaggered, watchLeaderCount: 0,
+                    weekdayStartHour: parseHour(dockWeekdayStart), weekdayEndHour: parseHour(dockWeekdayEnd),
+                    weekdayCrewPerWatch: dockWeekdayCrewPerWatch,
+                    weekendStartHour: parseHour(dockWeekendStart), weekendEndHour: parseHour(dockWeekendEnd),
+                    weekendCrewPerWatch: dockWeekendCrewPerWatch,
+                }, slots
+            };
+            setPreviewSchedule(newSchedule as any);
+            setScheduleViolations([]);
+            setStep(3);
+            return;
+        }
+
+        // ── Nav / Anchor watch: fixed-duration slot loop ──
+        const effectiveDuration = duration;
+        const offsetHours = isStaggered && crewPerWatch > 1 ? (effectiveDuration / crewPerWatch) : effectiveDuration;
+        const loopIncrement = offsetHours * 60 * 60 * 1000;
+        let currentTime = new Date(startDateTime);
+
         while (currentTime < endDateTime) {
             const chunkStart = new Date(currentTime);
             const chunkEnd = new Date(currentTime.getTime() + loopIncrement);
             currentTime = chunkEnd;
-            iter++;
 
             // Determine whether this slot is active, off-duty, or skipped entirely
             let shouldSkip = false;
@@ -424,51 +503,84 @@ export default function ScheduleGeneratorWizard() {
 
             if (watchType === 'anchor') {
                 if (!isWithinHours(chunkStart, anchorStartTime, anchorEndTime)) shouldSkip = true;
-            } else if (watchType === 'dock') {
-                const isWkend = chunkStart.getDay() === 0 || chunkStart.getDay() === 6;
-                const wStart = isWkend ? dockWeekendStart : dockWeekdayStart;
-                const wEnd = isWkend ? dockWeekendEnd : dockWeekdayEnd;
-                if (!isWithinHours(chunkStart, wStart, wEnd)) condition = 'outside-watch-hours';
             }
 
             if (shouldSkip) continue;
 
+            const slotCrewPerWatch = crewPerWatch;
+
             const activeCrewInChunk: { userId: string; userFirstName: string; userLastName: string }[] = [];
 
             if (hasRestrictions) {
-                // Restriction-aware round-robin: walk orderedCrew from rotationIdx, skip ineligible
                 const dateKey = chunkStart.toISOString().split('T')[0];
+
+                // STEP 1: Anchor constrained crew into every slot they're eligible for
+                for (const u of constrainedCrew) {
+                    if (activeCrewInChunk.length >= slotCrewPerWatch) break;
+                    if (activeCrewInChunk.find(a => a.userId === u.id)) continue;
+                    const r = restrictions[u.id];
+                    if (r.from && r.to && !isWithinHours(chunkStart, r.from, r.to)) continue;
+                    if (r.maxPerDay !== undefined && (watchesOnDay[u.id]?.[dateKey] ?? 0) >= r.maxPerDay) continue;
+                    activeCrewInChunk.push({ userId: u.id, ...crewLabel(u) });
+                    if (!watchesOnDay[u.id]) watchesOnDay[u.id] = {};
+                    watchesOnDay[u.id][dateKey] = (watchesOnDay[u.id][dateKey] ?? 0) + 1;
+                    constrainedPlacedOnDay[u.id].add(dateKey);
+                }
+
+                // STEP 2: Fill remaining spots with unconstrained crew via round-robin
+                const uncPool = unconstrainedCrew.length > 0 ? unconstrainedCrew : orderedCrew;
                 let attempts = 0;
-                while (activeCrewInChunk.length < crewPerWatch && attempts < totalCrew * 2) {
+                while (activeCrewInChunk.length < slotCrewPerWatch && attempts < uncPool.length * 2) {
+                    const u = uncPool[rotationIdx % uncPool.length];
+                    rotationIdx++;
+                    attempts++;
+                    if (activeCrewInChunk.find(a => a.userId === u.id)) continue;
+                    activeCrewInChunk.push({ userId: u.id, ...crewLabel(u) });
+                }
+            } else {
+                // Fair global round-robin — rotationIdx never resets between days
+                // so each night picks up exactly where the previous left off.
+                // Per-night soft cap: prefer crew who haven't watched yet tonight
+                // before doubling anyone up.
+                const dateKey = chunkStart.toISOString().split('T')[0];
+                let added = 0;
+                let attempts = 0;
+                const startIdx = rotationIdx;
+
+                while (added < slotCrewPerWatch && attempts < totalCrew * 2) {
                     const u = orderedCrew[rotationIdx % totalCrew];
                     rotationIdx++;
                     attempts++;
 
                     if (activeCrewInChunk.find(a => a.userId === u.id)) continue;
 
-                    const r = restrictions[u.id];
-                    if (r) {
-                        if (r.from && r.to && !isWithinHours(chunkStart, r.from, r.to)) continue;
-                        if (r.maxPerDay !== undefined && (watchesOnDay[u.id]?.[dateKey] ?? 0) >= r.maxPerDay) continue;
-                    }
+                    const watchesTonight = watchesOnDay[u.id]?.[dateKey] ?? 0;
+                    const someoneFreeTonightExists = orderedCrew.some(
+                        o => !activeCrewInChunk.find(a => a.userId === o.id) &&
+                             (watchesOnDay[o.id]?.[dateKey] ?? 0) === 0
+                    );
+
+                    // Skip this person if they've already watched tonight AND
+                    // someone else who hasn't watched yet is still in the pool
+                    if (watchesTonight > 0 && someoneFreeTonightExists) continue;
 
                     activeCrewInChunk.push({ userId: u.id, ...crewLabel(u) });
                     if (!watchesOnDay[u.id]) watchesOnDay[u.id] = {};
-                    watchesOnDay[u.id][dateKey] = (watchesOnDay[u.id][dateKey] ?? 0) + 1;
+                    watchesOnDay[u.id][dateKey] = watchesTonight + 1;
+                    added++;
                 }
-                // Fallback: fill any remaining spots ignoring restrictions
-                for (const u of orderedCrew) {
-                    if (activeCrewInChunk.length >= crewPerWatch) break;
-                    if (activeCrewInChunk.find(a => a.userId === u.id)) continue;
-                    activeCrewInChunk.push({ userId: u.id, ...crewLabel(u) });
-                }
-            } else {
-                // Standard round-robin
-                for (let i = 0; i < crewPerWatch; i++) {
-                    let crewIndex = (iter - 1 - i) % totalCrew;
-                    if (crewIndex < 0) crewIndex += totalCrew;
-                    const u = orderedCrew[crewIndex];
-                    activeCrewInChunk.push({ userId: u.id, ...crewLabel(u) });
+
+                // Safety: if we somehow couldn't fill the slot (shouldn't happen),
+                // fall back to simple sequential fill
+                if (added < slotCrewPerWatch) {
+                    let fallback = startIdx;
+                    while (added < slotCrewPerWatch) {
+                        const u = orderedCrew[fallback % totalCrew];
+                        fallback++;
+                        if (activeCrewInChunk.find(a => a.userId === u.id)) continue;
+                        activeCrewInChunk.push({ userId: u.id, ...crewLabel(u) });
+                        added++;
+                    }
                 }
             }
 
@@ -498,16 +610,30 @@ export default function ScheduleGeneratorWizard() {
                     startHour: parseHour(anchorStartTime),
                     endHour: parseHour(anchorEndTime),
                 }),
-                ...(watchType === 'dock' && {
-                    weekdayStartHour: parseHour(dockWeekdayStart),
-                    weekdayEndHour: parseHour(dockWeekdayEnd),
-                    weekendStartHour: parseHour(dockWeekendStart),
-                    weekendEndHour: parseHour(dockWeekendEnd),
-                }),
             },
             slots
         };
 
+        // Detect violations: constrained crew missing from any day in the schedule
+        const violations: string[] = [];
+        if (hasRestrictions) {
+            // Collect all unique day keys in the schedule
+            const allDays = new Set(slots.map(s => s.start.split('T')[0]));
+            for (const u of constrainedCrew) {
+                const r = restrictions[u.id];
+                const name = `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'Crew';
+                const window = (r.from && r.to) ? `${r.from}–${r.to}` : null;
+                const missing = [...allDays].filter(d => !constrainedPlacedOnDay[u.id].has(d));
+                if (missing.length > 0) {
+                    const reason = window
+                        ? `no watch slot falls within their ${window} window`
+                        : `max watches per day limit reached`;
+                    violations.push(`${name} could not be placed on ${missing.length} day${missing.length > 1 ? 's' : ''} — ${reason}.`);
+                }
+            }
+        }
+
+        setScheduleViolations(violations);
         setPreviewSchedule(newSchedule);
         setStep(3);
     };
@@ -641,18 +767,38 @@ export default function ScheduleGeneratorWizard() {
                                     <label style={{ fontSize: 13 }} className="font-medium text-foreground">Watch Hours</label>
                                     <p className="text-xs text-muted-foreground mt-0.5">Slots outside these hours are marked as off-duty.</p>
                                 </div>
-                                <div className="space-y-1">
+                                <div className="space-y-2">
                                     <p style={{ fontSize: 12 }} className="font-medium text-muted-foreground uppercase tracking-wide">Weekdays</p>
                                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                                         <TimePickerField label="From" value={dockWeekdayStart} onChange={setDockWeekdayStart} />
-                                        <TimePickerField label="To" value={dockWeekdayEnd} onChange={setDockWeekdayEnd} isNextDay={!!dockWeekdayStart && !!dockWeekdayEnd && dockWeekdayEnd < dockWeekdayStart} />
+                                        <TimePickerField label="To" value={dockWeekdayEnd} onChange={setDockWeekdayEnd} isNextDay={!!dockWeekdayStart && !!dockWeekdayEnd && dockWeekdayEnd <= dockWeekdayStart} />
+                                    </div>
+                                    <div style={fieldStyle} className="relative">
+                                        <span style={{ fontSize: 14, color: '#0f172a' }}>{dockWeekdayCrewPerWatch} crew per watch</span>
+                                        <select
+                                            value={dockWeekdayCrewPerWatch}
+                                            onChange={e => setDockWeekdayCrewPerWatch(Number(e.target.value))}
+                                            style={{ position: 'absolute', inset: 0, opacity: 0, width: '100%', height: '100%', cursor: 'pointer' }}
+                                        >
+                                            {[1,2,3,4,5,6].map(n => <option key={n} value={n}>{n} crew per watch</option>)}
+                                        </select>
                                     </div>
                                 </div>
-                                <div className="space-y-1">
+                                <div className="space-y-2">
                                     <p style={{ fontSize: 12 }} className="font-medium text-muted-foreground uppercase tracking-wide">Weekends</p>
                                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                                         <TimePickerField label="From" value={dockWeekendStart} onChange={setDockWeekendStart} />
-                                        <TimePickerField label="To" value={dockWeekendEnd} onChange={setDockWeekendEnd} isNextDay={!!dockWeekendStart && !!dockWeekendEnd && dockWeekendEnd < dockWeekendStart} />
+                                        <TimePickerField label="To" value={dockWeekendEnd} onChange={setDockWeekendEnd} isNextDay={!!dockWeekendStart && !!dockWeekendEnd && dockWeekendEnd <= dockWeekendStart} />
+                                    </div>
+                                    <div style={fieldStyle} className="relative">
+                                        <span style={{ fontSize: 14, color: '#0f172a' }}>{dockWeekendCrewPerWatch} crew per watch</span>
+                                        <select
+                                            value={dockWeekendCrewPerWatch}
+                                            onChange={e => setDockWeekendCrewPerWatch(Number(e.target.value))}
+                                            style={{ position: 'absolute', inset: 0, opacity: 0, width: '100%', height: '100%', cursor: 'pointer' }}
+                                        >
+                                            {[1,2,3,4,5,6].map(n => <option key={n} value={n}>{n} crew per watch</option>)}
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -810,15 +956,17 @@ export default function ScheduleGeneratorWizard() {
                                     </div>
                                 </div>
                             )}
-                            <div className="space-y-2">
-                                <label style={{ fontSize: 13 }} className="font-medium text-foreground">Crew Per Watch</label>
-                                <div style={{ ...fieldStyle, position: 'relative' }}>
-                                    <span style={{ fontSize: 14, color: '#0f172a' }}>{crewPerWatch}</span>
-                                    <select value={crewPerWatch} onChange={e => setCrewPerWatch(Number(e.target.value))} style={{ position: 'absolute', inset: 0, opacity: 0, width: '100%', height: '100%', cursor: 'pointer' }}>
-                                        {Array.from({ length: maxCrewPerWatch }, (_, i) => i + 1).map(n => <option key={n} value={n}>{n}</option>)}
-                                    </select>
+                            {watchType !== 'dock' && (
+                                <div className="space-y-2">
+                                    <label style={{ fontSize: 13 }} className="font-medium text-foreground">Crew Per Watch</label>
+                                    <div style={{ ...fieldStyle, position: 'relative' }}>
+                                        <span style={{ fontSize: 14, color: '#0f172a' }}>{crewPerWatch}</span>
+                                        <select value={crewPerWatch} onChange={e => setCrewPerWatch(Number(e.target.value))} style={{ position: 'absolute', inset: 0, opacity: 0, width: '100%', height: '100%', cursor: 'pointer' }}>
+                                            {Array.from({ length: maxCrewPerWatch }, (_, i) => i + 1).map(n => <option key={n} value={n}>{n}</option>)}
+                                        </select>
+                                    </div>
                                 </div>
-                            </div>
+                            )}
                         </div>
 
                         {crewPerWatch > 1 && (
@@ -906,12 +1054,37 @@ export default function ScheduleGeneratorWizard() {
                         </div>
 
                         <div className="space-y-3">
-                            {availableCrew.map(u => {
+                            {(() => {
+                                // Build display labels: first name only, unless ambiguous
+                                const getNames = (u: UserData) => {
+                                    const isCap = u.id === currentUser?.id;
+                                    const f = u.firstName?.trim() || (isCap ? currentUser?.firstName?.trim() : '') || 'Unknown';
+                                    const l = u.lastName?.trim() || (isCap ? currentUser?.lastName?.trim() : '') || '';
+                                    return { f, l };
+                                };
+                                const crewLabels: Record<string, string> = {};
+                                availableCrew.forEach(u => {
+                                    const { f, l } = getNames(u);
+                                    // Find others with the same first name
+                                    const sameFirst = availableCrew.filter(o => o.id !== u.id && getNames(o).f === f);
+                                    if (sameFirst.length === 0) {
+                                        crewLabels[u.id] = f;
+                                    } else {
+                                        // Same first name — check if first letter of surname also clashes
+                                        const sameFirstAndInitial = sameFirst.filter(o => getNames(o).l.charAt(0).toLowerCase() === l.charAt(0).toLowerCase());
+                                        if (sameFirstAndInitial.length === 0) {
+                                            crewLabels[u.id] = l ? `${f} ${l.charAt(0).toUpperCase()}.` : f;
+                                        } else {
+                                            crewLabels[u.id] = l.length >= 2 ? `${f} ${l.slice(0, 2)}` : f;
+                                        }
+                                    }
+                                });
+                                return availableCrew.map(u => {
                                 const rank = getSelectionOrder(u.id);
                                 const isSelected = rank !== null;
                                 const isCaptain = u.id === currentUser?.id;
                                 const fName = u.firstName?.trim() || (isCaptain ? currentUser?.firstName?.trim() : '') || 'Unknown';
-                                const lName = u.lastName?.trim() || (isCaptain ? currentUser?.lastName?.trim() : '') || 'Crew';
+                                const displayName = crewLabels[u.id] ?? fName;
 
                                 const restriction = restrictions[u.id];
                                 const isExpanded = expandedRestriction === u.id;
@@ -933,11 +1106,11 @@ export default function ScheduleGeneratorWizard() {
                                             onClick={() => toggleCrewSelection(u.id)}
                                         >
                                             <div className="flex items-center gap-4">
-                                                <div className={cn("h-10 w-10 rounded-full flex items-center justify-center text-sm font-bold border", isSelected ? "bg-background text-primary border-primary/20" : "bg-secondary text-muted-foreground border-transparent")}>
-                                                    {fName.charAt(0).toUpperCase()}
+                                                <div className={cn("h-10 w-10 rounded-full flex items-center justify-center text-sm font-bold border", isSelected ? "bg-primary text-primary-foreground border-primary" : "bg-secondary text-muted-foreground border-transparent")}>
+                                                    {isSelected ? rank : fName.charAt(0).toUpperCase()}
                                                 </div>
                                                 <div>
-                                                    <div className="font-semibold text-sm">{fName} {lName}</div>
+                                                    <div className="font-semibold text-sm">{displayName}</div>
                                                     <div className="text-xs text-muted-foreground capitalize">{u.customRole || u.role}</div>
                                                 </div>
                                             </div>
@@ -969,11 +1142,6 @@ export default function ScheduleGeneratorWizard() {
                                                     </button>
                                                 )}
 
-                                                {isSelected && (
-                                                    <div className="h-6 w-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold shadow-sm">
-                                                        {rank}
-                                                    </div>
-                                                )}
                                             </div>
                                         </div>
 
@@ -984,7 +1152,7 @@ export default function ScheduleGeneratorWizard() {
                                                 <div className="flex flex-wrap gap-3 items-end">
                                                     {/* Max watches per day */}
                                                     <div className="space-y-1.5">
-                                                        <label style={{ fontSize: 12 }} className="font-medium text-foreground">Max per day</label>
+                                                        <label style={{ fontSize: 12 }} className="font-medium text-foreground">Max watches per day</label>
                                                         <div style={{ ...fieldStyle, width: 110, padding: '10px 12px', position: 'relative' }}>
                                                             <span style={{ fontSize: 13, color: '#0f172a' }}>
                                                                 {restriction?.maxPerDay !== undefined ? `${restriction.maxPerDay} watch${restriction.maxPerDay !== 1 ? 'es' : ''}` : 'No limit'}
@@ -1009,13 +1177,28 @@ export default function ScheduleGeneratorWizard() {
                                                                 <input
                                                                     type="time"
                                                                     value={restriction?.from || ''}
-                                                                    onChange={e => setRestrictionField(u.id, 'from', e.target.value || undefined)}
+                                                                    onChange={e => {
+                                                                        const from = e.target.value || undefined;
+                                                                        setRestrictionField(u.id, 'from', from);
+                                                                        if (from) {
+                                                                            const [h, m] = from.split(':').map(Number);
+                                                                            const totalMins = h * 60 + m + duration * 60;
+                                                                            const toH = Math.floor(totalMins / 60) % 24;
+                                                                            const toM = totalMins % 60;
+                                                                            setRestrictionField(u.id, 'to', `${String(toH).padStart(2, '0')}:${String(toM).padStart(2, '0')}`);
+                                                                        }
+                                                                    }}
                                                                     style={{ position: 'absolute', inset: 0, opacity: 0, width: '100%', height: '100%', cursor: 'pointer' }}
                                                                 />
                                                             </div>
                                                             <span className="text-xs text-muted-foreground">–</span>
                                                             <div style={{ ...fieldStyle, width: 90, padding: '10px 12px', position: 'relative' }}>
-                                                                <span style={{ fontSize: 13, color: restriction?.to ? '#0f172a' : '#94a3b8' }}>{restriction?.to || 'To'}</span>
+                                                                <span style={{ fontSize: 13, color: restriction?.to ? '#0f172a' : '#94a3b8' }}>
+                                                                    {restriction?.to || 'To'}
+                                                                    {restriction?.from && restriction?.to && restriction.to <= restriction.from
+                                                                        ? <sup style={{ fontSize: 9, marginLeft: 1 }}>+1</sup>
+                                                                        : null}
+                                                                </span>
                                                                 <input
                                                                     type="time"
                                                                     value={restriction?.to || ''}
@@ -1030,7 +1213,8 @@ export default function ScheduleGeneratorWizard() {
                                         )}
                                     </div>
                                 );
-                            })}
+                            });
+                            })()}
                         </div>
 
                         <Button
@@ -1046,6 +1230,21 @@ export default function ScheduleGeneratorWizard() {
                 {/* STEP 3: PREVIEW */}
                 {step === 3 && previewSchedule && (
                     <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+
+                        {scheduleViolations.length > 0 && (
+                            <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 space-y-2">
+                                <p className="text-sm font-semibold text-amber-800">⚠ Special case adjustments</p>
+                                <p className="text-xs text-amber-700">The following crew members could not be placed on every day due to their constraints. The schedule has been built around them as best as possible — review before publishing.</p>
+                                <ul className="mt-2 space-y-1">
+                                    {scheduleViolations.map((v, i) => (
+                                        <li key={i} className="text-xs text-amber-800 flex gap-2">
+                                            <span>•</span><span>{v}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+
                         <div className="bg-card rounded-xl p-6 border shadow-sm">
                             <h2 className="font-bold text-lg mb-2 flex items-center gap-2">
                                 <CalendarIcon className="h-5 w-5 text-primary" />
