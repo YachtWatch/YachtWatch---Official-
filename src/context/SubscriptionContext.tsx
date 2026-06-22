@@ -3,8 +3,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Purchases, PurchasesPackage, CustomerInfo, LOG_LEVEL } from '@revenuecat/purchases-capacitor';
 import { Capacitor } from '@capacitor/core';
 
-// ⛳ DEV BYPASS — set to true to skip paywall during testing. SET BACK TO false BEFORE SHIPPING.
-const DEV_BYPASS_PAYWALL = true;
+const FREE_UNTIL = new Date('2026-09-01T00:00:00');
 
 interface SubscriptionContextType {
     currentCustomerInfo: CustomerInfo | null;
@@ -20,13 +19,14 @@ const SubscriptionContext = createContext<SubscriptionContextType | undefined>(u
 export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [currentCustomerInfo, setCurrentCustomerInfo] = useState<CustomerInfo | null>(null);
     const [offerings, setOfferings] = useState<PurchasesPackage[]>([]);
-    const [isSubscribed, setIsSubscribed] = useState(DEV_BYPASS_PAYWALL);
+    const isFreeperiod = new Date() < FREE_UNTIL;
+    const [isSubscribed, setIsSubscribed] = useState(isFreeperiod);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const init = async () => {
-            if (DEV_BYPASS_PAYWALL) {
-                console.log('[RevenueCat] ⛳ DEV_BYPASS_PAYWALL is ON — skipping RevenueCat, treating user as subscribed.');
+            if (isFreeperiod) {
+                console.log(`[RevenueCat] Free period active until ${FREE_UNTIL.toISOString()} — all users treated as Pro.`);
                 setIsSubscribed(true);
                 setLoading(false);
                 return;
