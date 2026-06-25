@@ -4,7 +4,7 @@
 }
 
 .safe-area-pt {
-  padding-top: env(safe-area-inset-top, 0px);
+  padding-top: max(calc(env(safe-area-inset-top, 0px) - 20px), 0px);
 }
 
 
@@ -15,7 +15,7 @@ body {
 }
 
 body.platform-ios .safe-area-pb {
-  padding-bottom: max(env(safe-area-inset-bottom, 0px), 20px);
+  padding-bottom: max(env(safe-area-inset-bottom, 34px), 34px);
 }
 
 @tailwind base;
@@ -98,5 +98,19 @@ body.platform-ios .safe-area-pb {
 @layer utilities {
   .animate-pulse-slow {
     animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  .animate-border-pulse-blue {
+    animation: border-pulse-blue 1.4s ease-in-out infinite;
+  }
+}
+
+@keyframes border-pulse-blue {
+  0%, 100% {
+    border-color: #1B2A6B;
+    box-shadow: 0 0 0 0 rgba(27, 42, 107, 0);
+  }
+  50% {
+    border-color: #1B2A6B;
+    box-shadow: 0 0 0 3px rgba(27, 42, 107, 0.22), 0 0 14px 2px rgba(27, 42, 107, 0.12);
   }
 }

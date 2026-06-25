@@ -287,9 +287,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
     // Guard ref: prevents re-scheduling watch reminders on every check-in (only re-run when schedule/prefs change)
     const lastRemindersKeyRef = useRef<string | null>(null);
 
-    const loadFromCache = () => {
+    const loadFromCache = (userId?: string) => {
+        const cacheKey = userId ? `yachtwatch_offline_data_${userId}` : 'yachtwatch_offline_data';
         try {
-            const cached = localStorage.getItem('yachtwatch_offline_data');
+            const cached = localStorage.getItem(cacheKey);
             if (cached) {
                 const data = JSON.parse(cached);
                 if (data.users) setUsers(data.users);
@@ -306,23 +307,27 @@ export function DataProvider({ children }: { children: ReactNode }) {
     const refreshData = async () => {
         if (!navigator.onLine) {
             console.log("Offline mode: Skipping fetch, loading from cache.");
-            loadFromCache();
+            const { data: offlineAuth } = await supabase.auth.getUser();
+            loadFromCache(offlineAuth?.user?.id);
             if (!initialLoadComplete) setInitialLoadComplete(true);
             return;
         }
+
+        // Hoist uid and activeVesselId above try so the catch block can use them for cache key lookup
+        let uid: string | null = null;
+        let activeVesselId: string | null = null;
 
         try {
             let usersWithVessels: UserData[] = [];
             const { data: authUser } = await supabase.auth.getUser();
 
             if (authUser?.user) {
-                const uid = authUser.user.id;
+                uid = authUser.user.id;
 
                 // ── STEP 1: Determine active vessel and role reliably ──
                 // For captains: look up the vessel they OWN (not vessel_members, which can have stale test entries)
                 // For crew: look up their approved join_request (source of truth for membership)
 
-                let activeVesselId: string | null = null;
                 let isCaptain = false;
 
                 // Check if user is a captain of any vessel
@@ -464,11 +469,24 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
             setUsers(usersWithVessels);
 
-            const { data: vData } = await supabase.from('vessels').select('id, captain_id, name, length, type, capacity, join_code, check_in_enabled, check_in_interval, timezone, created_at');
+            // Fetch vessel, requests, and schedules in parallel, scoped to the active vessel.
+            // Scoping prevents cross-vessel contamination when RLS allows seeing multiple vessels
+            // (e.g. stale vessel_members rows from testing).
+            const vesselQuery = activeVesselId
+                ? supabase.from('vessels').select('id, captain_id, name, length, type, capacity, join_code, check_in_enabled, check_in_interval, timezone, created_at').eq('id', activeVesselId)
+                : supabase.from('vessels').select('id, captain_id, name, length, type, capacity, join_code, check_in_enabled, check_in_interval, timezone, created_at');
+            const requestQuery = activeVesselId
+                ? supabase.from('join_requests').select('id, vessel_id, user_id, user_first_name, user_last_name, status, created_at').eq('vessel_id', activeVesselId)
+                : supabase.from('join_requests').select('id, vessel_id, user_id, user_first_name, user_last_name, status, created_at');
+            const scheduleQuery = activeVesselId
+                ? supabase.from('schedules').select('id, vessel_id, name, watch_type, watch_config, timezone, slots, standing_orders, acknowledgments, order_completions, created_at').eq('vessel_id', activeVesselId).order('created_at', { ascending: false })
+                : supabase.from('schedules').select('id, vessel_id, name, watch_type, watch_config, timezone, slots, standing_orders, acknowledgments, order_completions, created_at').order('created_at', { ascending: false });
+
+            const [{ data: vData }, { data: rData }, { data: sData }] = await Promise.all([vesselQuery, requestQuery, scheduleQuery]);
+
             const newVessels = vData ? (vData as SupabaseVessel[]).map(mapVessel) : [];
             if (vData) setVessels(newVessels);
 
-            const { data: rData } = await supabase.from('join_requests').select('id, vessel_id, user_id, user_first_name, user_last_name, status, created_at');
             let newRequests: JoinRequest[] = [];
             if (rData) {
                 newRequests = (rData as SupabaseJoinRequest[]).map(mapRequest);
@@ -490,7 +508,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
             }
 
             // ORDER BY created_at DESC to ensure we always get the latest schedule first
-            const { data: sData } = await supabase.from('schedules').select('id, vessel_id, name, watch_type, watch_config, timezone, slots, standing_orders, acknowledgments, order_completions, created_at').order('created_at', { ascending: false });
             let newSchedules: WatchSchedule[] = [];
             if (sData) {
                 newSchedules = (sData as SupabaseSchedule[]).map(mapSchedule);
@@ -509,8 +526,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
                 }
             }
 
-            // Cache data for offline usage
-            localStorage.setItem('yachtwatch_offline_data', JSON.stringify({
+            // Cache data for offline usage, keyed by user so cross-account logins don't share stale data
+            const cacheKey = uid ? `yachtwatch_offline_data_${uid}` : 'yachtwatch_offline_data';
+            localStorage.setItem(cacheKey, JSON.stringify({
                 users: usersWithVessels,
                 vessels: newVessels,
                 requests: newRequests,
@@ -520,7 +538,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
             if (!initialLoadComplete) setInitialLoadComplete(true);
         } catch (error) {
             console.error("Network or fetch error during refresh, loading from cache", error);
-            loadFromCache();
+            loadFromCache(uid ?? undefined);
             if (!initialLoadComplete) setInitialLoadComplete(true);
         }
     };

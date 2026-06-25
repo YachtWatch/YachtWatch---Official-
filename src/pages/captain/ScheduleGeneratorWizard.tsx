@@ -182,6 +182,7 @@ export default function ScheduleGeneratorWizard() {
 
     const [watchType, setWatchType] = useState<WatchSchedule['watchType']>(existingSchedule?.watchType || 'Navigation');
     const [scheduleName, setScheduleName] = useState(existingSchedule?.name || '');
+    const [scheduleNameError, setScheduleNameError] = useState('');
 
     // Initializers for date/time
     const [startDate, setStartDate] = useState(() => {
@@ -384,7 +385,7 @@ export default function ScheduleGeneratorWizard() {
         const parseMin  = (t: string) => parseInt(t.split(':')[1] ?? '0', 10);
 
         const orderedCrew = selectedCrewIds.map(id => availableCrew.find(u => u.id === id)).filter(Boolean) as UserData[];
-        if (orderedCrew.length === 0) return;
+        if (orderedCrew.length === 0) { console.warn('generateSchedule: orderedCrew is empty, aborting'); return; }
 
         const isWithinHours = (date: Date, startStr: string, endStr: string): boolean => {
             const h = date.getHours();
@@ -667,7 +668,7 @@ export default function ScheduleGeneratorWizard() {
         <div className="min-h-screen bg-background flex flex-col">
             {/* Main YachtWatch header */}
             <header className="border-b bg-card sticky top-0 z-50 safe-area-pt">
-                <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+                <div className="container mx-auto px-4 h-16 flex items-center justify-between pt-[5px]">
                     <div className="flex items-center gap-2 font-bold text-xl text-primary">
                         <Anchor className="h-6 w-6" />
                         <span>YachtWatch</span>
@@ -705,7 +706,7 @@ export default function ScheduleGeneratorWizard() {
 
                 {/* STEP 1: CONFIGURATION */}
                 {step === 1 && (
-                    <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-300">
+                    <div className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-300">
 
                         {/* Watch Type Selector */}
                         <div className="space-y-2">
@@ -740,10 +741,11 @@ export default function ScheduleGeneratorWizard() {
                             <Input
                                 placeholder="e.g. Atlantic Crossing 2026"
                                 value={scheduleName}
-                                onChange={e => setScheduleName(e.target.value)}
-                                className="rounded-[10px]"
+                                onChange={e => { setScheduleName(e.target.value); if (e.target.value.trim()) setScheduleNameError(''); }}
+                                className={`rounded-[10px]${scheduleNameError ? ' animate-border-pulse-blue' : ''}`}
                                 style={{ background: '#ffffff', border: '1.5px solid #e2ddd8', padding: '13px 14px', height: 'auto', textAlign: 'left', width: '100%', boxSizing: 'border-box' }}
                             />
+                            {scheduleNameError && <p className="text-sm text-muted-foreground mt-1">{scheduleNameError}</p>}
                         </div>
 
                         {/* Anchor watch hour config */}
@@ -1031,7 +1033,13 @@ export default function ScheduleGeneratorWizard() {
 
                         <Button
                             className="w-full h-12 text-base font-semibold bg-primary hover:bg-primary/90 mt-8"
-                            onClick={() => setStep(2)}
+                            onClick={() => {
+                                if (!scheduleName.trim()) {
+                                    setScheduleNameError('Please enter a schedule name before continuing.');
+                                    return;
+                                }
+                                setStep(2);
+                            }}
                         >
                             Next: Select Crew
                         </Button>

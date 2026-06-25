@@ -76,11 +76,6 @@ export function useNotifications() {
                     },
                     (_payload) => {
 
-                        NotificationService.sendLocalAlert(
-                            'New Crew Request',
-                            `A new crew member has requested to join your vessel.`
-                        );
-                        // refreshData already re-fetches all requests — no separate fetch needed
                         refreshData();
                     }
                 )
@@ -129,16 +124,8 @@ export function useNotifications() {
                     (payload) => {
 
                         if (payload.eventType === 'INSERT') {
-                            NotificationService.sendLocalAlert(
-                                'New Schedule',
-                                'A new watch schedule has been published.'
-                            );
                             refreshData();
                         } else if (payload.eventType === 'UPDATE') {
-                            NotificationService.sendLocalAlert(
-                                'Schedule Updated',
-                                'The watch schedule has been updated.'
-                            );
                             refreshData();
                         } else if (payload.eventType === 'DELETE') {
 

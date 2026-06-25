@@ -140,13 +140,14 @@ export default function CrewDashboard() {
   const match = path.match(/\/join\/([A-Z0-9]+)/i);
   if (match) setJoinCode(match[1].toUpperCase());
 
-  const listener = CapApp.addListener('appUrlOpen', (event) => {
+  let listenerHandle: { remove: () => void } | null = null;
+  CapApp.addListener('appUrlOpen', (event) => {
     const url = new URL(event.url);
     const code = url.pathname.replace('/join/', '').toUpperCase();
     if (code) setJoinCode(code);
-  });
+  }).then(handle => { listenerHandle = handle; });
 
-  return () => { listener.then(l => l.remove()); };
+  return () => { listenerHandle?.remove(); };
 }, []);
 
     const approvedVessel = user ? getCrewVessel(user.id) : undefined;
@@ -348,7 +349,7 @@ export default function CrewDashboard() {
     return (
         <div className="min-h-screen bg-background text-foreground">
             <header className="border-b bg-card relative z-50 safe-area-pt">
-                <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+                <div className="container mx-auto px-4 h-16 flex items-center justify-between pt-[5px]">
                     <div className="flex items-center gap-2 font-bold text-xl text-primary">
                         <Anchor className="h-6 w-6" />
                         <span>YachtWatch</span>

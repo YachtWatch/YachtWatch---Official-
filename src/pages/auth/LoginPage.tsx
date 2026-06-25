@@ -110,13 +110,8 @@ export default function LoginPage() {
         } catch (err: any) {
             console.error("❌ Login EXCEPTION:", err);
             setError(err.message || 'Invalid email or password');
-            setLoading(false);
         } finally {
-            // Only set loading false if we haven't navigated? 
-            // Actually, if we navigated, the component might be unmounting, 
-            // but setting state on unmounted component is a warning, not a crash.
-            // Better to let the navigation happen.
-
+            setLoading(false);
         }
     };
 

@@ -104,12 +104,17 @@ export default function CaptainDashboard() {
     const handleCreateVessel = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!user) return;
+        const length = Number(vesselLength);
+        const capacity = Number(vesselCapacity);
+        if (!vesselName.trim()) return;
+        if (!length || length < 1 || length > 500) return;
+        if (!capacity || capacity < 1 || capacity > 200) return;
         const newVessel = await createVessel({
             captainId: user.id,
-            name: vesselName,
-            length: Number(vesselLength),
+            name: vesselName.trim(),
+            length,
             type: vesselType,
-            capacity: Number(vesselCapacity),
+            capacity,
             checkInEnabled: true,
             checkInInterval: 15,
             timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -156,9 +161,13 @@ export default function CaptainDashboard() {
         }
     };
 
-    const handleRemoveCrew = (userId: string) => {
+    const handleRemoveCrew = async (userId: string) => {
         if (!vessel || !confirm('Are you sure you want to remove this crew member?')) return;
-        removeCrew(vessel.id, userId);
+        try {
+            await removeCrew(vessel.id, userId);
+        } catch {
+            // removeCrew already alerts the user with the reason before throwing
+        }
     };
 
     const handleEditRole = (userId: string) => {
@@ -180,6 +189,14 @@ export default function CaptainDashboard() {
     }
 
     if (!vessel) {
+        // vesselId exists but vessel hasn't loaded/confirmed missing yet — keep showing loader during retry window
+        if (user?.vesselId && !vesselMissingConfirmed) {
+            return (
+                <div className="min-h-screen flex items-center justify-center bg-background">
+                    <SailboatLoader />
+                </div>
+            );
+        }
         if (user?.vesselId && vesselMissingConfirmed) {
             return (
                 <div className="container max-w-md mx-auto py-12 px-4 text-center">
@@ -232,7 +249,7 @@ export default function CaptainDashboard() {
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium">Length (meters)</label>
-                                    <Input required type="number" value={vesselLength} onChange={e => setVesselLength(e.target.value)} placeholder="50" />
+                                    <Input required type="number" min="1" max="500" value={vesselLength} onChange={e => setVesselLength(e.target.value)} placeholder="50" />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium">Type</label>
@@ -249,7 +266,7 @@ export default function CaptainDashboard() {
 
                             <div className="space-y-2">
                                 <label className="text-sm font-medium">Crew Capacity</label>
-                                <Input required type="number" value={vesselCapacity} onChange={e => setVesselCapacity(e.target.value)} placeholder="12" />
+                                <Input required type="number" min="1" max="200" value={vesselCapacity} onChange={e => setVesselCapacity(e.target.value)} placeholder="12" />
                             </div>
 
                             <Button type="submit" className="w-full">Initialize Vessel</Button>
@@ -263,7 +280,7 @@ export default function CaptainDashboard() {
     return (
         <div className="min-h-screen bg-background text-foreground">
             <header className="border-b bg-card relative z-50 safe-area-pt print:hidden">
-                <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+                <div className="container mx-auto px-4 h-16 flex items-center justify-between pt-[5px]">
                     <div className="flex items-center gap-2 font-bold text-xl text-primary">
                         <Anchor className="h-6 w-6" />
                         <span>YachtWatch</span>
@@ -313,7 +330,7 @@ export default function CaptainDashboard() {
                                             <Users className="h-6 w-6" />
                                         </div>
                                         <div className="text-sm text-muted-foreground font-medium mb-1">Crew Size</div>
-                                        <div className="font-bold text-lg leading-tight">{users.filter(u => u.id === user?.id || u.vesselId === vessel.id).length}</div>
+                                        <div className="font-bold text-lg leading-tight">{users.length}</div>
                                     </Card>
                                 </div>
 

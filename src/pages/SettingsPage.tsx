@@ -31,7 +31,7 @@ export default function SettingsPage() {
     return (
         <div className="min-h-screen bg-background">
             <header className="border-b bg-card sticky top-0 z-50 safe-area-pt">
-                <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+                <div className="container mx-auto px-4 h-16 flex items-center justify-between pt-[5px]">
                     <div className="flex items-center gap-3">
                         <button
                             onClick={() => {
