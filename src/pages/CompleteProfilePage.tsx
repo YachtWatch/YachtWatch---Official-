@@ -186,18 +186,17 @@ export default function CompleteProfilePage() {
                     </p>
 
                     <form onSubmit={handleSave} className="space-y-4">
-                        <div className="flex gap-3 items-end">
-                            <div className="flex-1 min-w-0 overflow-hidden space-y-2">
-                                <label className="text-sm font-medium">Date of Birth</label>
-                                <Input
-                                    type="date"
-                                    value={dateOfBirth}
-                                    onChange={e => setDateOfBirth(e.target.value)}
-                                    className="w-full h-10"
-                                    required
-                                />
-                            </div>
-                            <div className="flex-1 min-w-0 overflow-hidden space-y-2">
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium">Date of Birth</label>
+                            <Input
+                                type="date"
+                                value={dateOfBirth}
+                                onChange={e => setDateOfBirth(e.target.value)}
+                                className="w-full"
+                                required
+                            />
+                        </div>
+                        <div className="space-y-2">
                                 <label className="text-sm font-medium">Nationality</label>
                                 <button
                                     type="button"
@@ -209,7 +208,6 @@ export default function CompleteProfilePage() {
                                     </span>
                                     <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0 ml-1" />
                                 </button>
-                            </div>
                         </div>
 
                         <div className="space-y-2">
