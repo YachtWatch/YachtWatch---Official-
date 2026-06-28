@@ -67,8 +67,8 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
-	<false/>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>YachtWatch uses your location to show weather conditions and forecasts for your current position at sea.</string>
+	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>YachtWatch uses your camera to scan QR codes for joining a vessel.</string>
 </dict>
 </plist>

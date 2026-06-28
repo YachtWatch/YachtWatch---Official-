@@ -3,6 +3,8 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Purchases, PurchasesPackage, CustomerInfo, LOG_LEVEL } from '@revenuecat/purchases-capacitor';
 import { Capacitor } from '@capacitor/core';
 
+const FREE_UNTIL = new Date('2026-09-01T00:00:00');
+
 interface SubscriptionContextType {
     currentCustomerInfo: CustomerInfo | null;
     offerings: PurchasesPackage[];
@@ -17,11 +19,19 @@ const SubscriptionContext = createContext<SubscriptionContextType | undefined>(u
 export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [currentCustomerInfo, setCurrentCustomerInfo] = useState<CustomerInfo | null>(null);
     const [offerings, setOfferings] = useState<PurchasesPackage[]>([]);
-    const [isSubscribed, setIsSubscribed] = useState(false);
+    const isFreeperiod = new Date() < FREE_UNTIL;
+    const [isSubscribed, setIsSubscribed] = useState(isFreeperiod);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const init = async () => {
+            if (isFreeperiod) {
+                console.log(`[RevenueCat] Free period active until ${FREE_UNTIL.toISOString()} — all users treated as Pro.`);
+                setIsSubscribed(true);
+                setLoading(false);
+                return;
+            }
+
             if (Capacitor.getPlatform() === 'web') {
                 console.log('[RevenueCat] Web platform detected — skipping initialization.');
                 setLoading(false);
@@ -65,6 +75,7 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
         };
 
         init();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const updateSubscriptionStatus = (customerInfo: CustomerInfo) => {

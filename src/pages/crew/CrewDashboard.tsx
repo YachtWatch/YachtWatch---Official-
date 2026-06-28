@@ -1,6 +1,6 @@
 import { TimezoneWarningBanner } from '../../components/TimezoneWarningBanner';
 import { useScheduleCache, loadScheduleCache, formatSyncAge } from '../../hooks/useScheduleCache';
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useData } from '../../contexts/DataContext';
 import { Button } from '../../components/ui/button';
@@ -14,94 +14,95 @@ import { CrewScheduleView } from './CrewScheduleView';
 import { CrewListView } from './CrewListView';
 import { useWatchLogic } from '../../hooks/useWatchLogic';
 import { App as CapApp } from '@capacitor/app';
+import { Camera as CapCamera, CameraResultType, CameraSource } from '@capacitor/camera';
 import jsQR from 'jsqr';
 
-function QRScanner({ onScan, onClose }: { onScan: (code: string) => void; onClose: () => void }) {
-    const videoRef = useRef<HTMLVideoElement>(null);
-    const canvasRef = useRef<HTMLCanvasElement>(null);
-    const streamRef = useRef<MediaStream | null>(null);
-    const rafRef = useRef<number>(0);
-    const [error, setError] = useState('');
+function extractJoinCode(raw: string): string {
+    let code = raw;
+    if (code.includes('join.yachtwatch.co/')) code = code.split('join.yachtwatch.co/').pop() || code;
+    else if (code.includes('yachtwatch://join/')) code = code.split('yachtwatch://join/').pop() || code;
+    return code.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+}
 
-    useEffect(() => {
-        let active = true;
-
-        const tick = () => {
-            if (!active || !videoRef.current || !canvasRef.current) return;
-            const video = videoRef.current;
-            const canvas = canvasRef.current;
-            if (video.readyState !== video.HAVE_ENOUGH_DATA) {
-                rafRef.current = requestAnimationFrame(tick);
-                return;
-            }
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
+async function decodeQRFromDataUrl(dataUrl: string): Promise<string | null> {
+    return new Promise(resolve => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
             const ctx = canvas.getContext('2d');
-            if (!ctx) return;
-            ctx.drawImage(video, 0, 0);
+            if (!ctx) return resolve(null);
+            ctx.drawImage(img, 0, 0);
             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             const result = jsQR(imageData.data, imageData.width, imageData.height);
-            if (result?.data) {
-                let code = result.data;
-                if (code.includes('join.yachtwatch.co/')) {
-                    code = code.split('join.yachtwatch.co/').pop() || code;
-                } else if (code.includes('yachtwatch://join/')) {
-                    code = code.split('yachtwatch://join/').pop() || code;
-                }
-                code = code.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
-                if (code.length > 0) { onScan(code); return; }
+            resolve(result?.data || null);
+        };
+        img.onerror = () => resolve(null);
+        img.src = dataUrl;
+    });
+}
+
+function QRScanner({ onScan, onClose }: { onScan: (code: string) => void; onClose: () => void }) {
+    const [scanning, setScanning] = useState(false);
+    const [error, setError] = useState('');
+
+    const handleScan = async () => {
+        setError('');
+        setScanning(true);
+        try {
+            const photo = await CapCamera.getPhoto({
+                quality: 90,
+                resultType: CameraResultType.DataUrl,
+                source: CameraSource.Camera,
+                promptLabelHeader: 'Scan QR Code',
+                promptLabelCancel: 'Cancel',
+            });
+            if (!photo.dataUrl) { setError('No image captured.'); setScanning(false); return; }
+            const raw = await decodeQRFromDataUrl(photo.dataUrl);
+            if (!raw) { setError('No QR code found. Try again with better lighting.'); setScanning(false); return; }
+            const code = extractJoinCode(raw);
+            if (code.length === 0) { setError('QR code not recognised. Please try again.'); setScanning(false); return; }
+            onScan(code);
+        } catch (err: any) {
+            // User cancelled — just close
+            if (err?.message?.includes('cancelled') || err?.message?.includes('cancel')) {
+                onClose();
+            } else {
+                setError('Camera error. Please allow camera access in Settings.');
             }
-            rafRef.current = requestAnimationFrame(tick);
-        };
-
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-            .then(stream => {
-                if (!active) { stream.getTracks().forEach(t => t.stop()); return; }
-                streamRef.current = stream;
-                if (videoRef.current) {
-                    videoRef.current.srcObject = stream;
-                    videoRef.current.play().then(tick);
-                }
-            })
-            .catch(() => setError('Camera access denied. Please allow camera access and try again.'));
-
-        return () => {
-            active = false;
-            cancelAnimationFrame(rafRef.current);
-            streamRef.current?.getTracks().forEach(t => t.stop());
-        };
-    }, [onScan]);
+            setScanning(false);
+        }
+    };
 
     return (
-        <div className="fixed inset-0 z-50 flex flex-col bg-black safe-area-pt">
+        <div className="fixed inset-0 z-50 flex flex-col bg-black/90">
             <div className="flex items-center justify-between px-4 py-3">
                 <h3 className="font-semibold text-lg text-white">Scan QR Code</h3>
                 <button onClick={onClose} className="p-2 rounded-full hover:bg-white/10">
                     <X className="h-6 w-6 text-white" />
                 </button>
             </div>
-            {error ? (
-                <div className="flex-1 flex items-center justify-center p-8">
-                    <p className="text-white text-center">{error}</p>
-                </div>
-            ) : (
-                <div className="flex-1 relative overflow-hidden">
-                    <video ref={videoRef} className="w-full h-full object-cover" playsInline muted />
-                    <canvas ref={canvasRef} className="hidden" />
-                    {/* Viewfinder overlay */}
+            <div className="flex-1 flex flex-col items-center justify-center gap-6 px-8">
+                <div className="relative w-64 h-64">
+                    <div className="absolute inset-0 border-2 border-white/30 rounded-2xl" />
+                    <div className="absolute top-0 left-0 w-10 h-10 border-t-4 border-l-4 border-white rounded-tl-2xl" />
+                    <div className="absolute top-0 right-0 w-10 h-10 border-t-4 border-r-4 border-white rounded-tr-2xl" />
+                    <div className="absolute bottom-0 left-0 w-10 h-10 border-b-4 border-l-4 border-white rounded-bl-2xl" />
+                    <div className="absolute bottom-0 right-0 w-10 h-10 border-b-4 border-r-4 border-white rounded-br-2xl" />
                     <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="relative w-64 h-64">
-                            <div className="absolute inset-0 border-2 border-white/30 rounded-2xl" />
-                            <div className="absolute top-0 left-0 w-10 h-10 border-t-4 border-l-4 border-[#1B2A6B] rounded-tl-2xl" />
-                            <div className="absolute top-0 right-0 w-10 h-10 border-t-4 border-r-4 border-[#1B2A6B] rounded-tr-2xl" />
-                            <div className="absolute bottom-0 left-0 w-10 h-10 border-b-4 border-l-4 border-[#1B2A6B] rounded-bl-2xl" />
-                            <div className="absolute bottom-0 right-0 w-10 h-10 border-b-4 border-r-4 border-[#1B2A6B] rounded-br-2xl" />
-                        </div>
+                        <Camera className="h-16 w-16 text-white/30" />
                     </div>
                 </div>
-            )}
-            <div className="p-6 text-center safe-area-pb">
-                <p className="text-white/60 text-sm">Point your camera at the captain's QR code</p>
+                {error && <p className="text-red-400 text-sm text-center">{error}</p>}
+                <p className="text-white/60 text-sm text-center">Take a photo of the captain's QR code</p>
+                <button
+                    onClick={handleScan}
+                    disabled={scanning}
+                    className="px-8 py-3 bg-white text-black font-semibold rounded-full disabled:opacity-50"
+                >
+                    {scanning ? 'Opening camera…' : error ? 'Try Again' : 'Open Camera'}
+                </button>
             </div>
         </div>
     );
@@ -140,13 +141,14 @@ export default function CrewDashboard() {
   const match = path.match(/\/join\/([A-Z0-9]+)/i);
   if (match) setJoinCode(match[1].toUpperCase());
 
-  const listener = CapApp.addListener('appUrlOpen', (event) => {
+  let listenerHandle: { remove: () => void } | null = null;
+  CapApp.addListener('appUrlOpen', (event) => {
     const url = new URL(event.url);
     const code = url.pathname.replace('/join/', '').toUpperCase();
     if (code) setJoinCode(code);
-  });
+  }).then(handle => { listenerHandle = handle; });
 
-  return () => { listener.then(l => l.remove()); };
+  return () => { listenerHandle?.remove(); };
 }, []);
 
     const approvedVessel = user ? getCrewVessel(user.id) : undefined;
@@ -222,14 +224,12 @@ export default function CrewDashboard() {
         // Validate request
         const result = await requestJoin(user.id, user.firstName || '', user.lastName || '', joinCode.trim().toUpperCase());
         if (result.success) {
-            // No need to update position here as it comes from signup
             setSuccess(result.message);
             setJoinCode('');
-            // Leave submitting=true — the pending request UI will replace this form
         } else {
             setError(result.message);
-            setSubmitting(false);
         }
+        setSubmitting(false);
     };
 
     const [checkInLoading, setCheckInLoading] = useState(false);
@@ -366,7 +366,7 @@ export default function CrewDashboard() {
     return (
         <div className="min-h-screen bg-background text-foreground">
             <header className="border-b bg-card relative z-50 safe-area-pt">
-                <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+                <div className="container mx-auto px-4 h-16 flex items-center justify-between pt-[5px]">
                     <div className="flex items-center gap-2 font-bold text-xl text-primary">
                         <Anchor className="h-6 w-6" />
                         <span>YachtWatch</span>

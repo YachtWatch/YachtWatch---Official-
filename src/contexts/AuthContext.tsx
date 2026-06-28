@@ -228,11 +228,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
                         finalVesselId = ownedVessel.id;
 
-                        // Fix the profile link if it was wrong
-                        if (finalVesselId !== ownedVessel.id) {
-                            console.warn("⚠️ Fixing Profile Link mismatch for captain.");
-                            supabase.from('vessel_members').insert({ vessel_id: ownedVessel.id, user_id: userId }).then();
-                        }
                     } else {
                         // User is captain but owns no vessel.
                         // Ensure we don't accidentally link them to a phantom vessel from a stale profile (unlikely but possible).

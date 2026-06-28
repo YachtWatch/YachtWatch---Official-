@@ -88,14 +88,18 @@ export const useWatchLogic = ({ vessel, schedule, user }: WatchLogicProps) => {
                     if (entry.lastActiveAt) {
                         lastActiveTime = new Date(entry.lastActiveAt).getTime();
                     } else if (entry.checkedInAt) {
-                        const [hh, mm] = entry.checkedInAt.split(':');
-                        const d = new Date();
-                        d.setHours(Number(hh), Number(mm), 0, 0);
-                        const nowTime = Date.now();
-                        if (d.getTime() > nowTime + 1000 * 60 * 60) {
-                            d.setDate(d.getDate() - 1);
+                        // checkedInAt may be a full ISO timestamp or a legacy "HH:MM" string
+                        if (entry.checkedInAt.includes('T') || entry.checkedInAt.includes('Z') || entry.checkedInAt.length > 5) {
+                            lastActiveTime = new Date(entry.checkedInAt).getTime();
+                        } else {
+                            const [hh, mm] = entry.checkedInAt.split(':');
+                            const d = new Date();
+                            d.setHours(Number(hh), Number(mm), 0, 0);
+                            if (d.getTime() > Date.now() + 1000 * 60 * 60) {
+                                d.setDate(d.getDate() - 1);
+                            }
+                            lastActiveTime = d.getTime();
                         }
-                        lastActiveTime = d.getTime();
                     }
 
                     if (lastActiveTime > 0) {

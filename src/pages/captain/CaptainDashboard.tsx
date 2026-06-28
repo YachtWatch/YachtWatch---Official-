@@ -1,5 +1,5 @@
 import { TimezoneWarningBanner } from '../../components/TimezoneWarningBanner';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { SailboatLoader } from '../../components/SailboatLoader';
 import { useData } from '../../contexts/DataContext';
@@ -33,6 +33,28 @@ export default function CaptainDashboard() {
     const [vesselCapacity, setVesselCapacity] = useState('');
 
     const vessel = user?.vesselId ? getVessel(user.vesselId) : undefined;
+
+    // Retry logic: if initialLoadComplete but vessel is missing, retry up to 3 times
+    // before showing the error. Absorbs race conditions on cold start / slow networks.
+    const [vesselMissingConfirmed, setVesselMissingConfirmed] = useState(false);
+    const retryCountRef = useRef(0);
+    useEffect(() => {
+        if (!initialLoadComplete || !user?.vesselId || vessel) {
+            setVesselMissingConfirmed(false);
+            retryCountRef.current = 0;
+            return;
+        }
+        if (retryCountRef.current >= 3) {
+            setVesselMissingConfirmed(true);
+            return;
+        }
+        const delay = 1500 * Math.pow(2, retryCountRef.current); // 1.5s, 3s, 6s
+        const timer = setTimeout(async () => {
+            retryCountRef.current += 1;
+            await refreshData();
+        }, delay);
+        return () => clearTimeout(timer);
+    }, [initialLoadComplete, user?.vesselId, vessel, refreshData]);
 
     // O(1) user lookup — avoids nested .find() inside crew-list renders.
     const userById = useMemo(
@@ -85,12 +107,17 @@ export default function CaptainDashboard() {
     const handleCreateVessel = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!user) return;
+        const length = Number(vesselLength);
+        const capacity = Number(vesselCapacity);
+        if (!vesselName.trim()) return;
+        if (!length || length < 1 || length > 500) return;
+        if (!capacity || capacity < 1 || capacity > 200) return;
         const newVessel = await createVessel({
             captainId: user.id,
-            name: vesselName,
-            length: Number(vesselLength),
+            name: vesselName.trim(),
+            length,
             type: vesselType,
-            capacity: Number(vesselCapacity),
+            capacity,
             checkInEnabled: true,
             checkInInterval: 15,
             timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -137,9 +164,13 @@ export default function CaptainDashboard() {
         }
     };
 
-    const handleRemoveCrew = (userId: string) => {
+    const handleRemoveCrew = async (userId: string) => {
         if (!vessel || !confirm('Are you sure you want to remove this crew member?')) return;
-        removeCrew(vessel.id, userId);
+        try {
+            await removeCrew(vessel.id, userId);
+        } catch {
+            // removeCrew already alerts the user with the reason before throwing
+        }
     };
 
     const handleEditRole = (userId: string) => {
@@ -161,9 +192,15 @@ export default function CaptainDashboard() {
     }
 
     if (!vessel) {
-        // Double check: if user has a vesselId but we can't find it, it might still be loading or it was deleted.
-        // But since we checked 'loading' above, if we are here and have vesselId but no vessel, it's an error state (or deleted).
-        if (user?.vesselId && initialLoadComplete) {
+        // vesselId exists but vessel hasn't loaded/confirmed missing yet — keep showing loader during retry window
+        if (user?.vesselId && !vesselMissingConfirmed) {
+            return (
+                <div className="min-h-screen flex items-center justify-center bg-background">
+                    <SailboatLoader />
+                </div>
+            );
+        }
+        if (user?.vesselId && vesselMissingConfirmed) {
             return (
                 <div className="container max-w-md mx-auto py-12 px-4 text-center">
                     <Card>
@@ -246,7 +283,7 @@ export default function CaptainDashboard() {
     return (
         <div className="min-h-screen bg-background text-foreground">
             <header className="border-b bg-card relative z-50 safe-area-pt print:hidden">
-                <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+                <div className="container mx-auto px-4 h-16 flex items-center justify-between pt-[5px]">
                     <div className="flex items-center gap-2 font-bold text-xl text-primary">
                         <Anchor className="h-6 w-6" />
                         <span>YachtWatch</span>
@@ -296,7 +333,7 @@ export default function CaptainDashboard() {
                                             <Users className="h-6 w-6" />
                                         </div>
                                         <div className="text-sm text-muted-foreground font-medium mb-1">Crew Size</div>
-                                        <div className="font-bold text-lg leading-tight">{approvedCrew.length + 1}</div>
+                                        <div className="font-bold text-lg leading-tight">{users.length}</div>
                                     </Card>
                                 </div>
 

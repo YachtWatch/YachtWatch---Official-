@@ -1,5 +1,6 @@
-import { Shield, ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Anchor } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { ProfileDropdown } from '../components/ui/ProfileDropdown';
 
 export default function PrivacyPolicyPage() {
     const navigate = useNavigate();
@@ -8,17 +9,17 @@ export default function PrivacyPolicyPage() {
         <div className="min-h-screen bg-background">
             {/* Header */}
             <header className="border-b bg-card sticky top-0 z-50 safe-area-pt">
-                <div className="container mx-auto px-4 h-16 flex items-center gap-4 max-w-3xl">
-                    <button
-                        onClick={() => navigate(-1)}
-                        className="p-2 -ml-2 hover:bg-accent rounded-lg transition-colors text-muted-foreground hover:text-foreground"
-                    >
-                        <ArrowLeft className="h-5 w-5" />
-                    </button>
-                    <div className="flex items-center gap-2">
-                        <Shield className="h-5 w-5 text-[#1E3A8A]" />
-                        <span className="font-semibold">Privacy Policy</span>
+                <div className="container mx-auto px-4 h-16 flex items-center justify-between pt-[5px] max-w-3xl">
+                    <div className="flex items-center gap-3">
+                        <button onClick={() => navigate(-1)} className="p-2 -ml-2 hover:bg-accent rounded-lg transition-colors">
+                            <ArrowLeft className="h-5 w-5" />
+                        </button>
+                        <div className="flex items-center gap-2 font-bold text-xl text-primary">
+                            <Anchor className="h-6 w-6" />
+                            <span>YachtWatch</span>
+                        </div>
                     </div>
+                    <ProfileDropdown />
                 </div>
             </header>
 

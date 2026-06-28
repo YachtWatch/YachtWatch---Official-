@@ -54,7 +54,7 @@ export function TimezoneWarningBanner() {
                     </span>
                 ) : (
                     <span className="truncate">
-                        Wrong timezone. Update your phone to <strong>{vesselOffset}</strong> in Settings → General → Date &amp; Time.
+                        Update your phone to <strong>{vesselOffset}</strong> in Settings → General → Date &amp; Time.
                     </span>
                 )}
             </div>
