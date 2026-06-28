@@ -15,8 +15,6 @@ export interface User {
     dateOfBirth?: string;
     reminder1?: number;
     reminder2?: number;
-    windUnit?: 'knots' | 'mph' | 'kmh';
-    waveUnit?: 'meters' | 'feet';
 }
 
 interface AuthContextType {
@@ -97,7 +95,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         try {
             if (showLoading) setLoading(true);
             const { data, error } = await withTimeout(
-                supabase.from('profiles').select('id, first_name, last_name, role, custom_role, nationality, reminder_1, reminder_2, wind_unit, wave_unit, created_at, vessel_id').eq('id', userId).single() as any,
+                supabase.from('profiles').select('id, first_name, last_name, role, custom_role, nationality, reminder_1, reminder_2, created_at, vessel_id').eq('id', userId).single() as any,
                 8000,
                 'Profile fetch timed out'
             );
@@ -257,8 +255,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     dateOfBirth: secureData?.date_of_birth,
                     reminder1: data.reminder_1 || 0,
                     reminder2: data.reminder_2 || 0,
-                    windUnit: data.wind_unit || 'knots',
-                    waveUnit: data.wave_unit || 'meters'
                 });
             }
         } catch (err: any) {
