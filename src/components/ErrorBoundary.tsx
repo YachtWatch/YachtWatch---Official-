@@ -1,4 +1,5 @@
 import { Component, ReactNode } from 'react';
+import * as Sentry from '@sentry/react';
 import { Anchor } from 'lucide-react';
 
 interface Props { children: ReactNode; }
@@ -12,7 +13,7 @@ export class ErrorBoundary extends Component<Props, State> {
     }
 
     componentDidCatch(error: Error, info: { componentStack: string }) {
-        console.error('[YachtWatch] Unhandled render error:', error, info.componentStack);
+        Sentry.captureException(error, { extra: { componentStack: info.componentStack } });
     }
 
     render() {
