@@ -2,6 +2,12 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Team & Documentation (read first)
+
+Two founders (Josh + cofounder) work this repo, each with their own Claude on their own machine. **The two Claudes cannot talk directly — they coordinate only through committed files.** So shared written state is the source of truth.
+
+**Before pushing or merging to main, run the `/document-changes` skill** to record what was done in `docs/DEVLOG.md` (shipped work) or `docs/ROADMAP.md` (built-but-parked features), written so the *other* founder's Claude can understand it with zero prior context. Include the doc update in the same push so the other founder sees it immediately. Parked/unfinished features stay on a `feature/*` branch (never merged) and get an entry in `docs/ROADMAP.md`.
+
 ## Commands
 
 ```bash
