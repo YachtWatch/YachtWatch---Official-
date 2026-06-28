@@ -5,8 +5,8 @@ test.describe('Comprehensive 10-User Flow', () => {
 
     let contextAdmin: BrowserContext;
     let pageAdmin: Page;
-    let crewContexts: BrowserContext[] = [];
-    let crewPages: Page[] = [];
+    const crewContexts: BrowserContext[] = [];
+    const crewPages: Page[] = [];
 
     const runId = Date.now().toString();
     const captainEmail = `cpt_${runId}@yacht.com`;

@@ -7,7 +7,7 @@ export default function DiagnosticsPage() {
     const [session, setSession] = useState<any>(null);
     const [profile, setProfile] = useState<any>(null);
     const [vessels, setVessels] = useState<any[]>([]);
-    const [_, setLoading] = useState(true);
+    const [, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     const runDiagnostics = async () => {

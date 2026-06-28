@@ -58,13 +58,16 @@ export default function CaptainDashboard() {
         nextGlobalSlot
     } = useWatchLogic({ vessel, schedule, user });
 
-    // Legacy mapping if needed, or direct usage. 
+    // Legacy mapping if needed, or direct usage.
     // activeSlot was used for "On Watch Now" card.
     // isCaptainOnWatch used for "Current Watch Status".
 
-    const handleCheckIn = () => {
-        if (!vessel || !activeSlot || !user) return;
-        checkInToWatch(vessel.id, activeSlot.id, user.id);
+    const [checkInLoading, setCheckInLoading] = useState(false);
+    const handleCheckIn = async () => {
+        if (!vessel || !activeSlot || !user || checkInLoading) return;
+        setCheckInLoading(true);
+        await checkInToWatch(vessel.id, activeSlot.id, user.id);
+        setCheckInLoading(false);
     };
 
     const getCardColor = () => {
@@ -206,13 +209,13 @@ export default function CaptainDashboard() {
                         <form onSubmit={handleCreateVessel} className="space-y-6">
                             <div className="space-y-2">
                                 <label className="text-sm font-medium">Vessel Name</label>
-                                <Input required value={vesselName} onChange={e => setVesselName(e.target.value)} placeholder="e.g. M/Y Eclipse" />
+                                <Input required maxLength={100} value={vesselName} onChange={e => setVesselName(e.target.value)} placeholder="e.g. M/Y Eclipse" />
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium">Length (meters)</label>
-                                    <Input required type="number" value={vesselLength} onChange={e => setVesselLength(e.target.value)} placeholder="50" />
+                                    <Input required type="number" min="1" max="999" value={vesselLength} onChange={e => setVesselLength(e.target.value)} placeholder="50" />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium">Type</label>
@@ -229,7 +232,7 @@ export default function CaptainDashboard() {
 
                             <div className="space-y-2">
                                 <label className="text-sm font-medium">Crew Capacity</label>
-                                <Input required type="number" value={vesselCapacity} onChange={e => setVesselCapacity(e.target.value)} placeholder="12" />
+                                <Input required type="number" min="1" max="500" value={vesselCapacity} onChange={e => setVesselCapacity(e.target.value)} placeholder="12" />
                             </div>
 
                             <Button type="submit" className="w-full">Initialize Vessel</Button>
@@ -326,7 +329,6 @@ export default function CaptainDashboard() {
                                                             {schedule?.watchType === 'anchor' ? 'Anchor Watch' : 'Navigation Watch'}
                                                         </div>
 
-                                                        {/* Timer */}
                                                         {(isCaptainOnWatch || displaySlot) && timeLeft && (
                                                             <div className="mt-2 text-right">
                                                                 <div className="text-xs uppercase text-muted-foreground font-bold">
@@ -370,8 +372,8 @@ export default function CaptainDashboard() {
                                                                 }
 
                                                                 return showCheckInButton ? (
-                                                                    <Button variant="destructive" size="sm" className="w-full font-bold animate-pulse shadow-lg" onClick={handleCheckIn}>
-                                                                        {buttonText}
+                                                                    <Button variant="destructive" size="sm" className="w-full font-bold animate-pulse shadow-lg" onClick={handleCheckIn} disabled={checkInLoading}>
+                                                                        {checkInLoading ? 'Checking in…' : buttonText}
                                                                     </Button>
                                                                 ) : (
                                                                     <div className="flex items-center justify-center gap-2 text-green-600 font-bold bg-green-500/10 rounded py-2 border border-green-500/20">
@@ -388,6 +390,7 @@ export default function CaptainDashboard() {
                                                     {schedule?.slots.some(s => s.crew.some(c => c.userId === user?.id)) ? "No upcoming watches." : "No watch assigned."}
                                                 </div>
                                             )}
+
                                         </CardContent>
                                     </Card>
 
@@ -550,6 +553,7 @@ export default function CaptainDashboard() {
             <div className="print:hidden">
                 <BottomTabs activeTab={activeTab} onTabChange={setActiveTab} />
             </div>
+
         </div>
     );
 }

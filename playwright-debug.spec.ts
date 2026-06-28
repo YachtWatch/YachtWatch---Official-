@@ -8,7 +8,7 @@ test('debug login', async ({ page }) => {
   // Wait a bit to see what happens
   await page.waitForTimeout(2000);
   
-  const content = await page.content();
+  await page.content();
   console.log("Page URL after clicking Sign In:", page.url());
   
   // See if "Enter your email" is on page

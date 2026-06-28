@@ -26,7 +26,7 @@ test('Settings Reminder Persistence', async ({ page }) => {
     try {
         await expect(page.getByText('Set up your profile')).toBeVisible({ timeout: 10000 });
         await page.click('button:has-text("Skip and do later")');
-    } catch (e) {
+    } catch {
         console.log("Skip/Profile not found, checking if we are already redirected...");
     }
 

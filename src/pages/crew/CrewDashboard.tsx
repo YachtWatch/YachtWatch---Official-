@@ -1,4 +1,5 @@
 import { TimezoneWarningBanner } from '../../components/TimezoneWarningBanner';
+import { useScheduleCache, loadScheduleCache, formatSyncAge } from '../../hooks/useScheduleCache';
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useData } from '../../contexts/DataContext';
@@ -158,6 +159,13 @@ export default function CrewDashboard() {
     const activeVessel = approvedVessel;
     const schedule = activeVessel ? getSchedule(activeVessel.id) : undefined;
 
+    // Persist live data to localStorage; restore when offline
+    useScheduleCache(activeVessel, schedule);
+    const [isOffline] = useState(!navigator.onLine);
+    const cached = useMemo(() => (!activeVessel || !schedule) && isOffline ? loadScheduleCache() : null, [isOffline, !!activeVessel, !!schedule]); // eslint-disable-line react-hooks/exhaustive-deps
+    const effectiveVessel = activeVessel ?? cached?.vessel ?? undefined;
+    const effectiveSchedule = schedule ?? cached?.schedule ?? undefined;
+
     // Show standing orders modal if crew hasn't acknowledged yet
     useEffect(() => {
         if (!schedule || !user) return;
@@ -196,13 +204,17 @@ export default function CrewDashboard() {
         isCheckedIn,
         myCrewEntry,
         nextGlobalSlot
-    } = useWatchLogic({ vessel: activeVessel, schedule, user });
+    } = useWatchLogic({ vessel: effectiveVessel, schedule: effectiveSchedule, user });
 
     const handleJoin = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!user || submitting) return;
         setError('');
         setSuccess('');
+        if (!joinCode.trim()) {
+            setError('Please enter a join code.');
+            return;
+        }
         setSubmitting(true);
 
         // Removed position validation per user request
@@ -220,15 +232,18 @@ export default function CrewDashboard() {
         }
     };
 
-    const handleCheckIn = () => {
-        if (!activeVessel || !displaySlot || !user) return;
-        checkInToWatch(activeVessel.id, displaySlot.id, user.id);
+    const [checkInLoading, setCheckInLoading] = useState(false);
+    const handleCheckIn = async () => {
+        if (!activeVessel || !displaySlot || !user || checkInLoading) return;
+        setCheckInLoading(true);
+        await checkInToWatch(activeVessel.id, displaySlot.id, user.id);
+        setCheckInLoading(false);
     };
 
     // Show spinner on first load OR during a background refresh if we haven't resolved a vessel yet.
     // Without this guard, a background data refresh can briefly show "Join a Vessel" before the
     // requests/vessels data repopulates, creating a false redirect.
-    if (loading && (!initialLoadComplete || !activeVessel)) {
+    if (loading && (!initialLoadComplete || !activeVessel) && !effectiveVessel) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-background">
                 <SailboatLoader />
@@ -247,7 +262,7 @@ export default function CrewDashboard() {
         );
     }
 
-    if (!activeVessel) {
+    if (!effectiveVessel) {
         return (
             <div className="container max-w-md mx-auto py-20 px-4">
                 <Card>
@@ -294,6 +309,8 @@ export default function CrewDashboard() {
                                         onChange={e => setJoinCode(e.target.value)}
                                         placeholder="e.g. A1B2C3"
                                         className="uppercase font-mono tracking-widest text-center text-lg"
+                                        maxLength={10}
+                                        required
                                     />
                                     <button
                                         type="button"
@@ -356,7 +373,7 @@ export default function CrewDashboard() {
                     </div>
                     <div className="flex items-center gap-4">
                         <div className="text-sm text-muted-foreground hidden sm:block">
-                            {users.find(u => u.id === user?.id)?.customRole || 'Crew'} on <span className="font-semibold text-foreground">{activeVessel.type === 'sail' ? 'S/Y' : 'M/Y'} {activeVessel.name}</span>
+                            {users.find(u => u.id === user?.id)?.customRole || 'Crew'} on <span className="font-semibold text-foreground">{effectiveVessel.type === 'sail' ? 'S/Y' : 'M/Y'} {effectiveVessel.name}</span>
                         </div>
                         <ProfileDropdown />
                     </div>
@@ -380,7 +397,7 @@ export default function CrewDashboard() {
                                     <Ship className="h-6 w-6" />
                                 </div>
                                 <div className="text-sm text-muted-foreground font-medium mb-1">Vessel</div>
-                                <div className="font-bold text-lg leading-tight px-2 break-words">{activeVessel.name}</div>
+                                <div className="font-bold text-lg leading-tight px-2 break-words">{effectiveVessel.name}</div>
                             </Card>
 
                             {/* Vessel Length */}
@@ -389,7 +406,7 @@ export default function CrewDashboard() {
                                     <Sailboat className="h-6 w-6" />
                                 </div>
                                 <div className="text-sm text-muted-foreground font-medium mb-1">Length</div>
-                                <div className="font-bold text-lg leading-tight">{activeVessel.length}m</div>
+                                <div className="font-bold text-lg leading-tight">{effectiveVessel.length}m</div>
                             </Card>
 
                             {/* Crew Size */}
@@ -406,11 +423,15 @@ export default function CrewDashboard() {
                             {/* Next Watch Card */}
                             <Card className={`transition-colors duration-500 flex flex-col justify-center border ${getCardColor()}`}>
                                 <CardHeader className="pb-2">
+                                    {cached && cached.syncedAt && (
+                                        <p className="text-xs text-amber-600 font-medium mb-1">
+                                            Offline · showing data synced {formatSyncAge(cached.syncedAt)}
+                                        </p>
+                                    )}
                                     <CardTitle className="text-lg flex items-center gap-2">
                                         <Clock className={`h-5 w-5 ${isCurrentlyOnWatch && watchStatus === 'red' ? 'text-red-600' : 'text-primary'}`} />
                                         Current Watch Status: <span className={(() => {
                                             if (isCurrentlyOnWatch) return "text-green-600 font-bold";
-                                            // Check if next slot starts within 1 hour
                                             if (myNextSlot) {
                                                 const diffHours = (new Date(myNextSlot.start).getTime() - new Date().getTime()) / (1000 * 60 * 60);
                                                 if (diffHours <= 1) return "text-orange-500 font-bold";
@@ -427,10 +448,9 @@ export default function CrewDashboard() {
                                             <div className="flex flex-col">
                                                 <div className="text-2xl font-bold">{formatTime(displaySlot.start)} - {formatTime(displaySlot.end)}</div>
                                                 <div className="text-sm text-muted-foreground capitalize">
-                                                    {schedule?.watchType === 'anchor' ? 'Anchor Watch' : 'Navigation Watch'}
+                                                    {effectiveSchedule?.watchType === 'anchor' ? 'Anchor Watch' : 'Navigation Watch'}
                                                 </div>
 
-                                                {/* Timer for Crew */}
                                                 {(isCurrentlyOnWatch || myNextSlot) && timeLeft && (
                                                     <div className="mt-2 text-right">
                                                         <div className="text-xs uppercase text-muted-foreground font-bold">
@@ -462,7 +482,7 @@ export default function CrewDashboard() {
                                                             }
 
                                                             const diffMinutes = (new Date().getTime() - lastActiveTime) / 1000 / 60;
-                                                            const interval = activeVessel.checkInInterval || 15;
+                                                            const interval = effectiveVessel.checkInInterval || 15;
                                                             // Enable re-check in if within 30 seconds of expiration (e.g. > 14.5m for 15m interval)
                                                             if (diffMinutes >= interval - 0.5) {
                                                                 showCheckInButton = true;
@@ -471,8 +491,8 @@ export default function CrewDashboard() {
                                                         }
 
                                                         return showCheckInButton ? (
-                                                            <Button variant="destructive" size="sm" className="w-full font-bold animate-pulse shadow-lg" onClick={handleCheckIn}>
-                                                                {buttonText}
+                                                            <Button variant="destructive" size="sm" className="w-full font-bold animate-pulse shadow-lg" onClick={handleCheckIn} disabled={checkInLoading}>
+                                                                {checkInLoading ? 'Checking in…' : buttonText}
                                                             </Button>
                                                         ) : (
                                                             <div className="flex items-center justify-center gap-2 text-green-600 font-bold bg-green-500/10 rounded py-2 border border-green-500/20">
@@ -489,6 +509,7 @@ export default function CrewDashboard() {
                                             {schedule?.slots.some(s => s.crew.some(c => c.userId === user?.id)) ? "No upcoming watches." : "No watch assigned."}
                                         </div>
                                     )}
+
                                 </CardContent>
                             </Card>
 
@@ -554,11 +575,11 @@ export default function CrewDashboard() {
                 )}
 
                 {activeTab === 'schedule' && (
-                    <CrewScheduleView schedule={schedule} user={user} />
+                    <CrewScheduleView schedule={effectiveSchedule} user={user} />
                 )}
 
                 {activeTab === 'crew' && (
-                    <CrewListView approvedCrew={approvedCrew} schedule={schedule} vesselName={activeVessel.name} />
+                    <CrewListView approvedCrew={approvedCrew} schedule={effectiveSchedule} vesselName={effectiveVessel.name} />
                 )}
 
 
@@ -647,6 +668,7 @@ export default function CrewDashboard() {
                     </div>
                 </div>
             )}
+
         </div>
     );
 }

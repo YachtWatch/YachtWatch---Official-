@@ -176,6 +176,7 @@ export default function SignupPage() {
                                 id="firstName"
                                 placeholder="John"
                                 required
+                                maxLength={50}
                                 value={firstName}
                                 onChange={(e) => setFirstName(e.target.value)}
                             />
@@ -186,6 +187,7 @@ export default function SignupPage() {
                                 id="lastName"
                                 placeholder="Doe"
                                 required
+                                maxLength={50}
                                 value={lastName}
                                 onChange={(e) => setLastName(e.target.value)}
                             />
@@ -198,6 +200,7 @@ export default function SignupPage() {
                             id="position"
                             placeholder={role === 'captain' ? "Captain" : "e.g. Bosun, Chef, Deckhand"}
                             required
+                            maxLength={50}
                             value={position}
                             onChange={(e) => setPosition(e.target.value)}
                         />

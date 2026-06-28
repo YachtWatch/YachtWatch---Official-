@@ -1,0 +1,772 @@
+diff --git a/node_modules/@revenuecat/purchases-capacitor/.swiftpm/xcode/xcuserdata/cass.xcuserdatad/xcschemes/xcschememanagement.plist b/node_modules/@revenuecat/purchases-capacitor/.swiftpm/xcode/xcuserdata/cass.xcuserdatad/xcschemes/xcschememanagement.plist
+new file mode 100644
+index 0000000..b4409d5
+--- /dev/null
++++ b/node_modules/@revenuecat/purchases-capacitor/.swiftpm/xcode/xcuserdata/cass.xcuserdatad/xcschemes/xcschememanagement.plist
+@@ -0,0 +1,14 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
++<plist version="1.0">
++<dict>
++	<key>SchemeUserState</key>
++	<dict>
++		<key>RevenuecatPurchasesCapacitor.xcscheme_^#shared#^_</key>
++		<dict>
++			<key>orderHint</key>
++			<integer>5</integer>
++		</dict>
++	</dict>
++</dict>
++</plist>
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build.gradle b/node_modules/@revenuecat/purchases-capacitor/android/build.gradle
+index f4d40b9..75f1e35 100644
+--- a/node_modules/@revenuecat/purchases-capacitor/android/build.gradle
++++ b/node_modules/@revenuecat/purchases-capacitor/android/build.gradle
+@@ -34,7 +34,7 @@ android {
+     buildTypes {
+         release {
+             minifyEnabled false
+-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
++            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+         }
+     }
+     lintOptions {
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/results.bin b/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/results.bin
+new file mode 100644
+index 0000000..7ed749e
+--- /dev/null
++++ b/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/results.bin
+@@ -0,0 +1 @@
++o/bundleLibRuntimeToDirDebug
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/revenuecat/purchases/capacitor/PurchasesPlugin$Companion.dex b/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/revenuecat/purchases/capacitor/PurchasesPlugin$Companion.dex
+new file mode 100644
+index 0000000..a4ce99f
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/revenuecat/purchases/capacitor/PurchasesPlugin$Companion.dex differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/revenuecat/purchases/capacitor/PurchasesPlugin$PurchaseOptionalInfoParams$Companion.dex b/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/revenuecat/purchases/capacitor/PurchasesPlugin$PurchaseOptionalInfoParams$Companion.dex
+new file mode 100644
+index 0000000..ca758f8
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/revenuecat/purchases/capacitor/PurchasesPlugin$PurchaseOptionalInfoParams$Companion.dex differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/revenuecat/purchases/capacitor/PurchasesPlugin$PurchaseOptionalInfoParams.dex b/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/revenuecat/purchases/capacitor/PurchasesPlugin$PurchaseOptionalInfoParams.dex
+new file mode 100644
+index 0000000..4ed142e
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/revenuecat/purchases/capacitor/PurchasesPlugin$PurchaseOptionalInfoParams.dex differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/revenuecat/purchases/capacitor/PurchasesPlugin$canMakePayments$1.dex b/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/revenuecat/purchases/capacitor/PurchasesPlugin$canMakePayments$1.dex
+new file mode 100644
+index 0000000..5588e60
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/revenuecat/purchases/capacitor/PurchasesPlugin$canMakePayments$1.dex differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/revenuecat/purchases/capacitor/PurchasesPlugin$getOnNullableResult$1.dex b/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/revenuecat/purchases/capacitor/PurchasesPlugin$getOnNullableResult$1.dex
+new file mode 100644
+index 0000000..a66f78f
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/revenuecat/purchases/capacitor/PurchasesPlugin$getOnNullableResult$1.dex differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/revenuecat/purchases/capacitor/PurchasesPlugin$getOnResult$1.dex b/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/revenuecat/purchases/capacitor/PurchasesPlugin$getOnResult$1.dex
+new file mode 100644
+index 0000000..bbfd30f
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/revenuecat/purchases/capacitor/PurchasesPlugin$getOnResult$1.dex differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/revenuecat/purchases/capacitor/PurchasesPlugin$getProducts$1.dex b/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/revenuecat/purchases/capacitor/PurchasesPlugin$getProducts$1.dex
+new file mode 100644
+index 0000000..36f1740
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/revenuecat/purchases/capacitor/PurchasesPlugin$getProducts$1.dex differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/revenuecat/purchases/capacitor/PurchasesPlugin.dex b/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/revenuecat/purchases/capacitor/PurchasesPlugin.dex
+new file mode 100644
+index 0000000..f42fb7c
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/revenuecat/purchases/capacitor/PurchasesPlugin.dex differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/revenuecat/purchases/capacitor/PurchasesPluginKt.dex b/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/revenuecat/purchases/capacitor/PurchasesPluginKt.dex
+new file mode 100644
+index 0000000..713df51
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/revenuecat/purchases/capacitor/PurchasesPluginKt.dex differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_global-synthetics/com/revenuecat/purchases/capacitor/PurchasesPlugin$$InternalSyntheticLambda$2$582060b7dd02996e6b7fffc9ec63884d3a3f53a1e9a31bf2afeded769927344b$0.globals b/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_global-synthetics/com/revenuecat/purchases/capacitor/PurchasesPlugin$$InternalSyntheticLambda$2$582060b7dd02996e6b7fffc9ec63884d3a3f53a1e9a31bf2afeded769927344b$0.globals
+new file mode 100644
+index 0000000..e87b511
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_global-synthetics/com/revenuecat/purchases/capacitor/PurchasesPlugin$$InternalSyntheticLambda$2$582060b7dd02996e6b7fffc9ec63884d3a3f53a1e9a31bf2afeded769927344b$0.globals differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_global-synthetics/com/revenuecat/purchases/capacitor/PurchasesPlugin$$InternalSyntheticLambda$2$8c05f7a199838d5881aca51825210d01c16ef6916a4b42e5c37b639bdf403618$0.globals b/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_global-synthetics/com/revenuecat/purchases/capacitor/PurchasesPlugin$$InternalSyntheticLambda$2$8c05f7a199838d5881aca51825210d01c16ef6916a4b42e5c37b639bdf403618$0.globals
+new file mode 100644
+index 0000000..e87b511
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_global-synthetics/com/revenuecat/purchases/capacitor/PurchasesPlugin$$InternalSyntheticLambda$2$8c05f7a199838d5881aca51825210d01c16ef6916a4b42e5c37b639bdf403618$0.globals differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_global-synthetics/com/revenuecat/purchases/capacitor/PurchasesPlugin$$InternalSyntheticLambda$2$a2f4f9adb277b2b4b35f43ffd8cd0d1c5c9c8baf07d96d7bf7d5980ae35b29a8$0.globals b/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_global-synthetics/com/revenuecat/purchases/capacitor/PurchasesPlugin$$InternalSyntheticLambda$2$a2f4f9adb277b2b4b35f43ffd8cd0d1c5c9c8baf07d96d7bf7d5980ae35b29a8$0.globals
+new file mode 100644
+index 0000000..e87b511
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_global-synthetics/com/revenuecat/purchases/capacitor/PurchasesPlugin$$InternalSyntheticLambda$2$a2f4f9adb277b2b4b35f43ffd8cd0d1c5c9c8baf07d96d7bf7d5980ae35b29a8$0.globals differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_global-synthetics/com/revenuecat/purchases/capacitor/PurchasesPlugin$$InternalSyntheticLambda$2$b29af65fc7dee5b31dbe04c88922dd8472fed08836eb1bf86207ece64bf0ef62$0.globals b/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_global-synthetics/com/revenuecat/purchases/capacitor/PurchasesPlugin$$InternalSyntheticLambda$2$b29af65fc7dee5b31dbe04c88922dd8472fed08836eb1bf86207ece64bf0ef62$0.globals
+new file mode 100644
+index 0000000..e87b511
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_global-synthetics/com/revenuecat/purchases/capacitor/PurchasesPlugin$$InternalSyntheticLambda$2$b29af65fc7dee5b31dbe04c88922dd8472fed08836eb1bf86207ece64bf0ef62$0.globals differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_global-synthetics/com/revenuecat/purchases/capacitor/PurchasesPlugin$$InternalSyntheticLambda$2$f0489effeaed69400edb9ec7a648a85b0de645cfa0791866296b25c571befd01$0.globals b/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_global-synthetics/com/revenuecat/purchases/capacitor/PurchasesPlugin$$InternalSyntheticLambda$2$f0489effeaed69400edb9ec7a648a85b0de645cfa0791866296b25c571befd01$0.globals
+new file mode 100644
+index 0000000..e87b511
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_global-synthetics/com/revenuecat/purchases/capacitor/PurchasesPlugin$$InternalSyntheticLambda$2$f0489effeaed69400edb9ec7a648a85b0de645cfa0791866296b25c571befd01$0.globals differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/desugar_graph.bin b/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/desugar_graph.bin
+new file mode 100644
+index 0000000..601f245
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/1658b64e97562c6921529ec763be6eb6/transformed/bundleLibRuntimeToDirDebug/desugar_graph.bin differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/a6c248c3d16f84476e7c9b6147b26f70/results.bin b/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/a6c248c3d16f84476e7c9b6147b26f70/results.bin
+new file mode 100644
+index 0000000..0d259dd
+--- /dev/null
++++ b/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/a6c248c3d16f84476e7c9b6147b26f70/results.bin
+@@ -0,0 +1 @@
++o/classes
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/a6c248c3d16f84476e7c9b6147b26f70/transformed/classes/classes_dex/classes.dex b/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/a6c248c3d16f84476e7c9b6147b26f70/transformed/classes/classes_dex/classes.dex
+new file mode 100644
+index 0000000..425fea4
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/a6c248c3d16f84476e7c9b6147b26f70/transformed/classes/classes_dex/classes.dex differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/a6c248c3d16f84476e7c9b6147b26f70/transformed/classes/classes_global-synthetics/global.globals b/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/a6c248c3d16f84476e7c9b6147b26f70/transformed/classes/classes_global-synthetics/global.globals
+new file mode 100644
+index 0000000..e87b511
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/.transforms/a6c248c3d16f84476e7c9b6147b26f70/transformed/classes/classes_global-synthetics/global.globals differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/aapt_friendly_merged_manifests/debug/processDebugManifest/aapt/AndroidManifest.xml b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/aapt_friendly_merged_manifests/debug/processDebugManifest/aapt/AndroidManifest.xml
+new file mode 100644
+index 0000000..816bb4d
+--- /dev/null
++++ b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/aapt_friendly_merged_manifests/debug/processDebugManifest/aapt/AndroidManifest.xml
+@@ -0,0 +1,7 @@
++<?xml version="1.0" encoding="utf-8"?>
++<manifest xmlns:android="http://schemas.android.com/apk/res/android"
++    package="com.revenuecat.purchases.capacitor" >
++
++    <uses-sdk android:minSdkVersion="24" />
++
++</manifest>
+\ No newline at end of file
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/aapt_friendly_merged_manifests/debug/processDebugManifest/aapt/output-metadata.json b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/aapt_friendly_merged_manifests/debug/processDebugManifest/aapt/output-metadata.json
+new file mode 100644
+index 0000000..ada4124
+--- /dev/null
++++ b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/aapt_friendly_merged_manifests/debug/processDebugManifest/aapt/output-metadata.json
+@@ -0,0 +1,18 @@
++{
++  "version": 3,
++  "artifactType": {
++    "type": "AAPT_FRIENDLY_MERGED_MANIFESTS",
++    "kind": "Directory"
++  },
++  "applicationId": "com.revenuecat.purchases.capacitor",
++  "variantName": "debug",
++  "elements": [
++    {
++      "type": "SINGLE",
++      "filters": [],
++      "attributes": [],
++      "outputFile": "AndroidManifest.xml"
++    }
++  ],
++  "elementType": "File"
++}
+\ No newline at end of file
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/aar_main_jar/debug/syncDebugLibJars/classes.jar b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/aar_main_jar/debug/syncDebugLibJars/classes.jar
+new file mode 100644
+index 0000000..5b9b382
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/aar_main_jar/debug/syncDebugLibJars/classes.jar differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/aar_metadata/debug/writeDebugAarMetadata/aar-metadata.properties b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/aar_metadata/debug/writeDebugAarMetadata/aar-metadata.properties
+new file mode 100644
+index 0000000..ba000c0
+--- /dev/null
++++ b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/aar_metadata/debug/writeDebugAarMetadata/aar-metadata.properties
+@@ -0,0 +1,6 @@
++aarFormatVersion=1.0
++aarMetadataVersion=1.0
++minCompileSdk=36
++minCompileSdkExtension=0
++minAndroidGradlePluginVersion=1.0.0
++coreLibraryDesugaringEnabled=false
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/android_res_source_set_path_map/debug/mapDebugSourceSetPaths/file-map.txt b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/android_res_source_set_path_map/debug/mapDebugSourceSetPaths/file-map.txt
+new file mode 100644
+index 0000000..c3a86e3
+--- /dev/null
++++ b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/android_res_source_set_path_map/debug/mapDebugSourceSetPaths/file-map.txt
+@@ -0,0 +1,9 @@
++com.revenuecat.purchases.capacitor.revenuecat-purchases-capacitor-pngs-0 /Users/cass/.gemini/antigravity/scratch/yachtwatch/node_modules/@revenuecat/purchases-capacitor/android/build/generated/res/pngs/debug
++com.revenuecat.purchases.capacitor.revenuecat-purchases-capacitor-resValues-1 /Users/cass/.gemini/antigravity/scratch/yachtwatch/node_modules/@revenuecat/purchases-capacitor/android/build/generated/res/resValues/debug
++com.revenuecat.purchases.capacitor.revenuecat-purchases-capacitor-updated_navigation_xml-2 /Users/cass/.gemini/antigravity/scratch/yachtwatch/node_modules/@revenuecat/purchases-capacitor/android/build/generated/updated_navigation_xml/debug
++com.revenuecat.purchases.capacitor.revenuecat-purchases-capacitor-mergeDebugResources-3 /Users/cass/.gemini/antigravity/scratch/yachtwatch/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/incremental/debug/mergeDebugResources/merged.dir
++com.revenuecat.purchases.capacitor.revenuecat-purchases-capacitor-mergeDebugResources-4 /Users/cass/.gemini/antigravity/scratch/yachtwatch/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/incremental/debug/mergeDebugResources/stripped.dir
++com.revenuecat.purchases.capacitor.revenuecat-purchases-capacitor-debug-5 /Users/cass/.gemini/antigravity/scratch/yachtwatch/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/merged_res/debug/mergeDebugResources
++com.revenuecat.purchases.capacitor.revenuecat-purchases-capacitor-debug-6 /Users/cass/.gemini/antigravity/scratch/yachtwatch/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/packaged_res/debug/packageDebugResources
++com.revenuecat.purchases.capacitor.revenuecat-purchases-capacitor-debug-7 /Users/cass/.gemini/antigravity/scratch/yachtwatch/node_modules/@revenuecat/purchases-capacitor/android/src/debug/res
++com.revenuecat.purchases.capacitor.revenuecat-purchases-capacitor-main-8 /Users/cass/.gemini/antigravity/scratch/yachtwatch/node_modules/@revenuecat/purchases-capacitor/android/src/main/res
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/annotation_processor_list/debug/javaPreCompileDebug/annotationProcessors.json b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/annotation_processor_list/debug/javaPreCompileDebug/annotationProcessors.json
+new file mode 100644
+index 0000000..9e26dfe
+--- /dev/null
++++ b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/annotation_processor_list/debug/javaPreCompileDebug/annotationProcessors.json
+@@ -0,0 +1 @@
++{}
+\ No newline at end of file
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/annotations_typedef_file/debug/extractDebugAnnotations/typedefs.txt b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/annotations_typedef_file/debug/extractDebugAnnotations/typedefs.txt
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/compile_library_classes_jar/debug/bundleLibCompileToJarDebug/classes.jar b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/compile_library_classes_jar/debug/bundleLibCompileToJarDebug/classes.jar
+new file mode 100644
+index 0000000..58658d9
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/compile_library_classes_jar/debug/bundleLibCompileToJarDebug/classes.jar differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/compile_r_class_jar/debug/generateDebugRFile/R.jar b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/compile_r_class_jar/debug/generateDebugRFile/R.jar
+new file mode 100644
+index 0000000..78ade23
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/compile_r_class_jar/debug/generateDebugRFile/R.jar differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/compile_symbol_list/debug/generateDebugRFile/R.txt b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/compile_symbol_list/debug/generateDebugRFile/R.txt
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/incremental/debug-mergeJavaRes/merge-state b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/incremental/debug-mergeJavaRes/merge-state
+new file mode 100644
+index 0000000..092a9ac
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/incremental/debug-mergeJavaRes/merge-state differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties
+new file mode 100644
+index 0000000..315c420
+--- /dev/null
++++ b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties
+@@ -0,0 +1 @@
++#Tue Mar 17 13:28:25 SAST 2026
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/incremental/debug/packageDebugResources/merger.xml b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/incremental/debug/packageDebugResources/merger.xml
+new file mode 100644
+index 0000000..6178bf3
+--- /dev/null
++++ b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/incremental/debug/packageDebugResources/merger.xml
+@@ -0,0 +1,2 @@
++<?xml version="1.0" encoding="utf-8"?>
++<merger version="3"><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="main$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/cass/.gemini/antigravity/scratch/yachtwatch/node_modules/@revenuecat/purchases-capacitor/android/src/main/res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="main" generated-set="main$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~:!&lt;dir>navigation"><source path="/Users/cass/.gemini/antigravity/scratch/yachtwatch/node_modules/@revenuecat/purchases-capacitor/android/src/main/res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="debug$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/cass/.gemini/antigravity/scratch/yachtwatch/node_modules/@revenuecat/purchases-capacitor/android/src/debug/res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="debug" generated-set="debug$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~:!&lt;dir>navigation"><source path="/Users/cass/.gemini/antigravity/scratch/yachtwatch/node_modules/@revenuecat/purchases-capacitor/android/src/debug/res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="generated$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/cass/.gemini/antigravity/scratch/yachtwatch/node_modules/@revenuecat/purchases-capacitor/android/build/generated/res/resValues/debug"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="generated" generated-set="generated$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~:!&lt;dir>navigation"><source path="/Users/cass/.gemini/antigravity/scratch/yachtwatch/node_modules/@revenuecat/purchases-capacitor/android/build/generated/res/resValues/debug"/></dataSet><mergedItems/></merger>
+\ No newline at end of file
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/incremental/mergeDebugAssets/merger.xml b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/incremental/mergeDebugAssets/merger.xml
+new file mode 100644
+index 0000000..8959b3b
+--- /dev/null
++++ b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/incremental/mergeDebugAssets/merger.xml
+@@ -0,0 +1,2 @@
++<?xml version="1.0" encoding="utf-8"?>
++<merger version="3"><dataSet config="main" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/cass/.gemini/antigravity/scratch/yachtwatch/node_modules/@revenuecat/purchases-capacitor/android/src/main/assets"/></dataSet><dataSet config="debug" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/cass/.gemini/antigravity/scratch/yachtwatch/node_modules/@revenuecat/purchases-capacitor/android/src/debug/assets"/></dataSet></merger>
+\ No newline at end of file
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml
+new file mode 100644
+index 0000000..4113726
+--- /dev/null
++++ b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml
+@@ -0,0 +1,2 @@
++<?xml version="1.0" encoding="utf-8"?>
++<merger version="3"><dataSet config="main" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/cass/.gemini/antigravity/scratch/yachtwatch/node_modules/@revenuecat/purchases-capacitor/android/src/main/jniLibs"/></dataSet><dataSet config="debug" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/cass/.gemini/antigravity/scratch/yachtwatch/node_modules/@revenuecat/purchases-capacitor/android/src/debug/jniLibs"/></dataSet></merger>
+\ No newline at end of file
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/java_res/debug/processDebugJavaRes/out/META-INF/revenuecat-purchases-capacitor_debug.kotlin_module b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/java_res/debug/processDebugJavaRes/out/META-INF/revenuecat-purchases-capacitor_debug.kotlin_module
+new file mode 100644
+index 0000000..8b51cff
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/java_res/debug/processDebugJavaRes/out/META-INF/revenuecat-purchases-capacitor_debug.kotlin_module differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/local_only_symbol_list/debug/parseDebugLocalResources/R-def.txt b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/local_only_symbol_list/debug/parseDebugLocalResources/R-def.txt
+new file mode 100644
+index 0000000..78ac5b8
+--- /dev/null
++++ b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/local_only_symbol_list/debug/parseDebugLocalResources/R-def.txt
+@@ -0,0 +1,2 @@
++R_DEF: Internal format may change without notice
++local
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/manifest_merge_blame_file/debug/processDebugManifest/manifest-merger-blame-debug-report.txt b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/manifest_merge_blame_file/debug/processDebugManifest/manifest-merger-blame-debug-report.txt
+new file mode 100644
+index 0000000..f6dfdd7
+--- /dev/null
++++ b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/manifest_merge_blame_file/debug/processDebugManifest/manifest-merger-blame-debug-report.txt
+@@ -0,0 +1,9 @@
++1<?xml version="1.0" encoding="utf-8"?>
++2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
++3    package="com.revenuecat.purchases.capacitor" >
++4
++5    <uses-sdk android:minSdkVersion="24" />
++5-->INJECTED
++5-->INJECTED
++6
++7</manifest>
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/merged_java_res/debug/mergeDebugJavaResource/feature-revenuecat-purchases-capacitor.jar b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/merged_java_res/debug/mergeDebugJavaResource/feature-revenuecat-purchases-capacitor.jar
+new file mode 100644
+index 0000000..77076c0
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/merged_java_res/debug/mergeDebugJavaResource/feature-revenuecat-purchases-capacitor.jar differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml
+new file mode 100644
+index 0000000..816bb4d
+--- /dev/null
++++ b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml
+@@ -0,0 +1,7 @@
++<?xml version="1.0" encoding="utf-8"?>
++<manifest xmlns:android="http://schemas.android.com/apk/res/android"
++    package="com.revenuecat.purchases.capacitor" >
++
++    <uses-sdk android:minSdkVersion="24" />
++
++</manifest>
+\ No newline at end of file
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/navigation_json/debug/extractDeepLinksDebug/navigation.json b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/navigation_json/debug/extractDeepLinksDebug/navigation.json
+new file mode 100644
+index 0000000..0637a08
+--- /dev/null
++++ b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/navigation_json/debug/extractDeepLinksDebug/navigation.json
+@@ -0,0 +1 @@
++[]
+\ No newline at end of file
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/nested_resources_validation_report/debug/generateDebugResources/nestedResourcesValidationReport.txt b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/nested_resources_validation_report/debug/generateDebugResources/nestedResourcesValidationReport.txt
+new file mode 100644
+index 0000000..08f4ebe
+--- /dev/null
++++ b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/nested_resources_validation_report/debug/generateDebugResources/nestedResourcesValidationReport.txt
+@@ -0,0 +1 @@
++0 Warning/Error
+\ No newline at end of file
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/META-INF/revenuecat-purchases-capacitor_debug.kotlin_module b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/META-INF/revenuecat-purchases-capacitor_debug.kotlin_module
+new file mode 100644
+index 0000000..8b51cff
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/META-INF/revenuecat-purchases-capacitor_debug.kotlin_module differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/revenuecat/purchases/capacitor/PurchasesPlugin$Companion.class b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/revenuecat/purchases/capacitor/PurchasesPlugin$Companion.class
+new file mode 100644
+index 0000000..efaaacc
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/revenuecat/purchases/capacitor/PurchasesPlugin$Companion.class differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/revenuecat/purchases/capacitor/PurchasesPlugin$PurchaseOptionalInfoParams$Companion.class b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/revenuecat/purchases/capacitor/PurchasesPlugin$PurchaseOptionalInfoParams$Companion.class
+new file mode 100644
+index 0000000..c074745
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/revenuecat/purchases/capacitor/PurchasesPlugin$PurchaseOptionalInfoParams$Companion.class differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/revenuecat/purchases/capacitor/PurchasesPlugin$PurchaseOptionalInfoParams.class b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/revenuecat/purchases/capacitor/PurchasesPlugin$PurchaseOptionalInfoParams.class
+new file mode 100644
+index 0000000..0cef262
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/revenuecat/purchases/capacitor/PurchasesPlugin$PurchaseOptionalInfoParams.class differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/revenuecat/purchases/capacitor/PurchasesPlugin$canMakePayments$1.class b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/revenuecat/purchases/capacitor/PurchasesPlugin$canMakePayments$1.class
+new file mode 100644
+index 0000000..7a1e737
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/revenuecat/purchases/capacitor/PurchasesPlugin$canMakePayments$1.class differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/revenuecat/purchases/capacitor/PurchasesPlugin$getOnNullableResult$1.class b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/revenuecat/purchases/capacitor/PurchasesPlugin$getOnNullableResult$1.class
+new file mode 100644
+index 0000000..93fc6b0
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/revenuecat/purchases/capacitor/PurchasesPlugin$getOnNullableResult$1.class differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/revenuecat/purchases/capacitor/PurchasesPlugin$getOnResult$1.class b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/revenuecat/purchases/capacitor/PurchasesPlugin$getOnResult$1.class
+new file mode 100644
+index 0000000..3d135ee
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/revenuecat/purchases/capacitor/PurchasesPlugin$getOnResult$1.class differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/revenuecat/purchases/capacitor/PurchasesPlugin$getProducts$1.class b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/revenuecat/purchases/capacitor/PurchasesPlugin$getProducts$1.class
+new file mode 100644
+index 0000000..963a696
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/revenuecat/purchases/capacitor/PurchasesPlugin$getProducts$1.class differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/revenuecat/purchases/capacitor/PurchasesPlugin.class b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/revenuecat/purchases/capacitor/PurchasesPlugin.class
+new file mode 100644
+index 0000000..7133715
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/revenuecat/purchases/capacitor/PurchasesPlugin.class differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/revenuecat/purchases/capacitor/PurchasesPluginKt.class b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/revenuecat/purchases/capacitor/PurchasesPluginKt.class
+new file mode 100644
+index 0000000..6c117aa
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/revenuecat/purchases/capacitor/PurchasesPluginKt.class differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/runtime_library_classes_jar/debug/bundleLibRuntimeToJarDebug/classes.jar b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/runtime_library_classes_jar/debug/bundleLibRuntimeToJarDebug/classes.jar
+new file mode 100644
+index 0000000..fed1970
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/runtime_library_classes_jar/debug/bundleLibRuntimeToJarDebug/classes.jar differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/symbol_list_with_package_name/debug/generateDebugRFile/package-aware-r.txt b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/symbol_list_with_package_name/debug/generateDebugRFile/package-aware-r.txt
+new file mode 100644
+index 0000000..9b77fd8
+--- /dev/null
++++ b/node_modules/@revenuecat/purchases-capacitor/android/build/intermediates/symbol_list_with_package_name/debug/generateDebugRFile/package-aware-r.txt
+@@ -0,0 +1 @@
++com.revenuecat.purchases.capacitor
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab
+new file mode 100644
+index 0000000..bdf584a
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.keystream b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.keystream
+new file mode 100644
+index 0000000..4dfef45
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.keystream differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.keystream.len b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.keystream.len
+new file mode 100644
+index 0000000..9d30930
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.keystream.len differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.len b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.len
+new file mode 100644
+index 0000000..2a17e6e
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.len differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.values.at b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.values.at
+new file mode 100644
+index 0000000..f1c3d98
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.values.at differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab_i b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab_i
+new file mode 100644
+index 0000000..50e9c2a
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab_i differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab_i.len b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab_i.len
+new file mode 100644
+index 0000000..131e265
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab_i.len differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab
+new file mode 100644
+index 0000000..8c13d4d
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.keystream b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.keystream
+new file mode 100644
+index 0000000..2569953
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.keystream differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.keystream.len b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.keystream.len
+new file mode 100644
+index 0000000..578a8d0
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.keystream.len differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.len b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.len
+new file mode 100644
+index 0000000..93a595b
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.len differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.values.at b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.values.at
+new file mode 100644
+index 0000000..8f28327
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.values.at differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab_i b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab_i
+new file mode 100644
+index 0000000..c2f4382
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab_i differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab_i.len b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab_i.len
+new file mode 100644
+index 0000000..131e265
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab_i.len differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab
+new file mode 100644
+index 0000000..1964763
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.keystream b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.keystream
+new file mode 100644
+index 0000000..2569953
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.keystream differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.keystream.len b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.keystream.len
+new file mode 100644
+index 0000000..578a8d0
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.keystream.len differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.len b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.len
+new file mode 100644
+index 0000000..93a595b
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.len differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.values.at b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.values.at
+new file mode 100644
+index 0000000..639d141
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.values.at differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab_i b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab_i
+new file mode 100644
+index 0000000..c2f4382
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab_i differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab_i.len b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab_i.len
+new file mode 100644
+index 0000000..131e265
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab_i.len differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab
+new file mode 100644
+index 0000000..b67d732
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.keystream b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.keystream
+new file mode 100644
+index 0000000..8d644d6
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.keystream differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.keystream.len b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.keystream.len
+new file mode 100644
+index 0000000..4852ea7
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.keystream.len differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.len b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.len
+new file mode 100644
+index 0000000..eb0b8a0
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.len differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.values.at b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.values.at
+new file mode 100644
+index 0000000..2381801
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.values.at differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab_i b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab_i
+new file mode 100644
+index 0000000..65185db
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab_i differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab_i.len b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab_i.len
+new file mode 100644
+index 0000000..131e265
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab_i.len differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab
+new file mode 100644
+index 0000000..bdf584a
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab.keystream b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab.keystream
+new file mode 100644
+index 0000000..befea52
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab.keystream differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab.keystream.len b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab.keystream.len
+new file mode 100644
+index 0000000..2370ff8
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab.keystream.len differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab.len b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab.len
+new file mode 100644
+index 0000000..2a17e6e
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab.len differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab.values.at b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab.values.at
+new file mode 100644
+index 0000000..46d6744
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab.values.at differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab_i b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab_i
+new file mode 100644
+index 0000000..88a7efe
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab_i differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab_i.len b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab_i.len
+new file mode 100644
+index 0000000..131e265
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab_i.len differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab
+new file mode 100644
+index 0000000..169a646
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.keystream b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.keystream
+new file mode 100644
+index 0000000..d48a4ad
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.keystream differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.keystream.len b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.keystream.len
+new file mode 100644
+index 0000000..2553f37
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.keystream.len differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.len b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.len
+new file mode 100644
+index 0000000..9e27f73
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.len differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.values.at b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.values.at
+new file mode 100644
+index 0000000..b3e0417
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.values.at differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab_i b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab_i
+new file mode 100644
+index 0000000..0551b08
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab_i differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab_i.len b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab_i.len
+new file mode 100644
+index 0000000..131e265
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab_i.len differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab
+new file mode 100644
+index 0000000..bdf584a
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.keystream b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.keystream
+new file mode 100644
+index 0000000..4dfef45
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.keystream differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.keystream.len b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.keystream.len
+new file mode 100644
+index 0000000..9d30930
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.keystream.len differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.len b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.len
+new file mode 100644
+index 0000000..2a17e6e
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.len differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.values.at b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.values.at
+new file mode 100644
+index 0000000..719473d
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.values.at differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab_i b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab_i
+new file mode 100644
+index 0000000..50e9c2a
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab_i differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab_i.len b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab_i.len
+new file mode 100644
+index 0000000..131e265
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab_i.len differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab
+new file mode 100644
+index 0000000..bdf584a
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.keystream b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.keystream
+new file mode 100644
+index 0000000..3ab9279
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.keystream differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.keystream.len b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.keystream.len
+new file mode 100644
+index 0000000..e534549
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.keystream.len differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.len b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.len
+new file mode 100644
+index 0000000..2a17e6e
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.len differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.values.at b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.values.at
+new file mode 100644
+index 0000000..5188f1c
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.values.at differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab_i b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab_i
+new file mode 100644
+index 0000000..ebba356
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab_i differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab_i.len b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab_i.len
+new file mode 100644
+index 0000000..131e265
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab_i.len differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab
+new file mode 100644
+index 0000000..bdf584a
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.keystream b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.keystream
+new file mode 100644
+index 0000000..0238d38
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.keystream differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.keystream.len b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.keystream.len
+new file mode 100644
+index 0000000..3d52cad
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.keystream.len differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.len b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.len
+new file mode 100644
+index 0000000..2a17e6e
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.len differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.values.at b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.values.at
+new file mode 100644
+index 0000000..c62eb16
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.values.at differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab_i b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab_i
+new file mode 100644
+index 0000000..0a4cfeb
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab_i differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab_i.len b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab_i.len
+new file mode 100644
+index 0000000..131e265
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab_i.len differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/counters.tab b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/counters.tab
+new file mode 100644
+index 0000000..166c057
+--- /dev/null
++++ b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/counters.tab
+@@ -0,0 +1,2 @@
++1
++0
+\ No newline at end of file
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab
+new file mode 100644
+index 0000000..bdf584a
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.keystream b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.keystream
+new file mode 100644
+index 0000000..4dfef45
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.keystream differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.keystream.len b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.keystream.len
+new file mode 100644
+index 0000000..9d30930
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.keystream.len differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.len b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.len
+new file mode 100644
+index 0000000..2a17e6e
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.len differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.values.at b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.values.at
+new file mode 100644
+index 0000000..5875372
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.values.at differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab_i b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab_i
+new file mode 100644
+index 0000000..50e9c2a
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab_i differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab_i.len b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab_i.len
+new file mode 100644
+index 0000000..131e265
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab_i.len differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab
+new file mode 100644
+index 0000000..8aad32b
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.keystream b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.keystream
+new file mode 100644
+index 0000000..08e7df1
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.keystream differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.keystream.len b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.keystream.len
+new file mode 100644
+index 0000000..b7da01d
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.keystream.len differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.len b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.len
+new file mode 100644
+index 0000000..2a17e6e
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.len differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.values.at b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.values.at
+new file mode 100644
+index 0000000..1ea1c04
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.values.at differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab_i.len b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab_i.len
+new file mode 100644
+index 0000000..1b1cb4d
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab_i.len differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab
+new file mode 100644
+index 0000000..53af5a5
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.keystream b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.keystream
+new file mode 100644
+index 0000000..07f804f
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.keystream differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.keystream.len b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.keystream.len
+new file mode 100644
+index 0000000..858c039
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.keystream.len differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.len b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.len
+new file mode 100644
+index 0000000..c687382
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.len differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.values.at b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.values.at
+new file mode 100644
+index 0000000..ebeb9eb
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.values.at differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab_i b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab_i
+new file mode 100644
+index 0000000..325546a
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab_i differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab_i.len b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab_i.len
+new file mode 100644
+index 0000000..131e265
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab_i.len differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/last-build.bin b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/last-build.bin
+new file mode 100644
+index 0000000..2a6fd8d
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/cacheable/last-build.bin differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/classpath-snapshot/shrunk-classpath-snapshot.bin b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/classpath-snapshot/shrunk-classpath-snapshot.bin
+new file mode 100644
+index 0000000..21f86d0
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/kotlin/compileDebugKotlin/classpath-snapshot/shrunk-classpath-snapshot.bin differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/outputs/aar/revenuecat-purchases-capacitor-debug.aar b/node_modules/@revenuecat/purchases-capacitor/android/build/outputs/aar/revenuecat-purchases-capacitor-debug.aar
+new file mode 100644
+index 0000000..c96b008
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/outputs/aar/revenuecat-purchases-capacitor-debug.aar differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/outputs/logs/manifest-merger-debug-report.txt b/node_modules/@revenuecat/purchases-capacitor/android/build/outputs/logs/manifest-merger-debug-report.txt
+new file mode 100644
+index 0000000..5ae9968
+--- /dev/null
++++ b/node_modules/@revenuecat/purchases-capacitor/android/build/outputs/logs/manifest-merger-debug-report.txt
+@@ -0,0 +1,16 @@
++-- Merging decision tree log ---
++manifest
++ADDED from /Users/cass/.gemini/antigravity/scratch/yachtwatch/node_modules/@revenuecat/purchases-capacitor/android/src/main/AndroidManifest.xml:1:1-2:12
++INJECTED from /Users/cass/.gemini/antigravity/scratch/yachtwatch/node_modules/@revenuecat/purchases-capacitor/android/src/main/AndroidManifest.xml:1:1-2:12
++	package
++		INJECTED from /Users/cass/.gemini/antigravity/scratch/yachtwatch/node_modules/@revenuecat/purchases-capacitor/android/src/main/AndroidManifest.xml
++	xmlns:android
++		ADDED from /Users/cass/.gemini/antigravity/scratch/yachtwatch/node_modules/@revenuecat/purchases-capacitor/android/src/main/AndroidManifest.xml:1:11-69
++uses-sdk
++INJECTED from /Users/cass/.gemini/antigravity/scratch/yachtwatch/node_modules/@revenuecat/purchases-capacitor/android/src/main/AndroidManifest.xml reason: use-sdk injection requested
++INJECTED from /Users/cass/.gemini/antigravity/scratch/yachtwatch/node_modules/@revenuecat/purchases-capacitor/android/src/main/AndroidManifest.xml
++INJECTED from /Users/cass/.gemini/antigravity/scratch/yachtwatch/node_modules/@revenuecat/purchases-capacitor/android/src/main/AndroidManifest.xml
++	android:targetSdkVersion
++		INJECTED from /Users/cass/.gemini/antigravity/scratch/yachtwatch/node_modules/@revenuecat/purchases-capacitor/android/src/main/AndroidManifest.xml
++	android:minSdkVersion
++		INJECTED from /Users/cass/.gemini/antigravity/scratch/yachtwatch/node_modules/@revenuecat/purchases-capacitor/android/src/main/AndroidManifest.xml
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/tmp/kotlin-classes/debug/META-INF/revenuecat-purchases-capacitor_debug.kotlin_module b/node_modules/@revenuecat/purchases-capacitor/android/build/tmp/kotlin-classes/debug/META-INF/revenuecat-purchases-capacitor_debug.kotlin_module
+new file mode 100644
+index 0000000..8b51cff
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/tmp/kotlin-classes/debug/META-INF/revenuecat-purchases-capacitor_debug.kotlin_module differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/tmp/kotlin-classes/debug/com/revenuecat/purchases/capacitor/PurchasesPlugin$Companion.class b/node_modules/@revenuecat/purchases-capacitor/android/build/tmp/kotlin-classes/debug/com/revenuecat/purchases/capacitor/PurchasesPlugin$Companion.class
+new file mode 100644
+index 0000000..efaaacc
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/tmp/kotlin-classes/debug/com/revenuecat/purchases/capacitor/PurchasesPlugin$Companion.class differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/tmp/kotlin-classes/debug/com/revenuecat/purchases/capacitor/PurchasesPlugin$PurchaseOptionalInfoParams$Companion.class b/node_modules/@revenuecat/purchases-capacitor/android/build/tmp/kotlin-classes/debug/com/revenuecat/purchases/capacitor/PurchasesPlugin$PurchaseOptionalInfoParams$Companion.class
+new file mode 100644
+index 0000000..c074745
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/tmp/kotlin-classes/debug/com/revenuecat/purchases/capacitor/PurchasesPlugin$PurchaseOptionalInfoParams$Companion.class differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/tmp/kotlin-classes/debug/com/revenuecat/purchases/capacitor/PurchasesPlugin$PurchaseOptionalInfoParams.class b/node_modules/@revenuecat/purchases-capacitor/android/build/tmp/kotlin-classes/debug/com/revenuecat/purchases/capacitor/PurchasesPlugin$PurchaseOptionalInfoParams.class
+new file mode 100644
+index 0000000..0cef262
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/tmp/kotlin-classes/debug/com/revenuecat/purchases/capacitor/PurchasesPlugin$PurchaseOptionalInfoParams.class differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/tmp/kotlin-classes/debug/com/revenuecat/purchases/capacitor/PurchasesPlugin$canMakePayments$1.class b/node_modules/@revenuecat/purchases-capacitor/android/build/tmp/kotlin-classes/debug/com/revenuecat/purchases/capacitor/PurchasesPlugin$canMakePayments$1.class
+new file mode 100644
+index 0000000..7a1e737
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/tmp/kotlin-classes/debug/com/revenuecat/purchases/capacitor/PurchasesPlugin$canMakePayments$1.class differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/tmp/kotlin-classes/debug/com/revenuecat/purchases/capacitor/PurchasesPlugin$getOnNullableResult$1.class b/node_modules/@revenuecat/purchases-capacitor/android/build/tmp/kotlin-classes/debug/com/revenuecat/purchases/capacitor/PurchasesPlugin$getOnNullableResult$1.class
+new file mode 100644
+index 0000000..93fc6b0
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/tmp/kotlin-classes/debug/com/revenuecat/purchases/capacitor/PurchasesPlugin$getOnNullableResult$1.class differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/tmp/kotlin-classes/debug/com/revenuecat/purchases/capacitor/PurchasesPlugin$getOnResult$1.class b/node_modules/@revenuecat/purchases-capacitor/android/build/tmp/kotlin-classes/debug/com/revenuecat/purchases/capacitor/PurchasesPlugin$getOnResult$1.class
+new file mode 100644
+index 0000000..3d135ee
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/tmp/kotlin-classes/debug/com/revenuecat/purchases/capacitor/PurchasesPlugin$getOnResult$1.class differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/tmp/kotlin-classes/debug/com/revenuecat/purchases/capacitor/PurchasesPlugin$getProducts$1.class b/node_modules/@revenuecat/purchases-capacitor/android/build/tmp/kotlin-classes/debug/com/revenuecat/purchases/capacitor/PurchasesPlugin$getProducts$1.class
+new file mode 100644
+index 0000000..963a696
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/tmp/kotlin-classes/debug/com/revenuecat/purchases/capacitor/PurchasesPlugin$getProducts$1.class differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/tmp/kotlin-classes/debug/com/revenuecat/purchases/capacitor/PurchasesPlugin.class b/node_modules/@revenuecat/purchases-capacitor/android/build/tmp/kotlin-classes/debug/com/revenuecat/purchases/capacitor/PurchasesPlugin.class
+new file mode 100644
+index 0000000..7133715
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/tmp/kotlin-classes/debug/com/revenuecat/purchases/capacitor/PurchasesPlugin.class differ
+diff --git a/node_modules/@revenuecat/purchases-capacitor/android/build/tmp/kotlin-classes/debug/com/revenuecat/purchases/capacitor/PurchasesPluginKt.class b/node_modules/@revenuecat/purchases-capacitor/android/build/tmp/kotlin-classes/debug/com/revenuecat/purchases/capacitor/PurchasesPluginKt.class
+new file mode 100644
+index 0000000..6c117aa
+Binary files /dev/null and b/node_modules/@revenuecat/purchases-capacitor/android/build/tmp/kotlin-classes/debug/com/revenuecat/purchases/capacitor/PurchasesPluginKt.class differ

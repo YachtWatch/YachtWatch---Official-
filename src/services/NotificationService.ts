@@ -3,7 +3,6 @@ import { PushNotifications } from '@capacitor/push-notifications';
 import { Capacitor } from '@capacitor/core';
 import { supabase } from '../lib/supabase';
 import { WatchSchedule } from '../contexts/DataContext';
-
 export const NotificationService = {
     async requestPermissions() {
         try {
@@ -19,7 +18,7 @@ export const NotificationService = {
         try {
             const result = await LocalNotifications.checkPermissions();
             return result.display === 'granted';
-        } catch (e) {
+        } catch {
             return false;
         }
     },
@@ -118,7 +117,7 @@ export const NotificationService = {
             // slot.start is "HH:MM". We need to convert this to a future Date.
             // Assumption: Schedule implies "Daily" or "Next occurrence".
 
-            let sStart = this.parseTime(slot.start);
+            const sStart = this.parseTime(slot.start);
 
             // If the slot time (e.g. 02:00) is earlier than now (e.g. 10:00), 
             // and we are looking at a 24h schedule, it likely means valid for Tomorrow?
@@ -145,9 +144,12 @@ export const NotificationService = {
                 // If watch is Today 10:00, now is 09:50, reminder 15min -> 09:45 (Past). Skip.
                 if (notifyAt > now) {
                     const idString = `${schedule.id}-${slot.id}-${typeSuffix}`;
+
+                    const body = `Your watch starts in ${minutesBefore} minutes.`;
+
                     notifications.push({
                         title: 'Watch Reminder',
-                        body: `Your watch starts in ${minutesBefore} minutes.`,
+                        body,
                         id: this.generateId(idString),
                         schedule: { at: notifyAt },
                         sound: 'default', // Plays default OS notification sound

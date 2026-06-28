@@ -16,7 +16,7 @@ interface IOSPickerProps {
 export function IOSPicker({ value, options, onChange, className }: IOSPickerProps) {
     const scrollRef = useRef<HTMLDivElement>(null);
     const itemHeight = 40; // Height of each item in pixels
-    const [_, setIsScrolling] = useState(false);
+    const [, setIsScrolling] = useState(false);
     const scrollTimeout = useRef<NodeJS.Timeout>();
 
     // Scroll to initial value
@@ -27,6 +27,7 @@ export function IOSPicker({ value, options, onChange, className }: IOSPickerProp
                 scrollRef.current.scrollTop = index * itemHeight;
             }
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []); // Run once on mount
 
     const handleScroll = () => {

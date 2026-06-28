@@ -72,7 +72,6 @@ export default function LoginPage() {
                 }
 
                 // Fallback: Fetch profile only if metadata is missing/invalid
-                console.log("Fetching profile from 'profiles' table for user:", data.user.id);
                 const { data: profile, error: profileError } = await supabase
                     .from('profiles')
                     .select('role')

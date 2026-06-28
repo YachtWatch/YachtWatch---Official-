@@ -148,10 +148,8 @@ export default function CompleteProfilePage() {
         // we must ensure it's respected even if 'skipping', because AuthContext might have 
         // auto-healed as 'crew' by default.
         const intendedRole = initialData?.role || user.role;
-        console.log(`⏩ Skipping profile, but enforcing role: ${intendedRole}`);
 
         if (intendedRole !== user.role) {
-            console.log("Updating role in store to match intended role...");
             await updateUserInStore(user.id, { role: intendedRole });
 
             // Also update local state to avoid race condition on redirect
@@ -221,6 +219,7 @@ export default function CompleteProfilePage() {
                                 onChange={e => setPassportNumber(e.target.value)}
                                 placeholder="Passport No."
                                 required
+                                maxLength={20}
                             />
                         </div>
 

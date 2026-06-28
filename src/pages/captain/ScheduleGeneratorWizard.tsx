@@ -44,7 +44,6 @@ const parseTimeStr = (s: string) => {
 
 const superscriptStyle: React.CSSProperties = { fontSize: 9, fontWeight: 700, color: '#1B2A6B', lineHeight: 1, alignSelf: 'flex-start', marginTop: 1 };
 
-// eslint-disable-next-line react/display-name
 const PickerTrigger = React.forwardRef<HTMLDivElement, { value?: string; onClick?: () => void; icon: React.ReactNode; placeholder: string; superscript?: React.ReactNode }>(
     ({ value, onClick, icon, placeholder, superscript }, ref) => (
         <div ref={ref} style={fieldStyle} onClick={onClick}>
@@ -352,6 +351,11 @@ export default function ScheduleGeneratorWizard() {
     };
 
     const generateSchedule = () => {
+        if (endDate && startDate && new Date(endDate) < new Date(startDate)) {
+            alert('End date must be after start date.');
+            return;
+        }
+
         const parseHourMin = (t: string) => t.split(':').map(Number) as [number, number];
 
         const startDateTime = new Date(startDate);
@@ -519,6 +523,7 @@ export default function ScheduleGeneratorWizard() {
         }
 
         if (!previewSchedule) return;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { id: _id, ...scheduleData } = previewSchedule;
         const targetVesselId = currentUser?.vesselId;
         if (!targetVesselId) {

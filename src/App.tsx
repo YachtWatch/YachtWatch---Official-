@@ -11,6 +11,7 @@ import { NotificationListener } from './components/NotificationListener';
 import { SubscriptionProvider } from './context/SubscriptionContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import { OfflineBanner } from './components/OfflineBanner';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 import { SailboatLoader } from './components/SailboatLoader';
 import LandingPage from './pages/LandingPage';
@@ -73,6 +74,7 @@ function App() {
     }, []);
 
     return (
+        <ErrorBoundary>
         <ThemeProvider defaultTheme="light" storageKey="yachtwatch-ui-theme">
             <ToastProvider>
                 <DataProvider>
@@ -131,6 +133,7 @@ function App() {
                 </DataProvider>
             </ToastProvider>
         </ThemeProvider>
+        </ErrorBoundary>
     );
 }
 
