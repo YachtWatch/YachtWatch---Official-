@@ -1,8 +1,18 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import * as Sentry from '@sentry/react'
+import posthog from 'posthog-js'
 import App from './App.tsx'
 import './index.css'
+
+if (import.meta.env.PROD) {
+    posthog.init(import.meta.env.VITE_POSTHOG_KEY, {
+        api_host: import.meta.env.VITE_POSTHOG_HOST,
+        capture_pageview: false, // we fire these manually via router
+        capture_pageleave: true,
+        person_profiles: 'identified_only',
+    })
+}
 
 Sentry.init({
     dsn: import.meta.env.VITE_SENTRY_DSN,

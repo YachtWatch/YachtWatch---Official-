@@ -1,5 +1,6 @@
 import { useEffect, Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { Analytics } from './services/AnalyticsService';
 import { Capacitor } from '@capacitor/core';
 import { SplashScreen } from '@capacitor/splash-screen';
 import { StatusBar, Style } from '@capacitor/status-bar';
@@ -30,6 +31,14 @@ const CrewExportWizard = lazy(() => import('./pages/captain/CrewExportWizard'));
 const SubscriptionPage = lazy(() => import('./pages/SubscriptionPage'));
 const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage'));
 const TermsOfServicePage = lazy(() => import('./pages/TermsOfServicePage'));
+
+function ScreenTracker() {
+    const location = useLocation();
+    useEffect(() => {
+        Analytics.screen(location.pathname);
+    }, [location.pathname]);
+    return null;
+}
 
 function RootRedirect() {
     const { user, loading } = useAuth();
@@ -82,6 +91,7 @@ function App() {
                             <NotificationListener />
                             <div className="min-h-screen bg-background text-foreground font-sans antialiased">
                                 <BrowserRouter>
+                                    <ScreenTracker />
                                     <OfflineBanner />
                                    
                                     <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-background"><SailboatLoader /></div>}>

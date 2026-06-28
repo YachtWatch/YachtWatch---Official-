@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { UserRole } from '../../contexts/AuthContext';
+import { Analytics } from '../../services/AnalyticsService';
 
 import { supabase } from '../../lib/supabase';
 import { Button } from '../../components/ui/button';
@@ -26,6 +27,7 @@ export default function SignupPage() {
     const handleSignup = async () => {
         setError('');
         setLoading(true);
+        Analytics.signupStarted();
 
         try {
             // 1. Sign up with Supabase Auth
@@ -65,7 +67,7 @@ export default function SignupPage() {
             }
 
             // 2. Navigate immediately to Complete Profile
-
+            Analytics.signupCompleted(role);
 
             navigate('/complete-profile', {
                 state: {

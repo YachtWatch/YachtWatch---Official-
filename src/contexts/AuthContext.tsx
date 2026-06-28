@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import * as Sentry from '@sentry/react';
+import { Analytics } from '../services/AnalyticsService';
 import { supabase } from '../lib/supabase';
 
 export type UserRole = 'captain' | 'crew';
@@ -85,9 +86,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             if (nextUser) {
                 localStorage.setItem(`yw_user_cache_${nextUser.id}`, JSON.stringify(nextUser));
                 Sentry.setUser({ id: nextUser.id, role: nextUser.role });
+                Analytics.identify(nextUser.id, nextUser.role);
             } else {
                 if (currentUser) localStorage.removeItem(`yw_user_cache_${currentUser.id}`);
                 Sentry.setUser(null);
+                Analytics.reset();
             }
             return nextUser;
         });

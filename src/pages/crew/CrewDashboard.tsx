@@ -1,5 +1,6 @@
 import { TimezoneWarningBanner } from '../../components/TimezoneWarningBanner';
 import { useScheduleCache, loadScheduleCache, formatSyncAge } from '../../hooks/useScheduleCache';
+import { Analytics } from '../../services/AnalyticsService';
 import { useState, useMemo, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useData } from '../../contexts/DataContext';
@@ -218,8 +219,7 @@ export default function CrewDashboard() {
             return;
         }
         setSubmitting(true);
-
-        // Removed position validation per user request
+        Analytics.crewJoinAttempted();
 
         // Validate request
         const result = await requestJoin(user.id, user.firstName || '', user.lastName || '', joinCode.trim().toUpperCase());
@@ -236,7 +236,9 @@ export default function CrewDashboard() {
     const handleCheckIn = async () => {
         if (!activeVessel || !displaySlot || !user || checkInLoading) return;
         setCheckInLoading(true);
+        Analytics.checkInTapped();
         await checkInToWatch(activeVessel.id, displaySlot.id, user.id);
+        Analytics.checkInCompleted();
         setCheckInLoading(false);
     };
 
