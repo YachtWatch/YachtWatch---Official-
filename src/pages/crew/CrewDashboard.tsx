@@ -29,14 +29,21 @@ async function decodeQRFromDataUrl(dataUrl: string): Promise<string | null> {
     return new Promise(resolve => {
         const img = new Image();
         img.onload = () => {
+            // Downscale to max 1024px — jsQR fails on full-res phone photos
+            const MAX = 1024;
+            const scale = Math.min(1, MAX / Math.max(img.width, img.height));
+            const w = Math.round(img.width * scale);
+            const h = Math.round(img.height * scale);
             const canvas = document.createElement('canvas');
-            canvas.width = img.width;
-            canvas.height = img.height;
+            canvas.width = w;
+            canvas.height = h;
             const ctx = canvas.getContext('2d');
             if (!ctx) return resolve(null);
-            ctx.drawImage(img, 0, 0);
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            const result = jsQR(imageData.data, imageData.width, imageData.height);
+            ctx.drawImage(img, 0, 0, w, h);
+            const imageData = ctx.getImageData(0, 0, w, h);
+            const result = jsQR(imageData.data, imageData.width, imageData.height, {
+                inversionAttempts: 'attemptBoth',
+            });
             resolve(result?.data || null);
         };
         img.onerror = () => resolve(null);
@@ -53,11 +60,12 @@ function QRScanner({ onScan, onClose }: { onScan: (code: string) => void; onClos
         setScanning(true);
         try {
             const photo = await CapCamera.getPhoto({
-                quality: 90,
+                quality: 70,
                 resultType: CameraResultType.DataUrl,
                 source: CameraSource.Camera,
                 promptLabelHeader: 'Scan QR Code',
                 promptLabelCancel: 'Cancel',
+                correctOrientation: true,
             });
             if (!photo.dataUrl) { setError('No image captured.'); setScanning(false); return; }
             const raw = await decodeQRFromDataUrl(photo.dataUrl);
