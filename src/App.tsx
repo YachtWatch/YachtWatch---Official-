@@ -27,7 +27,6 @@ const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 const CompleteProfilePage = lazy(() => import('./pages/CompleteProfilePage'));
 const ScheduleGeneratorWizard = lazy(() => import('./pages/captain/ScheduleGeneratorWizard'));
 const CrewExportWizard = lazy(() => import('./pages/captain/CrewExportWizard'));
-const DiagnosticsPage = lazy(() => import('./pages/DiagnosticsPage'));
 const SubscriptionPage = lazy(() => import('./pages/SubscriptionPage'));
 const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage'));
 const TermsOfServicePage = lazy(() => import('./pages/TermsOfServicePage'));
@@ -107,7 +106,6 @@ function App() {
                                                 <Route path="/complete-profile" element={<CompleteProfilePage />} />
                                                 <Route path="/profile" element={<ProfilePage />} />
                                                 <Route path="/settings" element={<SettingsPage />} />
-                                                <Route path="/diagnostics" element={<DiagnosticsPage />} />
                                                 <Route path="/subscription" element={<SubscriptionPage />} />
                                             </Route>
 
