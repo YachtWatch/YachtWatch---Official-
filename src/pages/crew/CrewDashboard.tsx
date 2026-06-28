@@ -85,30 +85,54 @@ function QRScanner({ onScan, onClose }: { onScan: (code: string) => void; onClos
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex flex-col bg-black/90">
-            <div className="flex items-center justify-between px-4 py-3">
-                <h3 className="font-semibold text-lg text-white">Scan QR Code</h3>
-                <button onClick={onClose} className="p-2 rounded-full hover:bg-white/10">
-                    <X className="h-6 w-6 text-white" />
+        <div className="fixed inset-0 z-50 flex flex-col bg-black">
+            <style>{`
+                @keyframes qr-scan {
+                    0%   { transform: translateY(0); opacity: 1; }
+                    45%  { opacity: 1; }
+                    50%  { transform: translateY(256px); opacity: 0; }
+                    51%  { transform: translateY(0); opacity: 0; }
+                    55%  { opacity: 1; }
+                    100% { transform: translateY(0); opacity: 1; }
+                }
+                .qr-scan-line { animation: qr-scan 2.4s ease-in-out infinite; }
+            `}</style>
+
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 pt-14 pb-4">
+                <h3 className="font-semibold text-lg text-white tracking-wide">Scan QR Code</h3>
+                <button onClick={onClose} className="p-2 rounded-full bg-white/10 active:bg-white/20">
+                    <X className="h-5 w-5 text-white" />
                 </button>
             </div>
-            <div className="flex-1 flex flex-col items-center justify-center gap-6 px-8">
+
+            {/* Viewfinder area */}
+            <div className="flex-1 flex flex-col items-center justify-center gap-8 px-8">
                 <div className="relative w-64 h-64">
-                    <div className="absolute inset-0 border-2 border-white/30 rounded-2xl" />
-                    <div className="absolute top-0 left-0 w-10 h-10 border-t-4 border-l-4 border-white rounded-tl-2xl" />
-                    <div className="absolute top-0 right-0 w-10 h-10 border-t-4 border-r-4 border-white rounded-tr-2xl" />
-                    <div className="absolute bottom-0 left-0 w-10 h-10 border-b-4 border-l-4 border-white rounded-bl-2xl" />
-                    <div className="absolute bottom-0 right-0 w-10 h-10 border-b-4 border-r-4 border-white rounded-br-2xl" />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                        <Camera className="h-16 w-16 text-white/30" />
+                    {/* Dark cutout edge glow */}
+                    <div className="absolute inset-0 rounded-2xl shadow-[0_0_0_9999px_rgba(0,0,0,0.75)]" />
+
+                    {/* Corner brackets */}
+                    <div className="absolute top-0 left-0 w-10 h-10 border-t-[3px] border-l-[3px] border-[#4A9EFF] rounded-tl-2xl" />
+                    <div className="absolute top-0 right-0 w-10 h-10 border-t-[3px] border-r-[3px] border-[#4A9EFF] rounded-tr-2xl" />
+                    <div className="absolute bottom-0 left-0 w-10 h-10 border-b-[3px] border-l-[3px] border-[#4A9EFF] rounded-bl-2xl" />
+                    <div className="absolute bottom-0 right-0 w-10 h-10 border-b-[3px] border-r-[3px] border-[#4A9EFF] rounded-br-2xl" />
+
+                    {/* Animated scan line */}
+                    <div className="absolute left-2 right-2 top-0 qr-scan-line pointer-events-none">
+                        <div className="h-[2px] bg-gradient-to-r from-transparent via-[#4A9EFF] to-transparent rounded-full shadow-[0_0_8px_2px_rgba(74,158,255,0.6)]" />
                     </div>
                 </div>
-                {error && <p className="text-red-400 text-sm text-center">{error}</p>}
-                <p className="text-white/60 text-sm text-center">Take a photo of the captain's QR code</p>
+
+                {error
+                    ? <p className="text-red-400 text-sm text-center px-4">{error}</p>
+                    : <p className="text-white/50 text-sm text-center">Position the QR code inside the frame</p>
+                }
+
                 <button
                     onClick={handleScan}
                     disabled={scanning}
-                    className="px-8 py-3 bg-white text-black font-semibold rounded-full disabled:opacity-50"
+                    className="px-10 py-3.5 bg-white text-black font-semibold rounded-full text-sm disabled:opacity-40 active:scale-95 transition-transform"
                 >
                     {scanning ? 'Opening camera…' : error ? 'Try Again' : 'Open Camera'}
                 </button>
