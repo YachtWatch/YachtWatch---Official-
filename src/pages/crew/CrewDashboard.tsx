@@ -1,4 +1,5 @@
 import { TimezoneWarningBanner } from '../../components/TimezoneWarningBanner';
+import { OfflineBanner } from '../../components/OfflineBanner';
 import { useScheduleCache, loadScheduleCache, formatSyncAge } from '../../hooks/useScheduleCache';
 import { Analytics } from '../../services/AnalyticsService';
 import { useState, useMemo, useEffect } from 'react';
@@ -413,6 +414,7 @@ export default function CrewDashboard() {
                     </div>
                 </div>
             </header>
+            <OfflineBanner />
             <TimezoneWarningBanner />
 
             <main className="container mx-auto px-4 py-6 pb-24">

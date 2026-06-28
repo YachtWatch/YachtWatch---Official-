@@ -11,7 +11,6 @@ import { ToastProvider } from './components/ui/Toast';
 import { NotificationListener } from './components/NotificationListener';
 import { SubscriptionProvider } from './context/SubscriptionContext';
 import ProtectedRoute from './components/ProtectedRoute';
-import { OfflineBanner } from './components/OfflineBanner';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
 import { SailboatLoader } from './components/SailboatLoader';
@@ -92,8 +91,6 @@ function App() {
                             <div className="min-h-screen bg-background text-foreground font-sans antialiased">
                                 <BrowserRouter>
                                     <ScreenTracker />
-                                    <OfflineBanner />
-                                   
                                     <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-background"><SailboatLoader /></div>}>
                                         <Routes>
                                             <Route path="/" element={<RootRedirect />} />

@@ -1,4 +1,5 @@
 import { TimezoneWarningBanner } from '../../components/TimezoneWarningBanner';
+import { OfflineBanner } from '../../components/OfflineBanner';
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { SailboatLoader } from '../../components/SailboatLoader';
@@ -296,6 +297,7 @@ export default function CaptainDashboard() {
                     </div>
                 </div>
             </header>
+            <OfflineBanner />
             <TimezoneWarningBanner />
 
             <main className="container mx-auto px-4 py-6 pb-24">

@@ -29,7 +29,7 @@ export function OfflineBanner() {
     };
 
     return (
-        <div className="bg-destructive text-destructive-foreground px-4 py-2 flex items-center justify-between text-sm font-medium z-50 sticky top-0 shadow-md">
+        <div className="bg-destructive text-destructive-foreground px-4 py-2 flex items-center justify-between text-sm font-medium shadow-md">
             <div className="flex items-center space-x-2">
                 <WifiOff className="w-4 h-4 shrink-0" />
                 <span>No connection — showing cached data.</span>
