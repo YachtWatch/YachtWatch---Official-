@@ -7,6 +7,16 @@ For features that are **built but parked** (not yet merged), see [ROADMAP.md](RO
 
 ---
 
+## 2026-06-23 — Supabase fallback removed — env vars now REQUIRED at build time ⚠️
+- **Author:** cofounder
+- **Commit/PR:** part of the `83077c4` push (security/cleanup batch)
+- **Branch:** main
+- **What changed:** `src/lib/supabase.ts` no longer has hardcoded `FALLBACK_URL`/`FALLBACK_ANON_KEY`. It now reads Supabase URL + anon key purely from env vars and **throws on launch** if they're missing. RevenueCat iOS key also moved from hardcoded to `import.meta.env.REVENUECAT_API_KEY_APPLE`.
+- **Why:** Removes hardcoded keys and fails loudly instead of silently falling back to the wrong database — directly prevents the "stuck on Initialize Vessel / wrong DB" bug from 2026-06-22. Good change.
+- **Key files:** `src/lib/supabase.ts` — now env-only, throws if unset.
+- **How to verify:** App launches and logs `Supabase Client initialized` against `oyukwinukknfgebibsqc`; missing env vars produce a thrown error instead of silent wrong-DB.
+- **Gotchas / follow-ups:** 🚨 **PUBLISHING REQUIREMENT:** the machine that builds the TestFlight/App Store binary MUST have the production Supabase keys in its `.env` (see the "BEFORE BUILDING" section in CLAUDE.md), or the published app white-screens on launch for all users. The RevenueCat Apple key is not exercised during the free period (RC init skipped until 2026-09-01) but should be set anyway.
+
 ## 2026-06-23 — Free access for all users until September 2026
 - **Author:** Josh
 - **Commit/PR:** `dcd1ed9` (merged to main via `3e29c44`)

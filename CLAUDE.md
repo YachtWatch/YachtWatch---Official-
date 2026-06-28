@@ -8,6 +8,21 @@ Two founders (Josh + cofounder) work this repo, each with their own Claude on th
 
 **Before pushing or merging to main, run the `/document-changes` skill** to record what was done in `docs/DEVLOG.md` (shipped work) or `docs/ROADMAP.md` (built-but-parked features), written so the *other* founder's Claude can understand it with zero prior context. Include the doc update in the same push so the other founder sees it immediately. Parked/unfinished features stay on a `feature/*` branch (never merged) and get an entry in `docs/ROADMAP.md`.
 
+## ⚠️ BEFORE BUILDING FOR THE APP STORE / TESTFLIGHT — REQUIRED ENV VARS
+
+As of 2026-06-23, `src/lib/supabase.ts` has **no hardcoded fallback** — it throws on launch if Supabase env vars are missing. **The build bakes env vars in at build time, so the machine that runs `npm run build && npx cap sync ios` MUST have these in its `.env` or the published app will white-screen / crash on launch for every user:**
+
+```
+SUPABASE_URL=https://oyukwinukknfgebibsqc.supabase.co
+SUPABASE_ANON_KEY=<production anon key>
+VITE_SUPABASE_URL=https://oyukwinukknfgebibsqc.supabase.co
+VITE_SUPABASE_ANON_KEY=<production anon key>
+REVENUECAT_API_KEY_APPLE=<appl_ key>     # not used during the free period (RC init skipped until 2026-09-01) but set it anyway
+REVENUECAT_API_KEY_GOOGLE=<goog_ key>
+```
+
+`oyukwinukknfgebibsqc` is the LIVE/production Supabase project. Do NOT build with an empty or wrong-project `.env`. Verify on launch that the console logs `Supabase Client initialized` against `oyukwinukknfgebibsqc`.
+
 ## Commands
 
 ```bash
