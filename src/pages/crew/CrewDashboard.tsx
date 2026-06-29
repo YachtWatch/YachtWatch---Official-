@@ -24,22 +24,32 @@ function QRScanner({ onScan, onClose }: { onScan: (code: string) => void; onClos
 
     useEffect(() => {
         let active = true;
+        let lastScan = 0;
+        const SCAN_INTERVAL = 150; // ms between scans — 6-7fps is plenty for jsQR
 
-        const tick = () => {
+        const tick = (now: number) => {
             if (!active || !videoRef.current || !canvasRef.current) return;
             const video = videoRef.current;
-            const canvas = canvasRef.current;
-            if (video.readyState !== video.HAVE_ENOUGH_DATA) {
+            if (video.readyState < video.HAVE_ENOUGH_DATA) {
                 rafRef.current = requestAnimationFrame(tick);
                 return;
             }
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
+            // Throttle: skip frames until SCAN_INTERVAL has elapsed
+            if (now - lastScan < SCAN_INTERVAL) {
+                rafRef.current = requestAnimationFrame(tick);
+                return;
+            }
+            lastScan = now;
+            const canvas = canvasRef.current;
+            // Scale down to 640px wide for faster jsQR processing
+            const scale = Math.min(1, 640 / video.videoWidth);
+            canvas.width = Math.round(video.videoWidth * scale);
+            canvas.height = Math.round(video.videoHeight * scale);
             const ctx = canvas.getContext('2d');
-            if (!ctx) return;
-            ctx.drawImage(video, 0, 0);
+            if (!ctx) { rafRef.current = requestAnimationFrame(tick); return; }
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            const result = jsQR(imageData.data, imageData.width, imageData.height);
+            const result = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'dontInvert' });
             if (result?.data) {
                 let code = result.data;
                 if (code.includes('join.yachtwatch.co/')) {
@@ -53,16 +63,28 @@ function QRScanner({ onScan, onClose }: { onScan: (code: string) => void; onClos
             rafRef.current = requestAnimationFrame(tick);
         };
 
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+        if (!navigator.mediaDevices?.getUserMedia) {
+            setError('Camera not available on this device.');
+            return;
+        }
+
+        navigator.mediaDevices.getUserMedia({
+            video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }
+        })
             .then(stream => {
                 if (!active) { stream.getTracks().forEach(t => t.stop()); return; }
                 streamRef.current = stream;
-                if (videoRef.current) {
-                    videoRef.current.srcObject = stream;
-                    videoRef.current.play().then(tick);
+                const video = videoRef.current;
+                if (video) {
+                    video.srcObject = stream;
+                    video.addEventListener('canplay', () => {
+                        if (!active) return;
+                        video.play().catch(() => {});
+                        rafRef.current = requestAnimationFrame(tick);
+                    }, { once: true });
                 }
             })
-            .catch(() => setError('Camera access denied. Please allow camera access and try again.'));
+            .catch(() => setError('Camera access denied. Please allow camera access in Settings and try again.'));
 
         return () => {
             active = false;
@@ -72,7 +94,7 @@ function QRScanner({ onScan, onClose }: { onScan: (code: string) => void; onClos
     }, [onScan]);
 
     return (
-        <div className="fixed inset-0 z-50 flex flex-col bg-black safe-area-pt">
+        <div className="fixed inset-0 z-50 bg-black flex flex-col" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
             <div className="flex items-center justify-between px-4 py-3">
                 <h3 className="font-semibold text-lg text-white">Scan QR Code</h3>
                 <button onClick={onClose} className="p-2 rounded-full hover:bg-white/10">
@@ -85,21 +107,25 @@ function QRScanner({ onScan, onClose }: { onScan: (code: string) => void; onClos
                 </div>
             ) : (
                 <div className="flex-1 relative overflow-hidden">
-                    <video ref={videoRef} className="w-full h-full object-cover" playsInline muted />
+                    <video ref={videoRef} className="absolute inset-0 w-full h-full object-cover" playsInline muted autoPlay />
                     <canvas ref={canvasRef} className="hidden" />
-                    {/* Viewfinder overlay */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="relative w-64 h-64">
-                            <div className="absolute inset-0 border-2 border-white/30 rounded-2xl" />
-                            <div className="absolute top-0 left-0 w-10 h-10 border-t-4 border-l-4 border-[#1B2A6B] rounded-tl-2xl" />
-                            <div className="absolute top-0 right-0 w-10 h-10 border-t-4 border-r-4 border-[#1B2A6B] rounded-tr-2xl" />
-                            <div className="absolute bottom-0 left-0 w-10 h-10 border-b-4 border-l-4 border-[#1B2A6B] rounded-bl-2xl" />
-                            <div className="absolute bottom-0 right-0 w-10 h-10 border-b-4 border-r-4 border-[#1B2A6B] rounded-br-2xl" />
+                    {/* Spotlight overlay: darken everything outside the viewfinder */}
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <div
+                            className="relative w-64 h-64 rounded-2xl overflow-hidden"
+                            style={{ boxShadow: '0 0 0 9999px rgba(0,0,0,0.6)' }}
+                        >
+                            {/* Corner brackets */}
+                            <div className="absolute top-0 left-0 w-8 h-8 border-t-[3px] border-l-[3px] border-white rounded-tl-xl" />
+                            <div className="absolute top-0 right-0 w-8 h-8 border-t-[3px] border-r-[3px] border-white rounded-tr-xl" />
+                            <div className="absolute bottom-0 left-0 w-8 h-8 border-b-[3px] border-l-[3px] border-white rounded-bl-xl" />
+                            <div className="absolute bottom-0 right-0 w-8 h-8 border-b-[3px] border-r-[3px] border-white rounded-br-xl" />
+
                         </div>
                     </div>
                 </div>
             )}
-            <div className="p-6 text-center safe-area-pb">
+            <div className="p-6 text-center" style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 1.5rem)' }}>
                 <p className="text-white/60 text-sm">Point your camera at the captain's QR code</p>
             </div>
         </div>
