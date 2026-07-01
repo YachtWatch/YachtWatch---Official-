@@ -41,18 +41,18 @@ const Paywall: React.FC = () => {
                             {pkg.product.priceString}
                         </div>
                         <ul className="space-y-2">
-                            {/* Placeholder features - replace with actual features */}
+                            {/* TODO(founders): confirm this benefit copy matches App Store listing + terms. */}
                             <li className="flex items-center">
                                 <Check className="mr-2 h-4 w-4 text-primary" />
-                                <span>Premium Feature 1</span>
+                                <span>Unlimited watch schedules</span>
                             </li>
                             <li className="flex items-center">
                                 <Check className="mr-2 h-4 w-4 text-primary" />
-                                <span>Premium Feature 2</span>
+                                <span>Full crew management &amp; approvals</span>
                             </li>
                             <li className="flex items-center">
                                 <Check className="mr-2 h-4 w-4 text-primary" />
-                                <span>Premium Feature 3</span>
+                                <span>PDF crew manifest export</span>
                             </li>
                         </ul>
                     </CardContent>

@@ -293,17 +293,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (!user) return;
         setLoading(true);
         try {
-            await supabase.from('join_requests').delete().eq('user_id', user.id);
-            await supabase.from('vessel_members').delete().eq('user_id', user.id);
-            await supabase.from('crew_secure_data').delete().eq('user_id', user.id);
-            await supabase.from('profiles').delete().eq('id', user.id);
+            // Delete server-side via Edge Function: removes the user's app data AND
+            // their Supabase Auth identity (App Store guideline 5.1.1(v)). A client
+            // using the anon key cannot delete its own auth user, so this must go
+            // through the service-role function.
+            const { error } = await supabase.functions.invoke('delete-account');
+            if (error) throw error;
             await supabase.auth.signOut();
             setUserWrapper(null);
         } catch (e) {
-            console.error("Failed to delete account data", e);
-            // Even if data deletion fails, we still sign out user to prevent them from staying in broken state
-            await supabase.auth.signOut();
-            setUserWrapper(null);
+            console.error("Failed to delete account", e);
+            // Re-throw so the UI tells the user deletion did NOT complete, rather
+            // than silently signing them out as though it had.
+            throw e;
         } finally {
             setLoading(false);
         }
