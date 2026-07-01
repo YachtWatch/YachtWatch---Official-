@@ -19,7 +19,15 @@ Sentry.init({
     enabled: import.meta.env.PROD,
     integrations: [
         Sentry.browserTracingIntegration(),
-        Sentry.replayIntegration(),
+        // Session replay is captured on error only (see rates below). Mask all
+        // text/inputs and block media so no crew PII (names, passport numbers,
+        // schedules) is recorded. These are Sentry's defaults; set explicitly so
+        // it's clear and auditable for the App Store privacy review.
+        Sentry.replayIntegration({
+            maskAllText: true,
+            maskAllInputs: true,
+            blockAllMedia: true,
+        }),
     ],
     // Capture 10% of transactions for performance monitoring
     tracesSampleRate: 0.1,
