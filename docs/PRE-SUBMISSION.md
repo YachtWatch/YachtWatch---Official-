@@ -16,6 +16,10 @@ Branch for the code fixes: `fix/pre-submission-blockers`.
 - **Now:** new Edge Function `supabase/functions/delete-account/index.ts` deletes the
   user's app data **and** the auth identity via the service role; `AuthContext.deleteAccount`
   invokes it and no longer silently signs out on failure (Settings shows an error instead).
+- **Captain deletion:** a schema diagnostic (2026-07-02) found `vessels.captain_id` is the only
+  other user reference and there are **no FK cascades**. So the function also deletes a captain's
+  owned vessel(s) + the vessel-scoped rows (`schedules`, `vessel_members`, `join_requests`) — crew
+  keep their accounts but lose access to that vessel. Crew deletion was already complete.
 - 🔧 **Action required:** **deploy the function** — `supabase functions deploy delete-account`
   (needs the project linked; service-role/anon/url env are auto-injected at runtime).
   Then verify end-to-end: Settings → Delete Account → confirm the user is gone from

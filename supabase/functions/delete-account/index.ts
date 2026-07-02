@@ -61,13 +61,29 @@ Deno.serve(async (req: Request) => {
       auth: { autoRefreshToken: false, persistSession: false },
     });
 
-    // 3. Delete the user's app data (authoritative, server-side).
+    // 3. If the user is a captain, delete the vessel(s) they own and everything
+    //    scoped to those vessels — schedules, crew links, and join requests. Crew
+    //    keep their own accounts but lose access to the deleted vessel. (There are
+    //    no FK cascades in this DB, so every dependent row is deleted explicitly.)
+    const { data: ownedVessels } = await admin
+      .from('vessels')
+      .select('id')
+      .eq('captain_id', userId);
+    const vesselIds = (ownedVessels ?? []).map((v: { id: string }) => v.id);
+    if (vesselIds.length > 0) {
+      await admin.from('schedules').delete().in('vessel_id', vesselIds);
+      await admin.from('vessel_members').delete().in('vessel_id', vesselIds);
+      await admin.from('join_requests').delete().in('vessel_id', vesselIds);
+      await admin.from('vessels').delete().eq('captain_id', userId);
+    }
+
+    // 4. Delete the user's own rows (their crew-side data + profile).
     await admin.from('join_requests').delete().eq('user_id', userId);
     await admin.from('vessel_members').delete().eq('user_id', userId);
     await admin.from('crew_secure_data').delete().eq('user_id', userId);
     await admin.from('profiles').delete().eq('id', userId);
 
-    // 4. Delete the Supabase Auth identity itself — the step the old flow missed.
+    // 5. Delete the Supabase Auth identity itself — the step the old flow missed.
     const { error: delErr } = await admin.auth.admin.deleteUser(userId);
     if (delErr) {
       return json({ error: `Failed to delete auth user: ${delErr.message}` }, 500);
