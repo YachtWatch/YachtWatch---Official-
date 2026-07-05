@@ -71,6 +71,11 @@ Deno.serve(async (req: Request) => {
       .eq('captain_id', userId);
     const vesselIds = (ownedVessels ?? []).map((v: { id: string }) => v.id);
     if (vesselIds.length > 0) {
+      // Detach crew the same way the in-app "remove crew" flow does: clear their
+      // profiles.vessel_id so they cleanly return to the join page. Their account,
+      // profile, and passport data (crew_secure_data) are NOT deleted — only their
+      // link to this vessel is removed.
+      await admin.from('profiles').update({ vessel_id: null }).in('vessel_id', vesselIds);
       await admin.from('schedules').delete().in('vessel_id', vesselIds);
       await admin.from('vessel_members').delete().in('vessel_id', vesselIds);
       await admin.from('join_requests').delete().in('vessel_id', vesselIds);
