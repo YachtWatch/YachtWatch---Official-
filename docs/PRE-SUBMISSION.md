@@ -8,6 +8,22 @@ Branch for the code fixes: `fix/pre-submission-blockers`.
 
 ---
 
+## 🚩 SUBMISSION HANDOFF — cofounder read this first
+
+Josh + his Claude did a round of pre-submission work (2026-07-01 → 07-06). **Most of it is on unmerged branches, and one piece is already live on prod — so building straight from `main` today would miss it.** Do these in order:
+
+1. **Merge PR #3 and PR #4 into `main`, then build from the merged `main`.**
+   - **PR #3** — landing-page App Store badge fix.
+   - **PR #4** — the real pre-submission work: **real account deletion** (Apple 5.1.1(v)), privacy manifest rewrite, privacy-policy disclosure of PostHog/Sentry, Sentry replay masking, paywall placeholder copy, `PRE-SUBMISSION.md`, and `APP-REVIEW-NOTES.md`.
+2. **The `delete-account` Edge Function is ALREADY DEPLOYED to prod** (`oyukwinukknfgebibsqc`) and end-to-end tested (crew + captain paths). But the **app code that calls it is in PR #4** — so it only takes effect once PR #4 is merged and a new build ships. Nothing to deploy; just merge + build.
+3. **Build with the production `.env`** (see the "BEFORE BUILDING" section in `CLAUDE.md`) — a wrong/empty `.env` white-screens the app for everyone.
+4. **App Store Connect:** the v1.2 rejections were all subscription/IAP. This build ships **free with no IAP** — so **do not attach any in-app purchase to the version** (that exact misconfig caused rejection 2.1(b)). Then update the **App Privacy** answers (item 2 below) and paste the review notes.
+5. **Paste the review notes** from [`APP-REVIEW-NOTES.md`](APP-REVIEW-NOTES.md) (fill in the `<FILL IN>` demo credentials — Apple needs working ones).
+
+Everything below is the detailed checklist. The subscription-rejection analysis is in `APP-REVIEW-NOTES.md`; the free-until-2026-09-01 decision is in `DEVLOG.md`.
+
+---
+
 ## Blockers — must be resolved before submitting
 
 ### ✅ 1. Real account deletion (Apple Guideline 5.1.1(v))

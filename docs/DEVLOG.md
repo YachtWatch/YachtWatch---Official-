@@ -7,6 +7,25 @@ For features that are **built but parked** (not yet merged), see [ROADMAP.md](RO
 
 ---
 
+## 2026-07-06 — Pre-submission fixes: real account deletion, privacy accuracy, review notes ⚠️ (PR #4, NOT yet merged)
+- **Author:** Josh
+- **Commit/PR:** **PR #4** (`fix/pre-submission-blockers`); covers `c12fd41`..`eb158ad`. Companion: **PR #3** (`final-touches`) = landing-page App Store badge fix.
+- **Branch:** `fix/pre-submission-blockers` — **NOT yet merged to main.** Merge PR #3 + #4 and build from merged main, or none of this is in the binary.
+- **What changed:**
+  - **Real account deletion (Apple 5.1.1(v)):** new Edge Function `supabase/functions/delete-account/index.ts` deletes the user's app data **and their Supabase Auth identity** via the service role; `AuthContext.deleteAccount` now invokes it (was client-only, which left the auth user alive). Captain deletion also deletes their owned vessel + vessel-scoped rows (`schedules`, `vessel_members`, `join_requests`) and nulls crew `profiles.vessel_id` so crew return to the join page. **Crew accounts / profiles / passport data are never deleted.**
+  - **Privacy manifest** (`ios/App/App/PrivacyInfo.xcprivacy`) rewritten: removed stale precise-location (weather feature is gone), declared the PostHog/Sentry/identity data now collected.
+  - **Privacy policy page** discloses analytics + diagnostics (generic categories, no vendor names).
+  - **Sentry replay masking** made explicit; **Paywall** `Premium Feature 1/2/3` placeholders replaced.
+  - Added `docs/PRE-SUBMISSION.md` (checklist + a "SUBMISSION HANDOFF — read first" block) and `docs/APP-REVIEW-NOTES.md` (paste-ready App Store review notes).
+- **Why:** Prep for the next App Store submission. The v1.2 rejections (Submission `c1690c4c`, Mar 2026) were **all** subscription/IAP. This build ships **free with no IAP** (see the FREE_UNTIL decision), which clears them — so the reviewer now gets *deeper* into the app, where account deletion (5.1.1(v)) and privacy accuracy become the gating items. That's what this work covers.
+- **Key files:** `supabase/functions/delete-account/index.ts` (deployed), `src/contexts/AuthContext.tsx`, `src/pages/SettingsPage.tsx`, `ios/App/App/PrivacyInfo.xcprivacy`, `src/pages/PrivacyPolicyPage.tsx`, `src/main.tsx`, `src/components/Paywall.tsx`, `docs/PRE-SUBMISSION.md`, `docs/APP-REVIEW-NOTES.md`.
+- **How to verify:** The delete-account function is **already deployed to prod (`oyukwinukknfgebibsqc`) and end-to-end tested** (throwaway signup → invoke → auth user returns 403 afterwards = gone). After merge + build: Settings → Delete Account removes the user from Supabase dashboard → Authentication → Users. `npm run build` + lint pass.
+- **Gotchas / follow-ups:**
+  - **The function is deployed but INERT until PR #4 merges + a new build ships** — the app code that calls it lives in this PR.
+  - **App Store Connect:** submit with **NO in-app purchase attached** (attaching the old tier IAPs caused the v1.2 2.1(b) rejection); update App Privacy answers (Usage/Diagnostics/Identifiers, Precise Location = No); build with the production `.env`. Ordered steps at the top of `docs/PRE-SUBMISSION.md`; reviewer notes in `docs/APP-REVIEW-NOTES.md` (fill in `<FILL IN>` demo creds).
+  - **September (paywall on):** fix CustomPaywall price prominence (v1.2 3.1.2(c)), add EULA/Terms, accept Paid Apps Agreement, re-attach the single IAP.
+  - Minor: this entry may create a trivial merge conflict with PR #3's 2026-06-30 DEVLOG entry (both prepend) — keep both, newest first.
+
 ## 2026-06-23 — Supabase fallback removed — env vars now REQUIRED at build time ⚠️
 - **Author:** cofounder
 - **Commit/PR:** part of the `83077c4` push (security/cleanup batch)
