@@ -86,6 +86,7 @@ Branch for the code fixes: `fix/pre-submission-blockers`.
 ---
 
 ## App Review notes to submit with the build
+> **Ready-to-paste version + the checks behind it: [`APP-REVIEW-NOTES.md`](APP-REVIEW-NOTES.md)** (addresses the v1.2 subscription/IAP rejections).
 - Demo captain account (with a vessel + crew) and a demo crew account / valid join code.
 - Steps: create vessel → add crew → generate schedule → publish.
 - YachtWatch is for **watch scheduling / crew operations** — not navigation, safety, or emergency monitoring.
