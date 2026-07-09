@@ -1,4 +1,3 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const APNS_KEY = Deno.env.get('APNS_KEY')!
 const APNS_KEY_ID = Deno.env.get('APNS_KEY_ID')!

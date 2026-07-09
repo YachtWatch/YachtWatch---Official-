@@ -51,7 +51,7 @@ export function getWatchStatus(lastCheckIn: string | undefined, intervalMinutes:
     // BUT for MVP, let's assume we standardise on today's date for comparison.
 
     const now = new Date();
-    let checkInTime = new Date();
+    const checkInTime = new Date();
     checkInTime.setHours(parseInt(lastCheckIn.split(':')[0]), parseInt(lastCheckIn.split(':')[1]), 0);
 
     // If checkInTime is in future (e.g. it was 23:59 and now 00:01, but we parsed 23:59 as today 23:59 which is > now 00:01), subtract day?

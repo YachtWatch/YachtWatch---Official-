@@ -1,5 +1,6 @@
 import { useEffect, useRef, Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { Analytics } from './services/AnalyticsService';
 import { Capacitor } from '@capacitor/core';
 import { SplashScreen } from '@capacitor/splash-screen';
 import { StatusBar, Style } from '@capacitor/status-bar';
@@ -10,7 +11,7 @@ import { ToastProvider } from './components/ui/Toast';
 import { NotificationListener } from './components/NotificationListener';
 import { SubscriptionProvider } from './context/SubscriptionContext';
 import ProtectedRoute from './components/ProtectedRoute';
-import { OfflineBanner } from './components/OfflineBanner';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 import { SailboatLoader } from './components/SailboatLoader';
 import LandingPage from './pages/LandingPage';
@@ -26,7 +27,6 @@ const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 const CompleteProfilePage = lazy(() => import('./pages/CompleteProfilePage'));
 const ScheduleGeneratorWizard = lazy(() => import('./pages/captain/ScheduleGeneratorWizard'));
 const CrewExportWizard = lazy(() => import('./pages/captain/CrewExportWizard'));
-const DiagnosticsPage = lazy(() => import('./pages/DiagnosticsPage'));
 const SubscriptionPage = lazy(() => import('./pages/SubscriptionPage'));
 const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage'));
 const TermsOfServicePage = lazy(() => import('./pages/TermsOfServicePage'));
@@ -58,6 +58,14 @@ function SplashController() {
         return () => clearTimeout(t);
     }, []);
 
+    return null;
+}
+
+function ScreenTracker() {
+    const location = useLocation();
+    useEffect(() => {
+        Analytics.screen(location.pathname);
+    }, [location.pathname]);
     return null;
 }
 
@@ -97,6 +105,7 @@ function App() {
     }, []);
 
     return (
+        <ErrorBoundary>
         <ThemeProvider defaultTheme="light" storageKey="yachtwatch-ui-theme">
             <ToastProvider>
                 <DataProvider>
@@ -106,8 +115,7 @@ function App() {
                             <NotificationListener />
                             <div className="min-h-screen bg-background text-foreground font-sans antialiased">
                                 <BrowserRouter>
-                                    <OfflineBanner />
-
+                                    <ScreenTracker />
                                     <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-background"><SailboatLoader /></div>}>
                                         <Routes>
                                             <Route path="/" element={<RootRedirect />} />
@@ -130,7 +138,6 @@ function App() {
                                                 <Route path="/complete-profile" element={<CompleteProfilePage />} />
                                                 <Route path="/profile" element={<ProfilePage />} />
                                                 <Route path="/settings" element={<SettingsPage />} />
-                                                <Route path="/diagnostics" element={<DiagnosticsPage />} />
                                                 <Route path="/subscription" element={<SubscriptionPage />} />
                                             </Route>
 
@@ -156,6 +163,7 @@ function App() {
                 </DataProvider>
             </ToastProvider>
         </ThemeProvider>
+        </ErrorBoundary>
     );
 }
 

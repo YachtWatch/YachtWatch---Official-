@@ -36,6 +36,7 @@ export function ScheduleMatrixView({ schedule, className, currentUserId, showOnl
         }
 
         return allColumns;
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [schedule, showOnlyUserId]);
 
     // 2. Determine Rows (Time Slots)

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { UserRole } from '../../contexts/AuthContext';
+import { Analytics } from '../../services/AnalyticsService';
 
 import { supabase } from '../../lib/supabase';
 import { Button } from '../../components/ui/button';
@@ -26,6 +27,7 @@ export default function SignupPage() {
     const handleSignup = async () => {
         setError('');
         setLoading(true);
+        Analytics.signupStarted();
 
         try {
             // 1. Sign up with Supabase Auth
@@ -65,7 +67,7 @@ export default function SignupPage() {
             }
 
             // 2. Navigate immediately to Complete Profile
-
+            Analytics.signupCompleted(role);
 
             navigate('/complete-profile', {
                 state: {
@@ -176,6 +178,7 @@ export default function SignupPage() {
                                 id="firstName"
                                 placeholder="John"
                                 required
+                                maxLength={50}
                                 value={firstName}
                                 onChange={(e) => setFirstName(e.target.value)}
                             />
@@ -186,6 +189,7 @@ export default function SignupPage() {
                                 id="lastName"
                                 placeholder="Doe"
                                 required
+                                maxLength={50}
                                 value={lastName}
                                 onChange={(e) => setLastName(e.target.value)}
                             />
@@ -198,6 +202,7 @@ export default function SignupPage() {
                             id="position"
                             placeholder={role === 'captain' ? "Captain" : "e.g. Bosun, Chef, Deckhand"}
                             required
+                            maxLength={50}
                             value={position}
                             onChange={(e) => setPosition(e.target.value)}
                         />

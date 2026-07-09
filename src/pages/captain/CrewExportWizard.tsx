@@ -67,6 +67,7 @@ export default function CrewExportWizard() {
         if (availableCrew.length > 0 && selectedIds.length === 0) {
             setSelectedIds(availableCrew.map(u => u.id));
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [availableCrew]);
 
     const selectedCrew = useMemo(

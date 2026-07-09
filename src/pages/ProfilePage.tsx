@@ -223,29 +223,27 @@ export default function ProfilePage() {
                                     />
                                 </div>
 
-                                <div className="flex gap-3 items-end">
-                                    <div className="flex-1 min-w-0 overflow-hidden space-y-2">
-                                        <label className="text-sm font-medium">Date of Birth</label>
-                                        <Input
-                                            type="date"
-                                            value={dateOfBirth}
-                                            onChange={e => setDateOfBirth(e.target.value)}
-                                            className="w-full h-10"
-                                        />
-                                    </div>
-                                    <div className="flex-1 min-w-0 overflow-hidden space-y-2">
-                                        <label className="text-sm font-medium">Nationality</label>
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowNationalityPicker(true)}
-                                            className="w-full h-10 px-3 flex items-center justify-between rounded-md border border-input bg-background text-sm"
-                                        >
-                                            <span className={`truncate ${nationality ? 'text-foreground' : 'text-muted-foreground'}`}>
-                                                {nationality || 'Nationality'}
-                                            </span>
-                                            <ChevronDown className="h-4 w-4 opacity-50 shrink-0" />
-                                        </button>
-                                    </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">Date of Birth</label>
+                                    <Input
+                                        type="date"
+                                        value={dateOfBirth}
+                                        onChange={e => setDateOfBirth(e.target.value)}
+                                        className="w-full"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">Nationality</label>
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowNationalityPicker(true)}
+                                        className="w-full h-10 px-3 flex items-center justify-between rounded-md border border-input bg-background text-sm"
+                                    >
+                                        <span className={`truncate ${nationality ? 'text-foreground' : 'text-muted-foreground'}`}>
+                                            {nationality || 'Nationality'}
+                                        </span>
+                                        <ChevronDown className="h-4 w-4 opacity-50 shrink-0" />
+                                    </button>
                                 </div>
 
                                 <div className="space-y-2">

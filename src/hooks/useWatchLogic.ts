@@ -147,7 +147,7 @@ export const useWatchLogic = ({ vessel, schedule, user }: WatchLogicProps) => {
         const timer = setInterval(updateTimer, 1000);
         updateTimer();
         return () => clearInterval(timer);
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    }, []);
 
     return {
         currentGlobalSlot,

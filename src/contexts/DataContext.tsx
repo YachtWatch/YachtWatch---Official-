@@ -27,6 +27,7 @@ export interface WatchConfig {
     watchLeaderCount?: number;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const WATCH_TYPE_DEFAULTS: Record<WatchType, Partial<WatchConfig>> = {
     'Navigation': {
         crewPerWatch: 2,
@@ -53,6 +54,7 @@ export const WATCH_TYPE_DEFAULTS: Record<WatchType, Partial<WatchConfig>> = {
     },
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function getWatchTypeDefaults(watchType: WatchType): WatchConfig {
     const defaults = WATCH_TYPE_DEFAULTS[watchType];
     return {
@@ -406,7 +408,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
                         }
 
                         if (memberData && memberData.length > 0) {
-                            let userIds = memberData.map(m => m.user_id);
+                            const userIds = memberData.map(m => m.user_id);
 
                             // ⭐️ CRITICAL FIX: The Captain is NOT in `vessel_members`. 
                             // We MUST manually ensure the captain runs through this profile query too so they appear in Shipmates.
@@ -675,6 +677,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
             document.removeEventListener('visibilitychange', handleVisibilityChange);
             if (refreshDebounceRef.current) clearTimeout(refreshDebounceRef.current);
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // Effect to schedule local notifications for upcoming watches.
@@ -888,7 +891,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
             console.error("❌ Failed to clear old schedules:", deleteError);
             // We proceed anyway, but warn
         } else {
-
+            // no-op: proceed to insert
         }
 
         // 2. Insert new schedule
@@ -1159,6 +1162,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useData() {
     const context = useContext(DataContext);
     if (context === undefined) {

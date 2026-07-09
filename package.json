@@ -1,7 +1,7 @@
 {
     "name": "yachtwatch",
     "private": true,
-    "version": "0.0.0",
+    "version": "1.0.0",
     "type": "module",
     "scripts": {
         "dev": "vite",
@@ -29,6 +29,7 @@
         "@dnd-kit/utilities": "^3.2.2",
         "@radix-ui/react-slot": "^1.2.4",
         "@revenuecat/purchases-capacitor": "^12.3.0",
+        "@sentry/react": "^10.62.0",
         "@supabase/supabase-js": "^2.90.1",
         "@types/react-datepicker": "^6.2.0",
         "class-variance-authority": "^0.7.1",
@@ -39,6 +40,7 @@
         "jspdf-autotable": "^5.0.7",
         "jsqr": "^1.4.0",
         "lucide-react": "^0.309.0",
+        "posthog-js": "^1.395.0",
         "react": "^18.2.0",
         "react-datepicker": "^9.1.0",
         "react-dom": "^18.2.0",
@@ -51,6 +53,7 @@
         "@capacitor/cli": "^8.1.0",
         "@capacitor/core": "^8.2.0",
         "@playwright/test": "^1.58.2",
+        "@sentry/vite-plugin": "^5.3.0",
         "@types/html2canvas": "^0.5.35",
         "@types/react": "^18.2.48",
         "@types/react-dom": "^18.2.18",

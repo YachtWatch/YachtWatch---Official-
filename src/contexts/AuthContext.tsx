@@ -1,4 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import * as Sentry from '@sentry/react';
+import { Analytics } from '../services/AnalyticsService';
 import { supabase } from '../lib/supabase';
 
 export type UserRole = 'captain' | 'crew';
@@ -74,6 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
 
         return () => subscription.unsubscribe();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // Wrapper for setUser to handle syncing to localStorage
@@ -82,8 +85,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const nextUser = typeof newUser === 'function' ? newUser(currentUser) : newUser;
             if (nextUser) {
                 localStorage.setItem(`yw_user_cache_${nextUser.id}`, JSON.stringify(nextUser));
-            } else if (currentUser) {
-                localStorage.removeItem(`yw_user_cache_${currentUser.id}`);
+                Sentry.setUser({ id: nextUser.id, role: nextUser.role });
+                Analytics.identify(nextUser.id, nextUser.role);
+            } else {
+                if (currentUser) localStorage.removeItem(`yw_user_cache_${currentUser.id}`);
+                Sentry.setUser(null);
+                Analytics.reset();
             }
             return nextUser;
         });
@@ -93,8 +100,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         try {
             if (showLoading) setLoading(true);
-            // Check if profile exists
-            console.log(`[AuthDebug] Fetching profile from 'profiles' table for user: ${userId}`);
             const { data, error } = await withTimeout(
                 supabase.from('profiles').select('id, first_name, last_name, role, custom_role, nationality, reminder_1, reminder_2, created_at, vessel_id').eq('id', userId).single() as any,
                 8000,
@@ -103,21 +108,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 
 
-            if (error) {
-                if (error.code === 'PGRST116') {
-                    console.warn(`[AuthDebug] Profile not found in 'profiles' (PGRST116). Creating new...`);
-                    // ... creation logic ...
-                } else {
-                    console.error(`❌ [AuthDebug] Profile Fetch Error against 'profiles' table:`, error);
-                    // alert(`DEBUG: Profile Fetch Error: ${error.message} (Code: ${error.code})`);
-                }
+            if (error && error.code !== 'PGRST116') {
+                console.error('Profile fetch error:', error);
             }
 
             // STRICT CHECK: Only auto-create if we explicitly got "Row not found" (PGRST116).
             // Any other error (network, timeout, 500) should NOT trigger auto-create.
             if (error && error.code === 'PGRST116') {
-                console.warn(`Profile not found for ${userId}. Attempting create in 'profiles' table...`);
-
                 const firstName = (metadata?.full_name || metadata?.name)?.split(' ')[0] || email.split('@')[0] || 'New';
                 const lastName = (metadata?.full_name || metadata?.name)?.split(' ').slice(1).join(' ') || 'User';
                 const newProfile = {
@@ -130,8 +127,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 };
 
 
-                // Upsert with timeout
-                console.log(`[AuthDebug] Upserting profile to 'profiles' table for user: ${userId}`);
                 const { error: insertError } = await withTimeout(
                     supabase.from('profiles').upsert(newProfile) as any,
                     8000,
@@ -181,7 +176,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
             } else if (data) {
                 // Determine raw role (default to crew if profile is missing it)
-                let rawProfileRole = data.role || 'crew';
+                const rawProfileRole = data.role || 'crew';
 
                 // Parallelize all subsequent remote data fetches to prevent waterfall delays
                 const [
@@ -265,7 +260,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     passportNumber: secureData?.passport_number,
                     dateOfBirth: secureData?.date_of_birth,
                     reminder1: data.reminder_1 || 0,
-                    reminder2: data.reminder_2 || 0
+                    reminder2: data.reminder_2 || 0,
                 });
             }
         } catch (err: any) {
@@ -298,6 +293,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (!user) return;
         setLoading(true);
         try {
+            await supabase.from('join_requests').delete().eq('user_id', user.id);
             await supabase.from('vessel_members').delete().eq('user_id', user.id);
             await supabase.from('crew_secure_data').delete().eq('user_id', user.id);
             await supabase.from('profiles').delete().eq('id', user.id);
@@ -337,6 +333,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
     const context = useContext(AuthContext);
     if (context === undefined) {

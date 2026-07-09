@@ -15,17 +15,12 @@ export default function ResetPasswordPage() {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const navigate = useNavigate();
 
+    const [sessionMissing, setSessionMissing] = useState(false);
+
     useEffect(() => {
-        // Check if we have an active session (which happens after clicking the magic link)
         const checkSession = async () => {
             const { data: { session } } = await supabase.auth.getSession();
-            if (!session) {
-                // If no session, the link might be invalid or expired
-                setMessage({
-                    type: 'error',
-                    text: 'Invalid or expired reset link. Please try again.',
-                });
-            }
+            if (!session) setSessionMissing(true);
         };
         checkSession();
     }, []);
@@ -71,6 +66,29 @@ export default function ResetPasswordPage() {
             setLoading(false);
         }
     };
+
+    if (sessionMissing) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-muted/50 px-4">
+                <Card className="w-full max-w-md">
+                    <CardHeader className="text-center space-y-2">
+                        <div className="flex justify-center">
+                            <Anchor className="h-10 w-10 text-primary" />
+                        </div>
+                        <CardTitle className="text-2xl font-bold">Link Expired</CardTitle>
+                        <CardDescription>
+                            This reset link is invalid or has already been used.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardFooter className="flex justify-center">
+                        <Button className="w-full" onClick={() => navigate('/auth/forgot-password')}>
+                            Request a new link
+                        </Button>
+                    </CardFooter>
+                </Card>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-muted/50 px-4">

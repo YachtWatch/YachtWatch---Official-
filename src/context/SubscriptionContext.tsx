@@ -41,10 +41,10 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
             try {
                 const platform = Capacitor.getPlatform();
                 if (platform === 'ios') {
-                    await Purchases.configure({ apiKey: 'appl_TxXCVVHhofCaDGcrSSspCfRbEGF' });
+                    await Purchases.configure({ apiKey: import.meta.env.REVENUECAT_API_KEY_APPLE });
                     console.log('[RevenueCat] Initialized on iOS.');
                 } else if (platform === 'android') {
-                    await Purchases.configure({ apiKey: import.meta.env.VITE_REVENUECAT_API_KEY_GOOGLE });
+                    await Purchases.configure({ apiKey: import.meta.env.REVENUECAT_API_KEY_GOOGLE });
                     console.log('[RevenueCat] Initialized on Android.');
                 }
 
@@ -75,6 +75,7 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
         };
 
         init();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const updateSubscriptionStatus = (customerInfo: CustomerInfo) => {
@@ -120,6 +121,7 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
     );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useSubscription = () => {
     const context = useContext(SubscriptionContext);
     if (context === undefined) {

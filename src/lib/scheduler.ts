@@ -116,7 +116,7 @@ export function generateSchedule(crew: CrewMember[], options: SchedulerOptions):
             leaderIndex++;
 
             // 2. Fill the rest of the required crew with keepers
-            let keepersNeeded = requiredCrew - 1;
+            const keepersNeeded = requiredCrew - 1;
             for (let c = 0; c < keepersNeeded; c++) {
                 if (keepers.length > 0) {
                     assigned.push(keepers[keeperIndex % keepers.length]);

@@ -1,12 +1,15 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { PurchasesPackage } from '@revenuecat/purchases-capacitor';
 import { useSubscription } from '../context/SubscriptionContext';
+import { Analytics } from '../services/AnalyticsService';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Check } from 'lucide-react';
 
 const Paywall: React.FC = () => {
     const { offerings, purchasePackage, isSubscribed } = useSubscription();
+
+    useEffect(() => { Analytics.paywallViewed(); }, []);
 
     if (isSubscribed) {
         return (
@@ -54,7 +57,7 @@ const Paywall: React.FC = () => {
                         </ul>
                     </CardContent>
                     <CardFooter>
-                        <Button className="w-full" onClick={() => purchasePackage(pkg)}>
+                        <Button className="w-full" onClick={() => { Analytics.subscriptionPurchased(pkg.identifier); purchasePackage(pkg); }}>
                             Subscribe
                         </Button>
                     </CardFooter>

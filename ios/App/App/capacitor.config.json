@@ -1,0 +1,31 @@
+{
+	"appId": "com.yachtwatch.ios",
+	"appName": "YachtWatch",
+	"webDir": "dist",
+	"plugins": {
+		"SplashScreen": {
+			"launchShowDuration": 1000,
+			"launchAutoHide": false,
+			"backgroundColor": "#1B2A6B",
+			"showSpinner": false,
+			"splashFullScreen": true,
+			"splashImmersive": true,
+			"useDialog": false
+		}
+	},
+	"packageClassList": [
+		"AppPlugin",
+		"CAPCameraPlugin",
+		"FilesystemPlugin",
+		"HapticsPlugin",
+		"KeyboardPlugin",
+		"LocalNotificationsPlugin",
+		"CAPNetworkPlugin",
+		"PreferencesPlugin",
+		"PushNotificationsPlugin",
+		"SharePlugin",
+		"SplashScreenPlugin",
+		"StatusBarPlugin",
+		"PurchasesPlugin"
+	]
+}

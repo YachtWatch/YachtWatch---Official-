@@ -31,6 +31,7 @@ export function useNotifications() {
                 user.reminder2 || 0
             );
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user?.id, user?.vesselId, user?.reminder1, user?.reminder2, activeSchedule]);
 
     // 3. Realtime Listeners
@@ -49,7 +50,7 @@ export function useNotifications() {
                     table: 'profiles',
                     filter: `id=eq.${user.id}`
                 },
-                (_payload) => {
+                () => {
                     // Debounce refresh to prevent loops from self-healing updates
                     const now = Date.now();
                     const lastRefresh = parseInt(sessionStorage.getItem('lastProfileRefresh') || '0');
@@ -74,8 +75,11 @@ export function useNotifications() {
                         table: 'join_requests',
                         filter: `vessel_id=eq.${user.vesselId}`
                     },
-                    (_payload) => {
-
+                    () => {
+                        NotificationService.sendLocalAlert(
+                            'New Crew Request',
+                            `A new crew member has requested to join your vessel.`
+                        );
                         refreshData();
                     }
                 )
@@ -142,5 +146,6 @@ export function useNotifications() {
             if (crewChannel) supabase.removeChannel(crewChannel);
             if (scheduleChannel) supabase.removeChannel(scheduleChannel);
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user?.id, user?.vesselId, user?.role]);
 }
