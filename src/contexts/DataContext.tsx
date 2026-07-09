@@ -287,7 +287,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     // Guard ref: prevents re-scheduling watch reminders on every check-in (only re-run when schedule/prefs change)
     const lastRemindersKeyRef = useRef<string | null>(null);
 
-    const loadFromCache = (userId?: string) => {
+    const loadFromCache = (userId?: string): boolean => {
         const cacheKey = userId ? `yachtwatch_offline_data_${userId}` : 'yachtwatch_offline_data';
         try {
             const cached = localStorage.getItem(cacheKey);
@@ -295,13 +295,21 @@ export function DataProvider({ children }: { children: ReactNode }) {
                 const data = JSON.parse(cached);
                 if (data.users) setUsers(data.users);
                 if (data.vessels) setVessels(data.vessels);
-                if (data.requests) setRequests(data.requests);
-                if (data.schedules) setSchedules(data.schedules);
-                console.log("Loaded data from offline cache.");
+                if (data.requests) {
+                    setRequests(data.requests);
+                    // Pre-seed diff refs so background refresh doesn't fire false notifications
+                    data.requests.forEach((r: JoinRequest) => knownRequestIds.current.add(r.id));
+                }
+                if (data.schedules) {
+                    setSchedules(data.schedules);
+                    data.schedules.forEach((s: WatchSchedule) => knownScheduleIds.current.add(s.id));
+                }
+                return true;
             }
         } catch (e) {
             console.error("Failed to parse local cache", e);
         }
+        return false;
     };
 
     const refreshData = async () => {
@@ -568,6 +576,18 @@ export function DataProvider({ children }: { children: ReactNode }) {
     useEffect(() => {
         const loadData = async () => {
             try {
+                // Read user ID from local session (no network call) to key the cache lookup
+                const { data: sessionData } = await supabase.auth.getSession();
+                const cachedUserId = sessionData?.session?.user?.id;
+
+                // Serve cached data immediately so the dashboard renders without waiting for the network
+                const cacheHit = loadFromCache(cachedUserId);
+                if (cacheHit) {
+                    setLoading(false);
+                    setInitialLoadComplete(true);
+                }
+
+                // Always fetch fresh data — runs in background when cache was hit
                 await refreshData();
             } catch (err) {
                 console.error("Unhandled error in refreshData:", err);

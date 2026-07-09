@@ -9,9 +9,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         Purchases.configure(withAPIKey: "appl_TxXCVVHhofCaDGcrSSspCfRbEGF")
-        // Paint the window navy immediately so there is no black frame
-        // between the OS LaunchScreen dismissal and the Capacitor splash.
-        window?.backgroundColor = UIColor(red: 27/255, green: 42/255, blue: 107/255, alpha: 1)
+        // Paint the window navy so there is no black frame between the
+        // OS LaunchScreen dismissal and the Capacitor splash.
+        // Note: must use CGFloat literals — Swift integer division (27/255) truncates to 0.
+        window?.backgroundColor = UIColor(red: 27.0/255.0, green: 42.0/255.0, blue: 107.0/255.0, alpha: 1.0)
         return true
     }
 

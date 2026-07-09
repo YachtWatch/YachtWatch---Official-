@@ -1,11 +1,11 @@
-import { useEffect, Suspense, lazy } from 'react';
+import { useEffect, useRef, Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Capacitor } from '@capacitor/core';
 import { SplashScreen } from '@capacitor/splash-screen';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { ThemeProvider } from './components/theme-provider';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { DataProvider } from './contexts/DataContext';
+import { DataProvider, useData } from './contexts/DataContext';
 import { ToastProvider } from './components/ui/Toast';
 import { NotificationListener } from './components/NotificationListener';
 import { SubscriptionProvider } from './context/SubscriptionContext';
@@ -30,6 +30,36 @@ const DiagnosticsPage = lazy(() => import('./pages/DiagnosticsPage'));
 const SubscriptionPage = lazy(() => import('./pages/SubscriptionPage'));
 const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage'));
 const TermsOfServicePage = lazy(() => import('./pages/TermsOfServicePage'));
+
+// Hides the native splash once auth has resolved and data is ready (or after a safety timeout).
+// Sits inside both AuthProvider and DataProvider so it can read both states.
+function SplashController() {
+    const { loading: authLoading } = useAuth();
+    const { initialLoadComplete } = useData();
+    const hasHidden = useRef(false);
+
+    useEffect(() => {
+        if (!Capacitor.isNativePlatform()) return;
+        if (!authLoading && initialLoadComplete && !hasHidden.current) {
+            hasHidden.current = true;
+            SplashScreen.hide();
+        }
+    }, [authLoading, initialLoadComplete]);
+
+    // Safety fallback — never leave the splash up forever
+    useEffect(() => {
+        if (!Capacitor.isNativePlatform()) return;
+        const t = setTimeout(() => {
+            if (!hasHidden.current) {
+                hasHidden.current = true;
+                SplashScreen.hide();
+            }
+        }, 8000);
+        return () => clearTimeout(t);
+    }, []);
+
+    return null;
+}
 
 function RootRedirect() {
     const { user, loading } = useAuth();
@@ -58,17 +88,11 @@ function RootRedirect() {
 function App() {
     useEffect(() => {
         if (Capacitor.isNativePlatform()) {
-            // Set a consistent status bar style
             StatusBar.setStyle({ style: Style.Light });
-
             if (Capacitor.getPlatform() === 'ios') {
                 StatusBar.setOverlaysWebView({ overlay: true });
                 document.body.classList.add('platform-ios');
             }
-
-            // Hold the splash for 1 second then reveal the sailboat loader
-            const t = setTimeout(() => SplashScreen.hide(), 1000);
-            return () => clearTimeout(t);
         }
     }, []);
 
@@ -78,11 +102,12 @@ function App() {
                 <DataProvider>
                     <AuthProvider>
                         <SubscriptionProvider>
+                            <SplashController />
                             <NotificationListener />
                             <div className="min-h-screen bg-background text-foreground font-sans antialiased">
                                 <BrowserRouter>
                                     <OfflineBanner />
-                                   
+
                                     <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-background"><SailboatLoader /></div>}>
                                         <Routes>
                                             <Route path="/" element={<RootRedirect />} />

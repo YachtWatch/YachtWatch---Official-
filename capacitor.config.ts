@@ -4,6 +4,9 @@ const config: CapacitorConfig = {
   appId: 'com.yachtwatch.ios',
   appName: 'YachtWatch',
   webDir: 'dist',
+  ios: {
+    backgroundColor: '#1B2A6B',
+  },
   plugins: {
     SplashScreen: {
       launchShowDuration: 1000,

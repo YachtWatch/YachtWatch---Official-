@@ -95,8 +95,11 @@ function QRScanner({ onScan, onClose }: { onScan: (code: string) => void; onClos
 
     return (
         <div className="fixed inset-0 z-50 bg-black flex flex-col" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-            <div className="flex items-center justify-between px-4 py-3">
-                <h3 className="font-semibold text-lg text-white">Scan QR Code</h3>
+            <div className="flex items-center justify-between px-4 h-16 border-b border-white/10">
+                <div className="flex items-center gap-2 font-bold text-xl text-white">
+                    <Anchor className="h-6 w-6" />
+                    <span>YachtWatch</span>
+                </div>
                 <button onClick={onClose} className="p-2 rounded-full hover:bg-white/10">
                     <X className="h-6 w-6 text-white" />
                 </button>
@@ -275,7 +278,17 @@ export default function CrewDashboard() {
 
     if (!activeVessel) {
         return (
-            <div className="container max-w-md mx-auto py-20 px-4">
+            <div className="min-h-screen bg-background text-foreground">
+                <header className="border-b bg-card relative z-50 safe-area-pt">
+                    <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+                        <div className="flex items-center gap-2 font-bold text-xl text-primary">
+                            <Anchor className="h-6 w-6" />
+                            <span>YachtWatch</span>
+                        </div>
+                        <ProfileDropdown />
+                    </div>
+                </header>
+                <div className="container max-w-md mx-auto py-10 px-4">
                 <Card>
                     <CardHeader>
                         <CardTitle>Join a Vessel</CardTitle>
@@ -355,6 +368,7 @@ export default function CrewDashboard() {
                     >
                         Sign out
                     </button>
+                </div>
                 </div>
             </div>
         );
