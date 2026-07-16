@@ -22,4 +22,16 @@ One maintenance habit: every few weeks, merge `main` *into* a long-lived parked 
 
 -->
 
-_No parked features logged yet. Example of something that belongs here: the **weather feature** — if built on a `feature/weather` branch but held back from main because it needs location permissions and is unproven, add an entry here pointing at that branch + its Draft PR._
+## 2026-06-30 — Deep-link join landing page (`/join/:code` web flow)
+- **Author:** Josh
+- **Status:** parked
+- **Branch:** `feature/deep-link-join` (commit `4959994`)
+- **The concept:** A web landing page at `/join/:code` that captures an invite code from a tapped universal link **when the app isn't installed**, persists it (`localStorage` `pendingJoinCode`), and redirects to the App/Play store — so after the user installs, the app can auto-join the vessel. The seamless "tap link → install → auto-join" onboarding.
+- **What's built so far:** `src/pages/JoinPage.tsx` exists (detects platform, stores `pendingJoinCode`, redirects to store) but is **orphaned** — it is not imported and not added to the router in `src/App.tsx`, so it never renders. Also on the branch: `public/.well-known/` (apple-app-site-association + assetlinks.json) — but these are **redundant**: the live `join.yachtwatch.co` already serves a working AASA (`curl` → 200; iOS universal links already work in TestFlight).
+- **Blockers / open questions:**
+  1. JoinPage store URLs are placeholders (`id000000000`) — real iOS URL is now known (`id6760187387`), Play URL still needed.
+  2. Nothing reads `pendingJoinCode` back after install to complete the auto-join. `CrewDashboard` currently handles codes via the `appUrlOpen` listener + path match + QR scan, **not** via `pendingJoinCode`.
+  3. Android app-links aren't configured natively — `AndroidManifest.xml` has no `VIEW` intent-filter, and `assetlinks.json` still has `REPLACE_WITH_YOUR_SHA256_SIGNING_FINGERPRINT`.
+  4. **Is it even needed?** The practical no-app case is now covered by the App Store badge on the landing page (shipped 2026-06-30, see DEVLOG). This heavier flow only matters if you want true auto-join-after-install rather than just "get them to the store."
+- **How to resume:** `git checkout feature/deep-link-join`; add `<Route path="/join/:code" element={<JoinPage/>} />` in `src/App.tsx` **before** the `*` catch-all; fill real store URLs; add `pendingJoinCode` pickup in `CrewDashboard` after login; for Android add the `VIEW` intent-filter + real signing fingerprint.
+- **Why parked, not shipped:** orphaned + placeholder URLs would be dead code on main, and the lightweight badge fix already closes the practical gap. Kept on a branch so the work isn't lost.

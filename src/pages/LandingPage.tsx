@@ -168,7 +168,7 @@ export default function LandingPage() {
 
                     {/* App Badges - Bottom Right */}
                     <div className="absolute -bottom-32 right-0 flex items-center gap-3">
-                        <a href="#" className="hover:opacity-80 transition-opacity block">
+                        <a href="https://apps.apple.com/app/id6760187387" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity block">
                             <img src="/app-store-badge.svg" alt="Download on the App Store" className="h-8 w-auto" />
                         </a>
                         <a href="#" className="hover:opacity-80 transition-opacity block">

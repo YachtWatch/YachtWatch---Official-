@@ -25,6 +25,17 @@ For features that are **built but parked** (not yet merged), see [ROADMAP.md](RO
   - **App Store Connect:** submit with **NO in-app purchase attached** (attaching the old tier IAPs caused the v1.2 2.1(b) rejection); update App Privacy answers (Usage/Diagnostics/Identifiers, Precise Location = No); build with the production `.env`. Ordered steps at the top of `docs/PRE-SUBMISSION.md`; reviewer notes in `docs/APP-REVIEW-NOTES.md` (fill in `<FILL IN>` demo creds).
   - **September (paywall on):** fix CustomPaywall price prominence (v1.2 3.1.2(c)), add EULA/Terms, accept Paid Apps Agreement, re-attach the single IAP.
   - Minor: this entry may create a trivial merge conflict with PR #3's 2026-06-30 DEVLOG entry (both prepend) — keep both, newest first.
+  - **Update 2026-07-16:** PR #3 and PR #4 merged into `main` (cofounder + Claude). Both are now live on `main`, no longer pending.
+
+## 2026-06-30 — Landing-page App Store badge now links to the live store (+ .env.example)
+- **Author:** Josh
+- **Commit/PR:** covers `7e48199`..`6499836`
+- **Branch:** final-touches (pending merge to main)
+- **What changed:** The "Download on the App Store" badge in the `LandingPage` hero previously had `href="#"` (a dead link). It now points to `https://apps.apple.com/app/id6760187387`. Also added `.env.example` — a template documenting the required build env vars (placeholders only, no secrets).
+- **Why:** A crew member who taps an invite link (`join.yachtwatch.co/join/<CODE>`) **without the app installed** gets bounced by the SPA catch-all to the web landing page — there is no `/join` web route. Previously every download CTA on that page was a dead `#`, so they had no working path to install. The badge now gives them one. Chosen as the lightweight fix over finishing the heavier JoinPage store-redirect flow (see ROADMAP "Deep-link join landing page").
+- **Key files:** `src/pages/LandingPage.tsx` — iOS App Store badge anchor now has the real `href` + `target="_blank"`; `.env.example` — new doc template.
+- **How to verify:** Load the landing page on web; the App Store badge links to `id6760187387`. ⚠️ That URL **404s until the public App Store listing goes live** — the app is currently TestFlight-only (Apple lookup API returns `resultCount: 0`). It resolves automatically once released; no code change needed. Verified web-only: the badge is unreachable in the native app (`RootRedirect` bypasses `LandingPage` on native) and is absent from the `dist/` build — **zero App Store submission impact** (confirmed by building and grepping `dist/`).
+- **Gotchas / follow-ups:** The **Google Play badge** next to it is still `href="#"` (dead) — left as-is for the iOS-first launch; wire it up when Android ships. The iOS badge link 404s during the TestFlight window before public release — decided (Josh) to leave it since it self-heals the moment the app goes live.
 
 ## 2026-06-23 — Supabase fallback removed — env vars now REQUIRED at build time ⚠️
 - **Author:** cofounder
