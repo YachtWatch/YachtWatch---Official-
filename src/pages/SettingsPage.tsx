@@ -281,8 +281,12 @@ export default function SettingsPage() {
                                 className="w-full gap-2 mt-4"
                                 onClick={async () => {
                                     if (window.confirm("Are you sure you want to delete your account? This will disconnect you from your vessels and permanently delete your data.")) {
-                                        await deleteAccount();
-                                        navigate('/');
+                                        try {
+                                            await deleteAccount();
+                                            navigate('/');
+                                        } catch {
+                                            window.alert("Sorry — we couldn't delete your account just now. Please try again, or contact support if the problem persists.");
+                                        }
                                     }
                                 }}
                             >

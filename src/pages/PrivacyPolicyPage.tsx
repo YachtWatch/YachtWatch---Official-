@@ -51,6 +51,8 @@ export default function PrivacyPolicyPage() {
                             <li>Device type</li>
                             <li>Operating system version</li>
                             <li>Session identifiers</li>
+                            <li>Usage and analytics data</li>
+                            <li>Crash and diagnostic data</li>
                             <li>Subscription and purchase metadata</li>
                         </ul>
                     </Section>
@@ -87,7 +89,7 @@ export default function PrivacyPolicyPage() {
 
                     <Section number="8" title="Third-Party Services">
                         <p>YachtWatch uses trusted third-party service providers to operate the platform. These providers may process limited data on our behalf under strict security and confidentiality obligations.</p>
-                        <p className="mt-2">Examples include cloud hosting providers, infrastructure services, and analytics or operational tools required to maintain the service.</p>
+                        <p className="mt-2">Examples include cloud hosting and infrastructure providers, product analytics providers, and error and performance diagnostics providers used to operate, secure, and improve the service.</p>
                     </Section>
 
                     <Section number="9" title="Payments & Subscriptions">

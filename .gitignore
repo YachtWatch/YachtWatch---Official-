@@ -119,3 +119,6 @@ ios/App/App/public
 ios/App/Podfile.lock
 ios/App/Pods
 .vercel
+
+# Supabase CLI local state
+supabase/.temp/
