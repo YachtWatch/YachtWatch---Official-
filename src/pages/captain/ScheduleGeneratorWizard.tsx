@@ -357,14 +357,18 @@ export default function ScheduleGeneratorWizard() {
     };
 
     const generateSchedule = () => {
-        if (endDate && startDate && new Date(endDate) < new Date(startDate)) {
+        if (endDate && startDate && parseDateStr(endDate)!.getTime() < parseDateStr(startDate)!.getTime()) {
             alert('End date must be after start date.');
             return;
         }
 
         const parseHourMin = (t: string) => t.split(':').map(Number) as [number, number];
 
-        const startDateTime = new Date(startDate);
+        // Date-only strings ("YYYY-MM-DD") parse as UTC midnight in JS, which lands on the
+        // previous calendar day for any timezone behind UTC once .setHours() is applied.
+        // Use parseDateStr (local midnight) so the generated schedule starts on the day the
+        // captain actually picked.
+        const startDateTime = parseDateStr(startDate)!;
         if (watchType === 'Navigation') {
             const [h, m] = parseHourMin(startTime);
             startDateTime.setHours(h, m, 0, 0);
@@ -373,7 +377,7 @@ export default function ScheduleGeneratorWizard() {
             startDateTime.setHours(0, 0, 0, 0);
         }
 
-        const endDateTime = new Date(endDate);
+        const endDateTime = parseDateStr(endDate)!;
         if (watchType === 'Navigation') {
             const [h, m] = parseHourMin(endTime);
             endDateTime.setHours(h, m, 0, 0);

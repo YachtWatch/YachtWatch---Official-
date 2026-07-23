@@ -283,7 +283,7 @@ export default function CaptainDashboard() {
 
     return (
         <div className="min-h-screen bg-background text-foreground">
-            <header className="border-b bg-card relative z-50 safe-area-pt print:hidden">
+            <header className="border-b bg-card sticky top-0 z-50 safe-area-pt print:hidden">
                 <div className="container mx-auto px-4 h-16 flex items-center justify-between pt-[5px]">
                     <div className="flex items-center gap-2 font-bold text-xl text-primary">
                         <Anchor className="h-6 w-6" />

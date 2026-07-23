@@ -297,7 +297,7 @@ export default function CrewDashboard() {
     if (!effectiveVessel) {
         return (
             <div className="min-h-screen bg-background text-foreground">
-                <header className="border-b bg-card relative z-50 safe-area-pt">
+                <header className="border-b bg-card sticky top-0 z-50 safe-area-pt">
                     <div className="container mx-auto px-4 h-16 flex items-center justify-between">
                         <div className="flex items-center gap-2 font-bold text-xl text-primary">
                             <Anchor className="h-6 w-6" />
@@ -408,7 +408,7 @@ export default function CrewDashboard() {
 
     return (
         <div className="min-h-screen bg-background text-foreground">
-            <header className="border-b bg-card relative z-50 safe-area-pt">
+            <header className="border-b bg-card sticky top-0 z-50 safe-area-pt">
                 <div className="container mx-auto px-4 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-2 font-bold text-xl text-primary">
                         <Anchor className="h-6 w-6" />
